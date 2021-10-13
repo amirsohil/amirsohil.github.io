@@ -1,2 +1,2 @@
-# mosohyl.github.io
+# amirsohil.github.io
 Personal Website
