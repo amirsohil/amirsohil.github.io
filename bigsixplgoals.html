@@ -1,0 +1,206 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>portfolio [amir // mōso]</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<script src="https://d3js.org/d3.v6.js"></script>
+		
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+	</head>
+	<body class="is-preload">
+
+		<!-- Page Wrapper -->
+			<div id="page-wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<h1 style="color:#CDFD50"><a href="index.html">Mohamed Amir Sohil Bishrul Hafi</a></h1>
+						<nav>
+							<a href="#menu" style="color:#CDFD50">Menu</a>
+						</nav>
+					</header>
+
+				<!-- Menu -->
+					<nav id="menu">
+						<div class="inner">
+							<h2 style="color:#000000">Menu</h2>
+							<ul class="links">
+								<li><a href="index.html" style="color:#000000;font-weight: bold">Home</a></li>
+								<li><a href="about.html" style="color:#000000;font-weight: bold">About</a></li>
+								<li><a href="portfolio.html" style="color:#000000;font-weight: bold">Portfolio</a></li>
+								<li><a href="articles.html" style="color:#000000;font-weight: bold">Articles</a></li>
+							</ul>
+							<a href="#" class="close">Close</a>
+						</div>
+					</nav>
+
+				<!-- Wrapper -->
+					<section id="wrapper">
+						<header style="margin-bottom: 0px; padding-bottom: 0px;">
+							<div class="inner">
+								<h2>Goals Scored in the Premier League by 'the Big Six'</h2>
+								<p>Visualisation</p>		
+							</div>
+						</header>
+
+						<!-- Content -->
+							<div class="wrapper">
+								<div class="inner">
+									<p align="justify">
+										This visualisation showcases the total number of goals scored in the Premier League (from seasons 1992/93 to 2023/24) by 'The Big Six' 
+										clubs: Arsenal, Chelsea, Liverpool, Manchester City, Manchester United and Tottenham Hotspur.
+										<br><br>
+										<b>Major tools utilised:</b>
+										&nbsp
+										<img src="images/d3.png" title="D3.js" height="25">
+									</p>								
+								</div>
+							</div>
+
+					</section>
+					<div id="bigsixgoals" align="center"></div>
+					<script>
+					// setting the dimensions and margins of the graph
+					const margin = {top: 20, right: 30, bottom: 0, left: 30},
+						  width = 1000 - margin.left - margin.right,
+						  height = 700 - margin.top - margin.bottom;
+						  
+					// appending the svg object to the body of the page
+					const svg = d3.select("#bigsixgoals")
+								  .append("svg")
+								  .attr("width", width + margin.left + margin.right)
+								  .attr("height", height + margin.top + margin.bottom)
+								  .append("g")
+								  .attr("transform",
+								  `translate(${margin.left}, ${margin.top})`);
+					
+					// parsing the data
+					d3.csv("https://raw.githubusercontent.com/amirsohil/datafiles/refs/heads/main/GoalsScored.csv").then(function(data) {
+
+					// list of groups = header of the csv files
+					const keys = data.columns.slice(1)
+					
+					// adding the x-axis
+					const x = d3.scaleLinear()
+								.domain(d3.extent(data, function(d) { return d.Season; }))
+								.range([ 0, width ]);
+					
+					svg.append("g")
+					   .attr("transform", `translate(0, ${height*0.8})`)
+					   .call(
+							 d3.axisBottom(x)
+							   .tickSize(-height * 0.7)
+							   .tickValues(d3.range(1992, 2024))
+							   .tickFormat((d, i) => i % 3 === 0 ? `${d}/${String(d + 1).slice(-2)}` : "")
+							   )
+					   .selectAll("text")
+					   .style("font-family", "'Familjen Grotesk', sans-serif")
+					   .select(".domain").remove()
+					
+					// customisation
+					svg.selectAll(".tick line").attr("stroke", "#333333")
+					
+					// adding X axis label:
+					svg.append("text")
+					   .attr("text-anchor", "end")
+					   .attr("x", width)
+					   .attr("y", height-70 )
+					   .style("fill", "white")
+					   .style("font-family", "'Familjen Grotesk', sans-serif")
+					   .text("Season");
+					   
+					// adding y-axis
+					const y = d3.scaleLinear()
+							    .domain([-500, 400])
+								.range([height, 0]);
+								
+					// colour palette
+					const color = d3.scaleOrdinal()
+									.domain(keys)
+									.range(["#EF0107", "#034694", "#C8102E", "#6CABDD", "#DA291C", "#132257"]);
+
+					// stacking the data
+					const stackedData = d3.stack()
+										  .offset(d3.stackOffsetSilhouette)
+										  .keys(keys)    
+										  (data);
+										  
+					// creating a tooltip
+					const Tooltip = svg.append("text")
+									   .attr("x", 0)
+									   .attr("y", 0)
+									   .style("opacity", 0)
+									   .style("font-size", 15)
+									   .style("fill", "white")
+									   .style("font-family", "'Familjen Grotesk', sans-serif")
+
+					// functions that change the tooltip when user hover / move / leave a cell
+					const mouseover = function(event,d) {
+														 Tooltip.style("opacity", 1)
+														 d3.selectAll(".myArea").style("opacity", .3)
+														 d3.select(this)
+														   .style("stroke", "black")
+														   .style("opacity", 1)
+														   } 
+											
+					const mousemove = function(event,d,i) {
+														   grp = d.key
+														   Tooltip.text(grp)
+														   }
+														   
+					const mouseleave = function(event,d) {
+														  Tooltip.style("opacity", 0)
+														  d3.selectAll(".myArea").style("opacity", 1).style("stroke", "none")
+														  }
+														 
+					// generating area
+					const area = d3.area()
+								   .x(function(d) { return x(d.data.Season); })
+								   .y0(function(d) { return y(d[0]); })
+								   .y1(function(d) { return y(d[1]); })
+								   .curve(d3.curveCatmullRom);
+
+					// showing the areas
+					svg.selectAll("mylayers")
+					   .data(stackedData)
+					   .join("path")
+					   .attr("class", "myArea")
+					   .style("fill", function(d) { return color(d.key); })
+					   .attr("d", area)
+					   .on("mouseover", mouseover)
+					   .on("mousemove", mousemove)
+					   .on("mouseleave", mouseleave)
+					   })
+					</script>
+
+				<!-- Footer -->
+					<section id="footer">
+						<div class="inner">
+							<ul class="icons" align = "center">
+								<li><a href="https://www.linkedin.com/in/amir-sohil/" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+								<li><a href="mailto:bhmasohail@gmail.com" class="icon solid fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+							</ul>
+							
+							<ul class="copyright">
+								<li>&copy; Mohamed Amir Sohil Bishrul Hafi. All rights reserved.</li><li>Base Template: <a href="http://html5up.net">HTML5 UP</a></li>
+							</ul>
+						</div>
+					</section>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
