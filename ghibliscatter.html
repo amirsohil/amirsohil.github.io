@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Studio Ghibli — Budget vs. Revenue</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:       #1a1612;
+      --paper:     #f5f0e8;
+      --cream:     #ede7d9;
+      --rust:      #c0392b;
+      --gold:      #b8860b;
+      --muted:     #8a7f72;
+      --line:      #cec5b5;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', serif;
+      overflow-x: hidden;
+    }
+
+    /* ── GRAIN OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 999;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 3rem 4rem 1.5rem;
+      border-bottom: 1px solid var(--line);
+      display: flex; align-items: flex-end; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    header .title-block h1 {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 300; letter-spacing: 0.05em;
+      line-height: 1.1;
+    }
+    header .title-block h1 em {
+      font-style: italic; color: var(--rust);
+    }
+    header .title-block p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--muted);
+      margin-top: 0.5rem;
+    }
+    header .legend {
+      display: flex; gap: 2rem; align-items: center;
+      font-size: 0.82rem; color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+    .legend-item { display: flex; align-items: center; gap: 0.5rem; }
+    .legend-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .legend-dot.miyazaki  { background: var(--rust); }
+    .legend-dot.takahata  { background: var(--gold); }
+    .legend-dot.other     { background: var(--muted); }
+
+    /* ── MAIN LAYOUT ── */
+    main {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 0;
+      min-height: calc(100vh - 130px);
+    }
+
+    /* ── CHART PANEL ── */
+    #chart-panel {
+      padding: 2.5rem 2rem 2.5rem 4rem;
+      position: relative;
+    }
+
+    svg#scatter {
+      width: 100%;
+      height: 540px;
+      overflow: visible;
+    }
+
+    .axis path, .axis line {
+      stroke: var(--line);
+    }
+    .axis text {
+      fill: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+    }
+    .axis-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      fill: var(--muted);
+    }
+
+    /* grid lines */
+    .grid line { stroke: var(--line); stroke-opacity: 0.5; }
+    .grid path { display: none; }
+
+    /* dots */
+    .dot {
+      cursor: pointer;
+      transition: r 0.18s ease, opacity 0.18s ease;
+    }
+    .dot:hover { opacity: 1 !important; }
+
+    /* breakeven line */
+    .breakeven { stroke: var(--line); stroke-dasharray: 4 4; stroke-width: 1; }
+    .breakeven-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; fill: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── TOOLTIP ── */
+    #tooltip {
+      position: fixed;
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      max-width: 300px;
+    }
+    #tooltip.visible { opacity: 1; }
+
+    .tt-card {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 0;
+      border-radius: 2px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(26,22,18,0.35);
+    }
+    .tt-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+
+      display: block;
+      filter: sepia(0.15);
+    }
+    .tt-body { padding: 1rem 1.1rem; }
+    .tt-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 0.2rem;
+    }
+    .tt-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      color: #a09585;
+      margin-bottom: 0.6rem;
+      text-transform: uppercase;
+    }
+    .tt-blurb {
+      font-size: 0.82rem;
+      line-height: 1.55;
+      color: #d5cfc6;
+      font-style: italic;
+      margin-bottom: 0.7rem;
+    }
+    .tt-stats {
+      display: flex; gap: 1rem;
+      margin-bottom: 0.6rem;
+    }
+    .tt-stat { text-align: center; }
+    .tt-stat .val {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--paper);
+    }
+    .tt-stat .lbl {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #7a7068;
+    }
+    .tt-notes {
+      font-size: 0.65rem;
+      color: #7a7068;
+      font-family: 'DM Mono', monospace;
+      line-height: 1.4;
+      border-top: 1px solid #2e2a25;
+      padding-top: 0.5rem;
+      margin-top: 0.2rem;
+    }
+    .tt-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.07em;
+      color: var(--rust);
+      margin-top: 0.55rem;
+      text-transform: uppercase;
+    }
+
+    /* ── RIGHT PANEL ── */
+    #info-panel {
+      border-left: 1px solid var(--line);
+      padding: 2.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    #panel-idle {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      color: var(--muted);
+      text-align: center;
+      gap: 1rem;
+    }
+    #panel-idle .idle-icon {
+      font-size: 3rem;
+      opacity: 0.25;
+    }
+    #panel-idle p {
+      font-size: 0.85rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1.6;
+    }
+
+    #panel-content { display: none; }
+    #panel-content.active { display: block; }
+
+    #panel-movie-title {
+      font-size: 1.6rem;
+      font-weight: 300;
+      line-height: 1.2;
+      margin-bottom: 0.25rem;
+    }
+    #panel-movie-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.2rem;
+    }
+
+    /* stills grid */
+    #stills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 6px;
+      margin-bottom: 1.2rem;
+    }
+    #stills-grid img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      display: block;
+      border-radius: 1px;
+      filter: sepia(0.1);
+      transition: filter 0.2s;
+      cursor: zoom-in;
+    }
+    #stills-grid img:first-child {
+      grid-column: 1 / 3;
+      height: 170px;
+    }
+    #stills-grid img:hover { filter: sepia(0); }
+
+    #panel-divider {
+      height: 1px;
+      background: var(--line);
+      margin: 0.3rem 0;
+    }
+
+    #panel-stats {
+      display: flex; gap: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .panel-stat .val {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.05rem;
+      color: var(--ink);
+    }
+    .panel-stat .lbl {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .roi-positive { color: #4a7c59; }
+    .roi-negative { color: var(--rust); }
+
+    #panel-blurb {
+      font-size: 0.9rem;
+      line-height: 1.65;
+      font-style: italic;
+      color: #3a342e;
+      margin-bottom: 0.8rem;
+    }
+    #panel-notes {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── LIGHTBOX ── */
+    #lightbox {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(26,22,18,0.9);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      cursor: zoom-out;
+    }
+    #lightbox.open { display: flex; }
+    #lightbox img {
+      max-width: 90vw;
+      max-height: 88vh;
+      object-fit: contain;
+      border-radius: 2px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 1rem 4rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      display: flex; justify-content: space-between;
+      flex-wrap: wrap; gap: 0.5rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
+      #info-panel { border-left: none; border-top: 1px solid var(--line); }
+      header { padding: 2rem; }
+      #chart-panel { padding: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <h1>Studio Ghibli &mdash; <em>Budget vs. Revenue</em></h1>
+    <p>25 films &nbsp;·&nbsp; 1984–2023 &nbsp;·&nbsp; figures in millions USD</p>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot miyazaki"></div>Hayao Miyazaki</div>
+    <div class="legend-item"><div class="legend-dot takahata"></div>Isao Takahata</div>
+    <div class="legend-item"><div class="legend-dot other"></div>Other directors</div>
+  </div>
+</header>
+
+<main>
+  <div id="chart-panel">
+    <svg id="scatter"></svg>
+  </div>
+  <div id="info-panel">
+    <div id="panel-idle">
+      <div class="idle-icon">◎</div>
+      <p>Click any dot<br>to view stills<br>from the film</p>
+    </div>
+    <div id="panel-content">
+      <div id="panel-movie-title"></div>
+      <div id="panel-movie-meta"></div>
+      <div id="stills-grid">
+        <img id="still1" src="" alt="Still 1"/>
+        <img id="still2" src="" alt="Still 2"/>
+        <img id="still3" src="" alt="Still 3"/>
+      </div>
+      <div id="panel-divider"></div>
+      <div id="panel-stats"></div>
+      <p id="panel-blurb"></p>
+      <p id="panel-notes"></p>
+    </div>
+  </div>
+</main>
+
+<div id="tooltip"><div class="tt-card">
+  <img class="tt-img" id="tt-img" src="" alt=""/>
+  <div class="tt-body">
+    <div class="tt-title" id="tt-title"></div>
+    <div class="tt-meta"  id="tt-meta"></div>
+    <div class="tt-blurb" id="tt-blurb"></div>
+    <div class="tt-stats">
+      <div class="tt-stat"><div class="val" id="tt-budget"></div><div class="lbl">Budget</div></div>
+      <div class="tt-stat"><div class="val" id="tt-revenue"></div><div class="lbl">Revenue</div></div>
+      <div class="tt-stat"><div class="val" id="tt-runtime"></div><div class="lbl">Runtime</div></div>
+    </div>
+    <div class="tt-notes" id="tt-notes"></div>
+    <div class="tt-hint">↗ click to view stills</div>
+  </div>
+</div></div>
+
+<div id="lightbox"><img id="lb-img" src="" alt=""/></div>
+
+<footer>
+  <span>Sources vary by film — see individual notes</span>
+  <span>Visualisation by Mohamed Amir Sohil Bishrul Hafi</span>
+</footer>
+
+<script>
+const data = [
+  {movie:"Nausicaä of the Valley of the Wind",year:1984,director:"Hayao Miyazaki",blurb:"Warrior and pacifist Princess Nausicaä desperately struggles to prevent two warring nations from destroying themselves and their dying planet.",runtime:116,budget:0.76,revenue:9.01,notes:"Sources: Wikipedia, Box Office Mojo",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/nausicaa.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/nausicaa1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/nausicaa2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/nausicaa3.jpg"},
+  {movie:"Castle in the Sky",year:1986,director:"Hayao Miyazaki",blurb:"Pazu's life changes when he meets Sheeta, a girl whom pirates are chasing for her crystal amulet, which has the potential to locate Laputa, a legendary castle floating in the sky.",runtime:124,budget:3.3,revenue:6.53,notes:"Sources: Astro Boy Productions Wiki, Box Office Mojo",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/castleinthesky.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/castleinthesky1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/castleinthesky2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/castleinthesky3.jpg"},
+  {movie:"Grave of the Fireflies",year:1988,director:"Isao Takahata",blurb:"A young boy and his little sister struggle to survive in Japan during World War II.",runtime:88,budget:3.7,revenue:13.3,notes:"Sources: IMDb, Wikipedia",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/graveofthefireflies.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/graveofthefireflies1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/graveofthefireflies2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/graveofthefireflies3.jpg"},
+  {movie:"My Neighbor Totoro",year:1988,director:"Hayao Miyazaki",blurb:"When two girls move to the country to be near their ailing mother, they have adventures with the wondrous forest spirits who live nearby.",runtime:86,budget:3.7,revenue:30.4,notes:"Sources: Box Office Mojo",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/myneighbourtotoro.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/myneighbourtotoro1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/myneighbourtotoro2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/myneighbourtotoro3.jpg"},
+  {movie:"Kiki's Delivery Service",year:1989,director:"Hayao Miyazaki",blurb:"Along with her black cat Jiji, Kiki settles in a seaside town and starts a high-flying delivery service.",runtime:102,budget:5.8,revenue:41.8,notes:"Sources: Wikipedia",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/kikisdeliveryservice.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/kikisdeliveryservice1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/kikisdeliveryservice2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/kikisdeliveryservice3.jpg"},
+  {movie:"Only Yesterday",year:1991,director:"Isao Takahata",blurb:"A twenty-seven-year-old office worker travels to the countryside while reminiscing about her childhood in Tokyo.",runtime:119,budget:2.5,revenue:23.6,notes:"Sources: Reddit, Wikipedia",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/onlyyesterday.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/onlyyesterday1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/onlyyesterday2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/onlyyesterday3.jpg"},
+  {movie:"Porco Rosso",year:1992,director:"Hayao Miyazaki",blurb:"In 1930s Italy, a veteran World War I pilot is cursed to look like an anthropomorphic pig.",runtime:93,budget:7.1,revenue:42.6,notes:"Sources: Wikipedia",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/porcorosso.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/porcorosso1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/porcorosso2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/porcorosso3.jpg"},
+  {movie:"Ocean Waves",year:1993,director:"Tomomi Mochizuki",blurb:"As a young man returns home after his first year away at college he recalls his senior year of high school and the iron-willed, big city girl that turned his world upside down.",runtime:72,budget:0,revenue:0.089,notes:"TV-only debut. Production budget unavailable. Sources: Box Office Mojo",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/oceanwaves.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/oceanwaves1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/oceanwaves2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/oceanwaves3.jpg"},
+  {movie:"Pom Poko",year:1994,director:"Isao Takahata",blurb:"A community of magical shape-shifting raccoon dogs struggle to prevent their forest home from being destroyed by urban development.",runtime:119,budget:12,revenue:36,notes:"Sources: Reddit, Ghibli Wiki",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/pompoko.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/pompoko1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/pompoko2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/pompoko3.jpg"},
+  {movie:"Whisper of the Heart",year:1995,director:"Yoshifumi Kondô",blurb:"A love story between a girl who loves reading books and a boy who has previously checked out all of the library books she chooses.",runtime:111,budget:7,revenue:31.5,notes:"Sources: Reddit, Wikipedia",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/whisperoftheheart.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/whisperoftheheart1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/whisperoftheheart2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/whisperoftheheart3.jpg"},
+  {movie:"Princess Mononoke",year:1997,director:"Hayao Miyazaki",blurb:"While seeking to cure himself of a curse, young warrior Ashitaka stumbles into a conflict between the people of Iron Town and Princess Mononoke, a girl raised by wolves.",runtime:133,budget:20,revenue:177.64,notes:"Sources: Wikipedia, Box Office Mojo",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/princessmononoke.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/princessmononoke1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/princessmononoke2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/princessmononoke3.jpg"},
+  {movie:"My Neighbors the Yamadas",year:1999,director:"Isao Takahata",blurb:"The life and misadventures of a family in contemporary Japan.",runtime:104,budget:15.27,revenue:11.91,notes:"Sources: Wikipedia",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/myneighbourstheyamadas.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/myneighbourstheyamadas1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/myneighbourstheyamadas2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/myneighbourstheyamadas3.jpg"},
+  {movie:"Spirited Away",year:2001,director:"Hayao Miyazaki",blurb:"During her family's move to the suburbs, a sullen 10-year-old girl wanders into a world ruled by gods, witches and spirits, and where humans are changed into beasts.",runtime:125,budget:19.2,revenue:395.8,notes:"Sources: Wikipedia",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/spiritedaway.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/spiritedaway1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/spiritedaway2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/spiritedaway3.jpg"},
+  {movie:"The Cat Returns",year:2002,director:"Hiroyuki Morita",blurb:"After helping a cat, a seventeen-year-old girl finds herself involuntarily engaged to a cat Prince in a magical world.",runtime:75,budget:20,revenue:54.67,notes:"Sources: Reddit, Wikipedia",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/thecatreturns.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/thecatreturns1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/thecatreturns2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/thecatreturns3.jpg"},
+  {movie:"Howl's Moving Castle",year:2004,director:"Hayao Miyazaki",blurb:"When an unconfident young woman is cursed with an old body by a spiteful witch, her only chance of breaking the spell lies with a self-indulgent young wizard and his walking castle.",runtime:119,budget:24,revenue:235.18,notes:"Sources: Wikipedia, Box Office Mojo",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/howlsmovingcastle.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/howlsmovingcastle1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/howlsmovingcastle2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/howlsmovingcastle3.jpg"},
+  {movie:"Tales from Earthsea",year:2006,director:"Gorô Miyazaki",blurb:"In a mythical land, a man and a young boy investigate a series of unusual occurrences.",runtime:115,budget:22,revenue:68.67,notes:"Sources: Wikipedia, Box Office Mojo",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/talesfromearthsea.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/talesfromearthsea1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/talesfromearthsea2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/talesfromearthsea3.jpg"},
+  {movie:"Ponyo on the Cliff by the Sea",year:2008,director:"Hayao Miyazaki",blurb:"A five-year-old boy develops a relationship with Ponyo, a young goldfish princess who longs to become a human after falling in love with him.",runtime:101,budget:34,revenue:206.47,notes:"Sources: IMDb, Box Office Mojo",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/ponyoonthecliffbythesea.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/ponyoonthecliffbythesea1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/ponyoonthecliffbythesea2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/ponyoonthecliffbythesea3.jpg"},
+  {movie:"Arrietty",year:2010,director:"Hiromasa Yonebayashi",blurb:"The Clock family are four-inch-tall people who live anonymously in another family's residence. Life changes when their daughter Arrietty is discovered.",runtime:94,budget:23,revenue:148.97,notes:"Sources: Reddit, Box Office Mojo",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/arrietty.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/arrietty1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/arrietty2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/arrietty3.jpg"},
+  {movie:"From Up on Poppy Hill",year:2011,director:"Gorô Miyazaki",blurb:"A group of Yokohama teens look to save their school's clubhouse from the wrecking ball in preparations for the 1964 Tokyo Olympics.",runtime:91,budget:28,revenue:61.46,notes:"Sources: Wikipedia, Box Office Mojo",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/fromuponpoppyhill.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/fromuponpoppyhill1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/fromuponpoppyhill2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/fromuponpoppyhill3.jpg"},
+  {movie:"The Wind Rises",year:2013,director:"Hayao Miyazaki",blurb:"Jiro Horikoshi studies assiduously to fulfill his aim of becoming an aeronautical engineer. As WWII begins, fighter aircraft designed by him end up getting used by the Japanese Empire.",runtime:126,budget:30,revenue:136.48,notes:"Sources: IMDb, Box Office Mojo",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/thewindrises.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/thewindrises1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/thewindrises2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/thewindrises3.jpg"},
+  {movie:"The Tale of The Princess Kaguya",year:2013,director:"Isao Takahata",blurb:"Kaguya is a beautiful young woman coveted by five nobles. To avoid marrying a stranger she doesn't love, she sends her suitors on seemingly impossible tasks.",runtime:137,budget:49.3,revenue:24.48,notes:"Sources: IMDb, Box Office Mojo",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/thetaleoftheprincesskaguya.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/thetaleoftheprincesskaguya1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/thetaleoftheprincesskaguya2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/thetaleoftheprincesskaguya3.jpg"},
+  {movie:"When Marnie Was There",year:2014,director:"Hiromasa Yonebayashi",blurb:"Anna, a shy 12-year-old girl, meets Marnie at an old mansion in the countryside. The two become best friends — but Marnie is not quite who she appears to be.",runtime:103,budget:10.5,revenue:34.1,notes:"Sources: Ghibli Wiki",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/whenmarniewasthere.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/whenmarniewasthere1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/whenmarniewasthere2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/whenmarniewasthere3.jpg"},
+  {movie:"The Red Turtle",year:2016,director:"Michael Dudok de Wit",blurb:"A massive sea turtle destroys a stranded man's raft every time he tries to sail away from a tropical island.",runtime:81,budget:11,revenue:6.71,notes:"Sources: The Numbers",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/latortuerouge.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/latortuerouge1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/latortuerouge2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/latortuerouge3.jpg"},
+  {movie:"Earwig and the Witch",year:2020,director:"Gorô Miyazaki",blurb:"An orphan girl, Earwig, is adopted by a witch and comes home to a spooky house filled with mystery and magic.",runtime:82,budget:0,revenue:0.84,notes:"TV movie. Production budget unavailable. Sources: Box Office Mojo",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/earwigandthewitch.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/earwigandthewitch1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/earwigandthewitch2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/earwigandthewitch3.jpg"},
+  {movie:"The Boy and the Heron",year:2023,director:"Hayao Miyazaki",blurb:"In the wake of his mother's death and his father's remarriage, a headstrong boy ventures into a dreamlike world shared by the living and the dead.",runtime:124,budget:55,revenue:282.42,notes:"Sources: Reddit",tooltip_image:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/theboyandtheheron.jpg",image1:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/theboyandtheheron1.jpg",image2:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/theboyandtheheron2.jpg",image3:"https://raw.githubusercontent.com/amirsohil/projectfiles/refs/heads/main/ghibli/images/theboyandtheheron3.jpg"},
+];
+
+function directorColor(d) {
+  if (d === "Hayao Miyazaki") return "#c0392b";
+  if (d === "Isao Takahata")  return "#b8860b";
+  return "#8a7f72";
+}
+
+// ── D3 CHART ──
+const svg    = d3.select("#scatter");
+const margin = { top: 30, right: 40, bottom: 60, left: 70 };
+
+function draw() {
+  svg.selectAll("*").remove();
+
+  const W = svg.node().getBoundingClientRect().width;
+  const H = +svg.attr("height") || 540;
+  const w = W - margin.left - margin.right;
+  const h = H - margin.top  - margin.bottom;
+
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const maxB = d3.max(data, d => d.budget);
+  const maxR = d3.max(data, d => d.revenue);
+
+  const x = d3.scaleLinear().domain([0, maxB * 1.08]).range([0, w]).nice();
+  const y = d3.scaleLinear().domain([0, maxR * 1.05]).range([h, 0]).nice();
+
+  // grid
+  g.append("g").attr("class","grid")
+    .attr("transform",`translate(0,${h})`)
+    .call(d3.axisBottom(x).ticks(6).tickSize(-h).tickFormat(""));
+  g.append("g").attr("class","grid")
+    .call(d3.axisLeft(y).ticks(6).tickSize(-w).tickFormat(""));
+
+  // breakeven line
+  const lineMax = Math.min(maxB * 1.08, maxR * 1.05);
+  g.append("line")
+    .attr("class","breakeven")
+    .attr("x1", x(0)).attr("y1", y(0))
+    .attr("x2", x(lineMax)).attr("y2", y(lineMax));
+  g.append("text").attr("class","breakeven-label")
+    .attr("x", x(lineMax) - 4)
+    .attr("y", y(lineMax) - 7)
+    .attr("text-anchor","end")
+    .text("BREAK-EVEN");
+
+  // axes
+  g.append("g").attr("class","axis")
+    .attr("transform",`translate(0,${h})`)
+    .call(d3.axisBottom(x).ticks(6).tickFormat(d => `$${d}M`));
+  g.append("g").attr("class","axis")
+    .call(d3.axisLeft(y).ticks(6).tickFormat(d => `$${d}M`));
+
+  // axis labels
+  g.append("text").attr("class","axis-label")
+    .attr("x", w / 2).attr("y", h + 50)
+    .attr("text-anchor","middle")
+    .text("Production Budget (USD)");
+  g.append("text").attr("class","axis-label")
+    .attr("transform","rotate(-90)")
+    .attr("x", -h / 2).attr("y", -58)
+    .attr("text-anchor","middle")
+    .text("Box Office Revenue (USD)");
+
+  // dots
+  const tooltip  = document.getElementById("tooltip");
+  const ttImg    = document.getElementById("tt-img");
+  const ttTitle  = document.getElementById("tt-title");
+  const ttMeta   = document.getElementById("tt-meta");
+  const ttBlurb  = document.getElementById("tt-blurb");
+  const ttBudget = document.getElementById("tt-budget");
+  const ttRev    = document.getElementById("tt-revenue");
+  const ttRun    = document.getElementById("tt-runtime");
+  const ttNotes  = document.getElementById("tt-notes");
+
+  g.selectAll(".dot")
+    .data(data).enter().append("circle")
+    .attr("class","dot")
+    .attr("cx", d => x(d.budget))
+    .attr("cy", d => y(d.revenue))
+    .attr("r",  7)
+    .attr("fill", d => directorColor(d.director))
+    .attr("stroke", "#f5f0e8")
+    .attr("stroke-width", 1.5)
+    .attr("opacity", 0.82)
+    .on("mousemove", function(event, d) {
+      ttImg.src    = d.tooltip_image;
+      ttTitle.textContent = d.movie;
+      ttMeta.textContent  = `${d.year}  ·  ${d.director}`;
+      ttBlurb.textContent = d.blurb;
+      ttBudget.textContent = d.budget > 0 ? `$${d.budget}M` : "N/A";
+      ttRev.textContent    = `$${d.revenue}M`;
+      ttRun.textContent    = `${d.runtime} min`;
+      ttNotes.textContent  = d.notes;
+
+      const pad = 16;
+      let tx = event.clientX + pad;
+      let ty = event.clientY + pad;
+      const tw = 300, th = 380;
+      if (tx + tw > window.innerWidth)  tx = event.clientX - tw - pad;
+      if (ty + th > window.innerHeight) ty = event.clientY - th - pad;
+
+      tooltip.style.left = tx + "px";
+      tooltip.style.top  = ty + "px";
+      tooltip.classList.add("visible");
+
+      d3.select(this).attr("r", 10).attr("opacity", 1);
+    })
+    .on("mouseleave", function() {
+      tooltip.classList.remove("visible");
+      d3.select(this).attr("r", 7).attr("opacity", 0.82);
+    })
+    .on("click", function(event, d) {
+      showPanel(d);
+      d3.selectAll(".dot")
+        .attr("stroke","#f5f0e8")
+        .attr("stroke-width", 1.5)
+        .attr("opacity", 0.82);
+      d3.select(this)
+        .attr("stroke","#1a1612")
+        .attr("stroke-width", 2.5)
+        .attr("opacity", 1);
+    });
+}
+
+draw();
+window.addEventListener("resize", draw);
+
+// ── PANEL ──
+function showPanel(d) {
+  document.getElementById("panel-idle").style.display    = "none";
+  document.getElementById("panel-content").classList.add("active");
+
+  document.getElementById("panel-movie-title").textContent = d.movie;
+  document.getElementById("panel-movie-meta").textContent  =
+    `${d.year}  ·  ${d.director}  ·  ${d.runtime} min`;
+
+  document.getElementById("still1").src = d.image1;
+  document.getElementById("still2").src = d.image2;
+  document.getElementById("still3").src = d.image3;
+
+  const roi    = d.budget > 0 ? ((d.revenue - d.budget) / d.budget * 100).toFixed(0) : null;
+  const roiCls = roi !== null && +roi >= 0 ? "roi-positive" : "roi-negative";
+  const roiTxt = roi !== null ? (roi >= 0 ? `+${roi}%` : `${roi}%`) : "N/A";
+
+  document.getElementById("panel-stats").innerHTML = `
+    <div class="panel-stat"><div class="val">${d.budget > 0 ? "$" + d.budget + "M" : "N/A"}</div><div class="lbl">Budget</div></div>
+    <div class="panel-stat"><div class="val">$${d.revenue}M</div><div class="lbl">Revenue</div></div>
+    <div class="panel-stat"><div class="val ${roiCls}">${roiTxt}</div><div class="lbl">ROI</div></div>
+  `;
+
+  document.getElementById("panel-blurb").textContent = d.blurb;
+  document.getElementById("panel-notes").textContent = d.notes;
+}
+
+// ── LIGHTBOX ──
+document.querySelectorAll("#stills-grid img").forEach(img => {
+  img.addEventListener("click", () => {
+    document.getElementById("lb-img").src = img.src;
+    document.getElementById("lightbox").classList.add("open");
+  });
+});
+document.getElementById("lightbox").addEventListener("click", () => {
+  document.getElementById("lightbox").classList.remove("open");
+});
+</script>
+</body>
+</html>
