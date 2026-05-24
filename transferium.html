@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<title>Essays [Amir Sohil]</title>
+		<title>Portfolio [Amir Sohil]</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -27,7 +27,8 @@
 							<ul class="links">
 								<li><a href="index.html" style="color:#000000;font-weight: bold">Home</a></li>
 								<li><a href="about.html" style="color:#000000;font-weight: bold">About</a></li>
-								<li><a href="portfolio.html" style="color:#000000;font-weight: bold">Portfolio</a></li>
+								<li><a href="portfolio2.html" style="color:#000000;font-weight: bold">Portfolio</a></li>
+								<li><a href="essays.html" style="color:#000000;font-weight: bold">Essays</a></li>
 								<li><a href="https://calendly.com/amirspatterns" target="_blank" style="color:#000000;font-weight: bold">Book a session</a></li>
 							</ul>
 							<a href="#" class="close">Close</a>
@@ -38,34 +39,40 @@
 					<section id="wrapper">
 						<header style="margin-bottom: 0px; padding-bottom: 0px;">
 							<div class="inner">
-								<h2>Essays</h2>
-								<p>A collection of written works.</p>
+								<h2><i>Transferium Player Intelligence</i></h2>
+								<p>Web Application</p>		
 							</div>
 						</header>
 
 						<!-- Content -->
 							<div class="wrapper">
 								<div class="inner">
-									<section class="features">
-										<article>
-											<a href="transferiumwriteup.html" class="image"><img src="images/transferiumwriteup.png" alt="" /></a>
-											<h3 class="major" style="color:#000000">My Football Player Replacement Finder</h3>
-											<p style="color:#000000">A full account of building <i>Transferium Player Intelligence</i>: every architectural decision, from 
-												choosing <i>Neo4j</i> over a relational database to designing a weighted cosine similarity engine that separates profile shape 
-												from absolute quality.
-											</p>
-											<a href="transferiumwriteup.html" class="special" style="color:#000000">Read the Essay</a>
-										</article>
-										<article>
-											<a href="goodhartslaw.html" class="image"><img src="images/goodhartslaw.png" alt="" /></a>
-											<h3 class="major" style="color:#000000">When Your Dashboards Deceive</h3>
-											<p style="color:#000000">An interactive essay on <i>Goodhart's Law</i>, the economic principle that silently corrupts KPI dashboards 
-												across every industry. Includes real case studies, a live metric simulator, and a practical framework for designing better measurements.
-											</p>
-											<a href="goodhartslaw.html" class="special" style="color:#000000">Read the Essay</a>
-										</article>
-									</section>
-
+									<p align="justify">
+										This project is a football player replacement finder built on a <i>Neo4j</i> graph database and a weighted cosine 
+										similarity engine. Given any player from a dataset of 18,405 <i>FC 26</i> entries, it surfaces the most statistically 
+										compatible replacements — filtered by position, adjusted for overall quality, and informed by league and regional 
+										context.
+									</p>
+									<p align="justify">
+										The graph stores 276,075 pre-computed similarity edges. Finding replacements at query time is a single traversal, with 
+										no recomputation or table scans.
+										<br><br>
+										<b>Major tools utilised:</b>
+										&nbsp
+										<img src="images/python.png" title="Python" height="25">&nbsp &nbsp
+										<img src="images/neo4j.png" title="Neo4j" height="25">&nbsp &nbsp
+										<img src="images/github.png" title="GitHub" height="25">&nbsp &nbsp
+										<img src="images/streamlit.png" title="Streamlit" height="25">
+									</p>
+									<p align="justify">
+										Click on the image below to launch the live application.
+									</p>
+									
+									<a href="https://transferium.streamlit.app/" target="_blank">
+										<img src="images/transferiumfull.png" title="Click to launch the live application." width="950" height="633">
+									</a>
+									<br><br><br>
+									<a href="https://calendly.com/amirspatterns" target="_blank" class="button primary fit small" style="display: inline-block; width: auto; text-align: center;"><font style="color:#000000;font-weight: bold">Book a Session</font></a>
 								</div>
 							</div>
 

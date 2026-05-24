@@ -1,0 +1,1024 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Essays [Amir Sohil]</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="description" content="How I built Transferium — a football player replacement finder powered by a graph database, a weighted similarity engine, and a live Streamlit app. Every architectural decision, explained.">
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<style>
+			/* Essay-specific overrides */
+
+			/* Reading width and typography */
+			.essay-body {
+				max-width: 720px;
+				margin: 0 auto;
+				font-size: 1.05em;
+				line-height: 1.85;
+			}
+
+			.essay-body p {
+				margin: 0 0 1.4em 0;
+				color: rgba(255,255,255,0.82);
+				font-size: 1em;
+			}
+
+			.essay-body h3 {
+				margin: 2.2em 0 0.7em 0;
+				font-size: 1.35em;
+				letter-spacing: 0.04em;
+			}
+
+			.essay-body p,
+			.essay-body td,
+			.essay-body li {
+				text-align: justify;
+			}
+
+			/* Refined blockquote */
+			.essay-body blockquote {
+				border-left: 3px solid #CDFD50;
+				background: rgba(205,253,80,0.05);
+				padding: 1.1em 1.5em;
+				margin: 1.8em 0;
+				font-family: Raleway, Helvetica, sans-serif;
+				font-style: italic;
+				font-size: 1.05em;
+				line-height: 1.65;
+				color: rgba(255,255,255,0.9);
+				border-radius: 0;
+			}
+
+			.essay-body blockquote cite {
+				display: block;
+				margin-top: 0.7em;
+				font-style: normal;
+				font-size: 0.75em;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				color: #CDFD50;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+			}
+
+			/* Section label */
+			.section-eyebrow {
+				display: block;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.72em;
+				letter-spacing: 0.22em;
+				text-transform: uppercase;
+				color: #CDFD50;
+				margin-bottom: 0.5em;
+			}
+
+			/* Code blocks */
+			.essay-body pre {
+				background: rgba(0,0,0,0.35);
+				border: 1px solid rgba(255,255,255,0.1);
+				border-left: 3px solid rgba(205,253,80,0.5);
+				padding: 1.3em 1.5em;
+				margin: 1.6em 0;
+				border-radius: 3px;
+				overflow-x: auto;
+				font-family: "JetBrains Mono", "Courier New", monospace;
+				font-size: 0.82em;
+				line-height: 1.7;
+				color: rgba(255,255,255,0.75);
+			}
+
+			.essay-body pre code {
+				background: none;
+				border: none;
+				padding: 0;
+				font-size: 1em;
+				color: inherit;
+			}
+
+			.essay-body code {
+				font-family: "JetBrains Mono", "Courier New", monospace;
+				font-size: 0.82em;
+				background: rgba(205,253,80,0.08);
+				border: 1px solid rgba(205,253,80,0.2);
+				padding: 1px 6px;
+				border-radius: 2px;
+				color: #CDFD50;
+			}
+
+			/* Decision cards */
+			.features.essay-decisions article {
+				background-color: rgba(255,255,255,0.04);
+				border: 1px solid rgba(255,255,255,0.1);
+				border-radius: 4px;
+				transition: border-color 0.25s, background-color 0.25s;
+				cursor: pointer;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.features.essay-decisions article::before {
+				content: '';
+				position: absolute;
+				left: 0; top: 0; bottom: 0;
+				width: 3px;
+				background: #CDFD50;
+				transform: scaleY(0);
+				transform-origin: bottom;
+				transition: transform 0.35s ease;
+			}
+
+			.features.essay-decisions article:hover,
+			.features.essay-decisions article.open {
+				background-color: rgba(205,253,80,0.06);
+				border-color: rgba(205,253,80,0.3);
+			}
+
+			.features.essay-decisions article:hover::before,
+			.features.essay-decisions article.open::before {
+				transform: scaleY(1);
+			}
+
+			.features.essay-decisions article h4.major {
+				color: #ffffff !important;
+				font-size: 1em;
+				margin-bottom: 0.5em;
+			}
+
+			.features.essay-decisions article .decision-tag {
+				display: inline-block;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.68em;
+				letter-spacing: 0.16em;
+				text-transform: uppercase;
+				color: #CDFD50;
+				border: 1px solid rgba(205,253,80,0.4);
+				padding: 2px 9px;
+				margin-bottom: 0.9em;
+				border-radius: 2px;
+			}
+
+			.features.essay-decisions article p {
+				color: rgba(255,255,255,0.6) !important;
+				font-size: 0.9em !important;
+				line-height: 1.65;
+			}
+
+			.features.essay-decisions article .decision-detail {
+				max-height: 0;
+				overflow: hidden;
+				transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1), opacity 0.3s;
+				opacity: 0;
+			}
+
+			.features.essay-decisions article.open .decision-detail {
+				max-height: 600px;
+				opacity: 1;
+			}
+
+			.features.essay-decisions article .decision-detail-inner {
+				border-top: 1px solid rgba(255,255,255,0.1);
+				margin-top: 1em;
+				padding-top: 1em;
+				font-size: 0.88em;
+				color: rgba(255,255,255,0.6);
+				line-height: 1.7;
+			}
+
+			.features.essay-decisions article .decision-detail-inner strong {
+				color: rgba(255,255,255,0.9);
+			}
+
+			.features.essay-decisions article .decision-detail-inner .lesson {
+				margin-top: 0.8em;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.78em;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				color: #CDFD50;
+			}
+
+			.card-toggle-hint {
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.72em;
+				color: rgba(255,255,255,0.3);
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				margin-bottom: 1.2em;
+			}
+
+			/* Stack table */
+			.stack-table td {
+				padding: 1.1em 0;
+				border-bottom: 1px solid rgba(255,255,255,0.07);
+				vertical-align: middle;
+				font-size: 0.92em;
+				color: rgba(255,255,255,0.75);
+				line-height: 1.6;
+			}
+
+			.stack-table td:first-child {
+				width: 38%;
+				font-family: Raleway, Helvetica, sans-serif;
+				font-weight: 700;
+				font-size: 0.88em;
+				color: #ffffff;
+				letter-spacing: 0.03em;
+				padding-right: 1.2em;
+			}
+
+			.stack-table td:last-child {
+				width: 12%;
+				text-align: right;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.72em;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: #CDFD50;
+			}
+
+			.stack-table tr:last-child td {
+				border-bottom: none;
+			}
+
+			/* Weight table */
+			.weight-table {
+				width: 100%;
+				border-collapse: collapse;
+				margin: 1.4em 0;
+			}
+
+			.weight-table thead th {
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.72em;
+				letter-spacing: 0.15em;
+				text-transform: uppercase;
+				color: rgba(255,255,255,0.45);
+				padding-bottom: 0.7em;
+				border-bottom: 1px solid rgba(255,255,255,0.15);
+				text-align: left;
+				font-weight: 600;
+			}
+
+			.weight-table tbody td {
+				font-size: 0.9em;
+				color: rgba(255,255,255,0.7);
+				padding: 0.85em 0.5em 0.85em 0;
+				border-bottom: 1px solid rgba(255,255,255,0.06);
+				vertical-align: top;
+				line-height: 1.55;
+			}
+
+			.weight-table tbody td:nth-child(2) {
+				font-family: "JetBrains Mono", monospace;
+				color: #CDFD50;
+				font-size: 0.88em;
+				white-space: nowrap;
+			}
+
+			.weight-table tbody tr:last-child td {
+				border-bottom: none;
+			}
+
+			/* Stat counters */
+			.stat-strip {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 1px;
+				background: rgba(255,255,255,0.07);
+				border: 1px solid rgba(255,255,255,0.07);
+				border-radius: 4px;
+				overflow: hidden;
+				margin: 1.8em 0;
+			}
+
+			.stat-cell {
+				background: rgba(0,0,0,0.25);
+				padding: 1.6em 1.4em;
+				text-align: center;
+			}
+
+			.stat-num {
+				font-family: Raleway, Helvetica, sans-serif;
+				font-size: 2.4em;
+				font-weight: 700;
+				color: #CDFD50;
+				line-height: 1;
+				display: block;
+			}
+
+			.stat-label {
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.68em;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: rgba(255,255,255,0.35);
+				margin-top: 0.55em;
+				display: block;
+			}
+
+			@media screen and (max-width: 600px) {
+				.stat-strip { grid-template-columns: 1fr; }
+			}
+
+			/* CTA block */
+			.cta-block {
+				border-top: 1px solid rgba(255,255,255,0.1);
+				margin-top: 3em;
+				padding-top: 2.5em;
+			}
+
+			.cta-block p {
+				color: rgba(255,255,255,0.7);
+			}
+
+			/* Scroll progress bar */
+			#essay-progress {
+				position: fixed;
+				top: 0; left: 0;
+				height: 2px;
+				width: 0%;
+				background: #CDFD50;
+				z-index: 9999;
+				transition: width 0.1s linear;
+			}
+
+			/* Scroll reveal */
+			.fade-in {
+				opacity: 0;
+				transform: translateY(20px);
+				transition: opacity 0.6s ease, transform 0.6s ease;
+			}
+
+			.fade-in.visible {
+				opacity: 1;
+				transform: none;
+			}
+
+			/* Schema diagram */
+			.schema-diagram {
+				background: rgba(0,0,0,0.3);
+				border: 1px solid rgba(255,255,255,0.1);
+				border-radius: 4px;
+				padding: 1.8em;
+				margin: 1.6em 0;
+				text-align: center;
+			}
+
+			.schema-nodes {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 0;
+				flex-wrap: wrap;
+				font-family: "JetBrains Mono", monospace;
+				font-size: 0.82em;
+				line-height: 2.4;
+				color: rgba(255,255,255,0.75);
+			}
+
+			.schema-node {
+				background: rgba(205,253,80,0.1);
+				border: 1px solid rgba(205,253,80,0.4);
+				color: #CDFD50;
+				padding: 0.25em 0.7em;
+				border-radius: 20px;
+				white-space: nowrap;
+			}
+
+			.schema-edge {
+				color: rgba(255,255,255,0.3);
+				padding: 0 0.3em;
+				font-size: 0.85em;
+			}
+
+			.schema-rel {
+				color: rgba(255,255,255,0.5);
+				font-size: 0.78em;
+				padding: 0 0.2em;
+			}
+
+			.schema-row {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 0;
+				flex-wrap: wrap;
+				margin: 0.3em 0;
+			}
+
+			/* Inline callout */
+			.callout {
+				background: rgba(205,253,80,0.05);
+				border: 1px solid rgba(205,253,80,0.2);
+				border-radius: 3px;
+				padding: 1em 1.3em;
+				margin: 1.6em 0;
+				font-size: 0.92em;
+				color: rgba(255,255,255,0.7);
+				line-height: 1.7;
+			}
+
+			.callout strong {
+				color: #CDFD50;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.78em;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				display: block;
+				margin-bottom: 0.4em;
+			}
+		</style>
+	</head>
+	<body class="is-preload">
+
+		<div id="essay-progress"></div>
+
+		<div id="page-wrapper">
+
+			<!-- Header -->
+			<header id="header">
+				<h1 style="color:#CDFD50"><a href="index.html">Mohamed Amir Sohil Bishrul Hafi</a></h1>
+				<nav>
+					<a href="#menu" style="color:#CDFD50">Menu</a>
+				</nav>
+			</header>
+
+			<!-- Menu -->
+			<nav id="menu">
+				<div class="inner">
+					<h2 style="color:#000000">Menu</h2>
+					<ul class="links">
+						<li><a href="index.html" style="color:#000000;font-weight:bold">Home</a></li>
+						<li><a href="about.html" style="color:#000000;font-weight:bold">About</a></li>
+						<li><a href="portfolio.html" style="color:#000000;font-weight:bold">Portfolio</a></li>
+						<li><a href="essays.html" style="color:#000000;font-weight:bold">Essays</a></li>
+						<li><a href="https://calendly.com/amirspatterns" target="_blank" style="color:#000000;font-weight:bold">Book a session</a></li>
+					</ul>
+					<a href="#" class="close">Close</a>
+				</div>
+			</nav>
+
+			<!-- Wrapper -->
+			<section id="wrapper">
+				<header style="margin-bottom:0;padding-bottom:0;">
+					<div class="inner">
+						<span class="section-eyebrow">Project Write-Up · Graph Databases &amp; ML</span>
+						<h2>My Football Player Replacement Finder</h2>
+						<p style="color:rgba(255,255,255,0.55);font-size:0.92em;">
+							<i>Transferium Player Intelligence</i> — Every architectural decision, including the ones I got wrong first
+						</p>
+					</div>
+				</header>
+
+				<div class="wrapper">
+					<div class="inner">
+						<div class="essay-body">
+
+							<div class="fade-in">
+								<blockquote>
+									There's a version of this project that's boring. You load a CSV into pandas, compute cosine similarity, and return the top ten results.
+									It works. It's fine. It's also exactly what everyone else does.
+								</blockquote>
+							</div>
+							<br>
+
+							<!-- ── The Starting Point ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">The Brief</span>
+								<h3>Starting Point</h3>
+								<p>
+									Most data science portfolios look the same. A regression here, a dashboard there, maybe a neural network trained on <i>MNIST</i>. 
+									I wanted to build something where the interesting problem wasn't just the model. What I was truly looking for was a project that would 
+									force me to make real architectural decisions and come out the other side having genuinely learned something.
+								</p>
+								<p>
+									The brief I gave myself was to build something visually impressive, technically differentiated, and useful enough that a non-technical
+									person could immediately understand the value. Enter, football player replacement. Think about it. The domain is universally relatable,
+									the problem ("who can replace this player?") is immediately understandable, and the data structure, as I'll explain, is a genuinely 
+									natural fit for a graph database. Oh, and most importantly, I love football.
+								</p>
+								<p>
+									The result is <i>Transferium Player Intelligence</i>: a player replacement finder powered by <i>Neo4j</i>, a weighted cosine similarity engine,
+									and a live <i>Streamlit</i> app. It took several wrong turns to get there, and I think those wrong turns are worth writing about too.
+								</p>
+
+								<div class="stat-strip">
+									<div class="stat-cell">
+										<span class="stat-num" data-target="18405" data-suffix="">0</span>
+										<span class="stat-label">Players modelled</span>
+									</div>
+									<div class="stat-cell">
+										<span class="stat-num" data-target="276075" data-suffix="">0</span>
+										<span class="stat-label">Similarity edges written</span>
+									</div>
+									<div class="stat-cell">
+										<span class="stat-num" data-target="0" data-prefix="£">0</span>
+										<span class="stat-label">Total cost</span>
+									</div>
+								</div>
+							</div>
+							<br><br>
+
+
+							<!-- ── Why a Graph Database ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">Architecture</span>
+								<h3>Why a Graph Database?</h3>
+								<p>
+									This was the first major decision, and the one I want to defend properly, because it's easy to dismiss as over-engineering.
+								</p>
+								<p>
+									In a relational database, relationships between entities are implicit. For example, if you want to find all players in the 
+									<i>Premier League</i>, you join players to clubs to leagues at query time. The database doesn't inherently know that 
+									<i>Liverpool FC</i> is connected to the <i>Premier League</i>. It finds out by scanning and matching rows. In a graph database,
+									relationships are first-class citizens. They're stored explicitly with their own properties. A path like 
+									<code>(Player)→(Club)→(League)</code> is a literal edge in the graph, not something computed at query time.
+								</p>
+								<p>
+									For this project, the key payoff is the <code>SIMILAR_TO</code> edge. Once I compute player similarity scores and store
+									them as graph edges — <code>(Kylian Mbappé Lottin)-[:SIMILAR_TO {score: 0.82}]->(Omar Khaled Mohamed Marmoush)</code> — finding replacements becomes a single hop:
+								</p>
+								<pre><code>MATCH (p:Player {name: "Kylian Mbappé Lottin"})-[r:SIMILAR_TO]->(s:Player)
+RETURN s.name, r.score ORDER BY r.score DESC LIMIT 15</code></pre>
+								<p>
+									Zero recomputing or scanning. Just traversal. At around 18,000 players the performance difference is modest, but the architecture
+									scales, and, more importantly, it forced me to think about my data as a network of relationships rather than a table of rows.
+									I believe that shift in thinking is the real value.
+								</p>
+
+								<div class="schema-diagram">
+									<div style="font-family:'Source Sans Pro',Helvetica,sans-serif;font-size:0.68em;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:1.2em;">Graph Schema</div>
+									<div class="schema-row">
+										<span class="schema-node">Player</span>
+										<span class="schema-edge">──</span>
+										<span class="schema-rel">[:PLAYS_FOR]</span>
+										<span class="schema-edge">──▶</span>
+										<span class="schema-node">Club</span>
+										<span class="schema-edge">──</span>
+										<span class="schema-rel">[:IN_LEAGUE]</span>
+										<span class="schema-edge">──▶</span>
+										<span class="schema-node">League</span>
+									</div>
+									<div class="schema-row" style="margin-top:0.6em;">
+										<span class="schema-node">Player</span>
+										<span class="schema-edge">──</span>
+										<span class="schema-rel">[:PLAYS_AT]</span>
+										<span class="schema-edge">──▶</span>
+										<span class="schema-node">Position</span>
+									</div>
+									<div class="schema-row" style="margin-top:0.6em;">
+										<span class="schema-node">Player</span>
+										<span class="schema-edge">──</span>
+										<span class="schema-rel">[:SIMILAR_TO {score, pos_match}]</span>
+										<span class="schema-edge">──▶</span>
+										<span class="schema-node">Player</span>
+									</div>
+									<div style="font-family:'Source Sans Pro',Helvetica,sans-serif;font-size:0.68em;color:rgba(255,255,255,0.25);margin-top:1.2em;letter-spacing:0.06em;">4 node types · 4 relationship types · each edge carries its own properties</div>
+								</div>
+							</div>
+							<br><br>
+
+
+							<!-- ── Dataset ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">Data Quality</span>
+								<h3>The Dataset Problem</h3>
+								<p>
+									I initially started with a <a href="https://www.kaggle.com/datasets/aniss7/fifa-player-data-from-sofifa-2025-06-03/data" 
+									target="_blank" rel="noopener noreferrer"><i>SoFIFA</i> dataset from <i>Kaggle</i></a>. On the surface, it looked 
+									comprehensive. It wasn't. Every individual skill attribute (crossing, finishing, dribbling, stamina, etc.) was null
+									for every single player. The scraper had captured biographical and overall rating data, but not the granular attributes 
+									I needed to build a meaningful similarity engine.
+								</p>
+
+								<div class="callout">
+									<strong>Lesson</strong>
+									Always audit your data before designing around it. Column names do not imply populated data.
+								</div>
+
+								<p>
+									So that was on me for not checking first. I switched to an <a href="https://www.kaggle.com/datasets/rovnez/fc-26-fifa-26-player-data" 
+									target="_blank" rel="noopener noreferrer"><i>FC 26</i> dataset</a> that included the full attribute breakdown across prefixed column groups:
+									<code>attacking_</code>, <code>skill_</code>, <code>movement_</code>, <code>power_</code>, <code>mentality_</code>,
+									<code>defending_</code>, and <code>goalkeeping_</code>. Zero nulls across all 29 outfield attributes and 7 goalkeeper
+									attributes. 18,405 players. This was the foundation.
+								</p>
+							</div>
+							<br><br>
+
+
+							<!-- ── Similarity Engine ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">The Engine</span>
+								<h3>Building the Similarity Model</h3>
+
+								<p>
+									Before any similarity computation, I made one structural decision that shaped everything downstream: goalkeepers and
+									outfield players are modelled entirely separately. A goalkeeper's reflexes score means something completely different
+									to a striker's finishing score, even if the numbers look similar in magnitude. Mixing them in a single vector space would 
+									produce statistically coherent but footballingly meaningless results. The two groups live in separate vector spaces. 
+									Similarity is only ever computed within each group.
+								</p>
+
+								<h3 style="font-size:1.1em;margin-top:1.8em;">Weighted Attribute Vectors</h3>
+								<p>
+									The naive approach treats all 29 attributes equally. But a defensive midfielder's interceptions matter far more than their finishing.
+									A striker's positioning is more important than their sliding tackle. Equal weighting ignores what positions actually demand.
+									I assigned weights across four groups: 
+								</p>
+
+								<table class="weight-table">
+									<thead>
+										<tr>
+											<th>Group</th>
+											<th>Weight</th>
+											<th>Key attributes</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>Technical</td>
+											<td>35%</td>
+											<td>Ball control, dribbling, passing, vision</td>
+										</tr>
+										<tr>
+											<td>Tactical</td>
+											<td>30%</td>
+											<td>Positioning, interceptions, marking, reactions</td>
+										</tr>
+										<tr>
+											<td>Physical</td>
+											<td>25%</td>
+											<td>Acceleration, sprint speed, stamina, strength</td>
+										</tr>
+										<tr>
+											<td>League / Region</td>
+											<td>10%</td>
+											<td>Contextual adaptation bonus</td>
+										</tr>
+									</tbody>
+								</table>
+
+								<p>
+									These group weights are informed judgements, not empirically optimised values. Each individual attribute's contribution 
+									is its raw score multiplied by its group weight divided by the number of attributes in that group.
+									A 90-rated crossing doesn't dominate the vector just because it's high; it's weighted relative to its group.
+								</p>
+
+								<h3 style="font-size:1.1em;margin-top:1.8em;">Cosine Similarity, Not Euclidean Distance</h3>
+								<p>
+									Cosine similarity measures the angle between two vectors, not the absolute distance between them.
+									This means a 70-rated player with a balanced profile is more "similar" to an 85-rated balanced player
+									than to a 90-rated specialist, because their skill shape is the same, even if the magnitude differs.
+									For player replacement, shape matters more than magnitude. You're looking for someone who plays the same way,
+									not someone of identical quality.
+								</p>
+								<p>
+									Consider Mohamed Salah and Francisco Trincão, a 91-rated <i>Premier League</i> superstar and an 82-rated winger at <i>Sporting CP</i>. 
+									Their Euclidean distance is significant: Salah's raw attribute numbers are simply higher across the board. But the model scores them 
+									at 76% similarity, because the shape of their profiles points in the same direction. The ratios between attributes are nearly identical, 
+									the same pattern, expressed at different levels. Euclidean distance would tell you they're far apart. Cosine similarity correctly 
+									identifies them as the same type of player, separated by level and context rather than style. That distinction is exactly what a 
+									replacement finder should care about. A club that can't afford Salah but needs his profile: a left-footed, right-sided attacker 
+									who dribbles, finishes, and doesn't defend too much, gets a credible starting point. That's what the engine is built to surface.
+								</p>
+
+								<h3 style="font-size:1.1em;margin-top:1.8em;">The Overall Rating Penalty</h3>
+								<p>
+									My first results exposed a flaw. A 73-rated player appeared as the top replacement for a 90-rated Bellingham
+									because their attribute ratios were nearly identical. Mathematically correct. Practically not useful.
+									I added a penalty term:
+								</p>
+								<pre><code>overall_diff = abs(player_a_overall - player_b_overall)
+overall_penalty = min(overall_diff * 0.015, 0.30)
+final_score = base_similarity * 0.90 + league_bonus - overall_penalty</code></pre>
+								<p>
+									A 17-point gap now reduces the score by up to 25.5%. The ceiling of 30% ensures a large gap is penalised,
+									but never completely eliminates a stylistically similar player from appearing.
+								</p>
+
+								<h3 style="font-size:1.1em;margin-top:1.8em;">The League / Region Bonus</h3>
+								<p>
+									Real scouting isn't purely statistical. Clubs prefer players already adapted to similar footballing cultures. Why?
+									Because there's a meaningful contextual advantage to finding someone already adapted to a similar environment: 
+									tactical styles, physical demands, officiating standards, etc. I encoded this as a 10% contextual bonus: same league gets +10%,
+									same regional group (e.g. both in Iberian leagues) gets +5%, different region gets nothing.
+									A perfect statistical twin in a different league still scores very high. The nudge here is small and deliberate.
+								</p>
+
+								<h3 style="font-size:1.1em;margin-top:1.8em;">Position Matching</h3>
+								<p>
+									A central midfielder is not a valid replacement for a striker, even if the underlying stats look similar. 
+									I only create <code>SIMILAR_TO</code> edges between players who share at least one position. Primary position match earns 
+									an additional 3% boost. Because <i>FC 26</i> players carry multiple positions, a player listed as <code>CAM, CM</code> 
+									can surface as a replacement for either role. This reflects real-world flexibility without forcing false matches.
+								</p>
+							</div>
+							<br><br>
+
+
+							<!-- ── Loading Edges ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">Engineering</span>
+								<h3>Loading 276,075 Edges Into <i>AuraDB</i></h3>
+								<p>
+									The production database is <i>Neo4j AuraDB Free</i>: cloud-hosted, zero cost, with a 200k node / 400k relationship limit.
+									The dataset sits comfortably within those limits.
+								</p>
+								<p>
+									The first loading attempt failed. I was sending 18,000 individual write queries over the internet, one per player.
+									The connection timed out mid-load. The fix was switching to <code>UNWIND</code> batch writes, sending 250 players
+									per round trip instead of one at a time:
+								</p>
+								<pre><code>UNWIND $batch AS props
+MERGE (p:Player {id: props.id})
+SET p += props</code></pre>
+
+								<div class="callout">
+									<strong>Lesson</strong>
+									Always batch writes to remote databases. This reduced round trips from 18,000 to 74, and the connection held for the full load.
+								</div>
+
+								<p>
+									The similarity computation runs as two separate matrices: cosine similarity across 16,343 outfield players produces a 16,343 × 
+									16,343 matrix (roughly 267 million comparisons), and a separate 2,062 × 2,062 matrix handles goalkeepers in their own attribute space. 
+									Both are computed in seconds by <i>NumPy</i>'s vectorised operations. The top 15 position-compatible candidates per player were then 
+									written as <code>SIMILAR_TO</code> edges to <i>AuraDB</i> in batches of 1,000. Total edges thus written were 276,075.
+								</p>
+							</div>
+							<br><br>
+
+
+							<!-- ── Design Decisions ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">Product Decisions</span>
+								<h3>Four Choices That Shaped the App</h3>
+								<p>
+									The technical layer was only half the design surface. Several product decisions had as much impact on the
+									final experience as any model choice. Click any card to read the reasoning.
+								</p>
+
+								<p class="card-toggle-hint">↓ Click to expand</p>
+
+								<section class="features essay-decisions">
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Design · Branding</div>
+										<h4 class="major">Dark and Minimal Visual Language</h4>
+										<p style="text-align:left;">Black background, <i>Bebas Neue</i> display type, <i>JetBrains Mono</i> for data. The colour accent is a sharp 
+											yellow-green.
+										</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												The design language I chose is dark and minimal: black background, Bebas Neue for display type, DM Sans for body,
+												JetBrains Mono for data values. The colour accent is <code style="font-size:0.9em;">#C9F31D</code>, a sharp yellow-green
+												that reads as "data" rather than "football kit." It's legible, distinctive, and avoids every visual cliché in the football analytics space.
+											</p>
+											<p>
+												This was also built to align with my personal brand. If you look at my website and this project, you would understand what I mean.
+											</p>
+											<div class="lesson">Outcome: Visually differentiated from every spreadsheet-style football tool I found in the space.</div>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Data · Longevity</div>
+										<h4 class="major">No Club, League, or Value Data in the UI</h4>
+										<p style="text-align:left;">Displaying dynamic data would make the app feel outdated within weeks.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												I made a deliberate choice to not show club, league, market value, or wage data.
+												All of those change. A player's club next season is unknown; their value fluctuates weekly.
+												Displaying them would anchor the app to a moment in time and make it feel stale.
+											</p>
+											<p>
+												What I do show: overall rating, position, nationality, age, similarity score, is stable within the <i>FC 26</i> snapshot,
+												which is clearly labelled in the interface. A decision was made to include age since it's genuinely useful context when 
+												evaluating a replacement. The league/region bonus was used in the model, but it isn't surfaced as a visible field, because 
+												the logic is internal and the data would drift.
+											</p>
+											<div class="lesson">Outcome: The app remains accurate and honest about what it knows and when.</div>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Naming</div>
+										<h4 class="major">Why <i>Transferium?</i></h4>
+										<p style="text-align:left;">It took a few iterations. Earlier candidates included <i>ScoutIQ</i> and <i>Squadrant</i>.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												<i>ScoutIQ</i> was too AI-tool-adjacent and generic. It could describe a hundred different products.
+												<i>Squadrant</i> was too hard to say and the wordplay didn't land on first read.
+											</p>
+											<p>
+												<i>Transferium</i> stuck because it sounds vaguely scientific, and maps immediately to the transfer market without 
+												being literal about it. Naming was one of the first UX decisions. And to be honest, it feels inevitable in retrospect.
+											</p>
+											<div class="lesson">Outcome: Instantly identifiable, memorable, and domain-appropriate.</div>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Infrastructure · Cost</div>
+										<h4 class="major">Free End to End</h4>
+										<p style="text-align:left;"><i>Neo4j AuraDB Free</i>, <i>Streamlit Community Cloud</i>, <i>Kaggle</i> data. Total cost: £0.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												Every component in the stack was deliberately chosen to be free without compromising on technical quality.
+												<i>Neo4j Desktop</i> for local development, <i>AuraDB Free</i> for cloud hosting. <i>Streamlit</i> for the frontend 
+												and <i>Streamlit Community Cloud</i> for hosting. <i>Python</i>, <i>pandas</i>, <i>NumPy</i>, and <i>scikit-learn</i> 
+												for processing. <i>GitHub</i> for version control. <i>FC 26</i> dataset from <i>Kaggle</i>.
+											</p>
+											<p>
+												The constraint was generative. Being forced to work within the <i>AuraDB</i> free tier meant thinking carefully about
+												schema design and edge counts from the start. I believe this made the architecture tighter overall.
+											</p>
+											<div class="lesson">Outcome: Production-grade stack with £0 ongoing cost.</div>
+										</div></div>
+									</article>
+
+								</section>
+							</div>
+							<br><br>
+
+
+							<!-- ── What I'd Do Differently ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">Retrospective</span>
+								<h3>What I Would Do Differently</h3>
+
+								<p>
+									<strong>Better base data.</strong> <i>FC 26</i> ratings are community-maintained perceptions, not tracking data.
+									Real clubs use <i>Opta</i>, <i>StatsBomb</i>, GPS telemetry. The limitation is real and worth naming. This makes the project a
+									game-data approximation of a scouting tool. I believe this could be useful on its own.
+								</p>
+								<p>
+									<strong>Player embeddings instead of raw attributes.</strong> Rather than vectors built from raw attribute scores,
+									I'd experiment with training embeddings on match performance data: representing players by how they actually play,
+									not how a video game rates them. That's a meaningfully harder problem to solve.
+								</p>
+								<p>
+									<strong>Age cohort filtering.</strong> Replacing a 32-year-old with a 19-year-old and a 35-year-old
+									are different scouting problems. A future version would let users filter by age range explicitly.
+								</p>
+								<p>
+									<strong>Explainability.</strong> The score ring tells you how similar a player is.
+									It doesn't tell you why. A radar chart overlay comparing the queried player's attribute
+									profile against the replacement would make results far more actionable. Once again, that is for a future version.
+								</p>
+							</div>
+							<br><br>
+
+
+							<!-- ── Stack ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">The Stack</span>
+								<h3>Everything Used, Free End to End</h3>
+
+								<table class="stack-table">
+									<tbody>
+										<tr>
+											<td>Graph database (local)</td>
+											<td><i>Neo4j Desktop</i></td>
+											<td>Free</td>
+										</tr>
+										<tr>
+											<td>Graph database (cloud)</td>
+											<td><i>Neo4j AuraDB Free</i></td>
+											<td>Free</td>
+										</tr>
+										<tr>
+											<td>Data processing</td>
+											<td><i>Python</i> · <i>pandas</i> · <i>NumPy</i> · <i>scikit-learn</i></td>
+											<td>Free</td>
+										</tr>
+										<tr>
+											<td>App framework</td>
+											<td><i>Streamlit</i></td>
+											<td>Free</td>
+										</tr>
+										<tr>
+											<td>Hosting</td>
+											<td><i>Streamlit Community Cloud</i></td>
+											<td>Free</td>
+										</tr>
+										<tr>
+											<td>Version control</td>
+											<td><i>GitHub</i></td>
+											<td>Free</td>
+										</tr>
+										<tr>
+											<td>Data</td>
+											<td><i>FC 26</i> · <i>Kaggle</i></td>
+											<td>Free</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<br><br>
+
+
+							<!-- ── CTA ── -->
+							<div class="cta-block fade-in">
+								<span class="section-eyebrow">Try It</span>
+								<p>
+									<i>Transferium Player Intelligence</i> is live. Search any player, find their replacements.
+								</p>
+								<p>
+									The code is on <i>GitHub</i>. If you're thinking about graph databases for a similar problem,
+									or if you have questions about any of the decisions above, I'd genuinely like to hear from you.
+								</p>
+								<ul class="actions">
+									<li>
+										<a href="https://transferium.streamlit.app" target="_blank" class="button primary"><font style="color:#000000;">Open <i>Transferium Player Intelligence</i></font></a>
+									</li>
+								</ul>
+							</div>
+
+							<hr><br><br>
+
+							<div class="cta-block fade-in">
+								<span class="section-eyebrow">About</span>
+								<p style="font-size:0.88em;color:rgba(255,255,255,0.5);line-height:1.9;">
+									Built by Mohamed Amir Sohil Bishrul Hafi.<br>
+									Data: <i>FC 26</i> · <i>SoFIFA</i> &nbsp;·&nbsp; Graph: <i>Neo4j</i> &nbsp;·&nbsp; App: <i>Streamlit</i>
+								</p>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Footer -->
+			<section id="footer">
+				<div class="inner">
+					<ul class="icons" style="text-align:center;">
+						<li><a href="https://www.linkedin.com/in/amir-sohil/" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+						<li><a href="mailto:bhmasohail@gmail.com" class="icon solid fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+					</ul>
+					<ul class="copyright">
+						<li>&copy; Mohamed Amir Sohil Bishrul Hafi. All rights reserved.</li><li>Base Template: <a href="http://html5up.net">HTML5 UP</a></li>
+					</ul>
+				</div>
+			</section>
+
+		</div>
+
+		<!-- Scripts -->
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/jquery.scrollex.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/main.js"></script>
+
+		<script>
+			// ── Scroll progress ──
+			window.addEventListener('scroll', () => {
+				const scrollTop = document.documentElement.scrollTop;
+				const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+				document.getElementById('essay-progress').style.width = (scrollTop / docHeight * 100) + '%';
+			});
+
+			// ── Scroll reveal ──
+			const revealObs = new IntersectionObserver((entries) => {
+				entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+			}, { threshold: 0.1 });
+			document.querySelectorAll('.fade-in').forEach(el => revealObs.observe(el));
+
+			// ── Count-up stats ──
+			const countObs = new IntersectionObserver((entries) => {
+				entries.forEach(e => {
+					if (e.isIntersecting && !e.target.dataset.counted) {
+						e.target.dataset.counted = true;
+						const target = +e.target.dataset.target;
+						const prefix = e.target.dataset.prefix || '';
+						const suffix = e.target.dataset.suffix || '';
+						const duration = 1600;
+						const start = performance.now();
+						const update = (now) => {
+							const t = Math.min((now - start) / duration, 1);
+							const eased = 1 - Math.pow(1 - t, 3);
+							e.target.textContent = prefix + Math.round(target * eased).toLocaleString() + suffix;
+							if (t < 1) requestAnimationFrame(update);
+						};
+						requestAnimationFrame(update);
+					}
+				});
+			}, { threshold: 0.5 });
+			document.querySelectorAll('.stat-num').forEach(el => countObs.observe(el));
+
+			// ── Decision cards ──
+			function toggleDecision(card) {
+				const wasOpen = card.classList.contains('open');
+				document.querySelectorAll('.essay-decisions article').forEach(c => c.classList.remove('open'));
+				if (!wasOpen) card.classList.add('open');
+			}
+
+			// ── Read time ──
+			const words = document.querySelector('.essay-body').innerText.split(/\s+/).length;
+		</script>
+
+	</body>
+</html>
