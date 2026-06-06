@@ -398,6 +398,159 @@
 			flex-shrink: 0;
 		}
 
+		/* ── Mobile responsive ── */
+		@media screen and (max-width: 736px) {
+
+			#chatbot-section {
+				padding: 2.5em 0 3em 0;
+			}
+
+			#chatbot-section .inner {
+				padding: 0 1.25em;
+				box-sizing: border-box;
+				width: 100%;
+			}
+
+			/* Fix the wrapper and header stretching above the chatbot */
+			#wrapper > .wrapper {
+				padding-left: 0 !important;
+				padding-right: 0 !important;
+			}
+
+			#wrapper > .wrapper > .inner {
+				padding-left: 1.25em !important;
+				padding-right: 1.25em !important;
+				box-sizing: border-box !important;
+				width: 100% !important;
+				max-width: 100% !important;
+			}
+
+			#wrapper > header {
+				padding-left: 1.25em !important;
+				padding-right: 1.25em !important;
+				box-sizing: border-box !important;
+			}
+
+			#wrapper > header .inner {
+				padding-left: 0 !important;
+				padding-right: 0 !important;
+				width: 100% !important;
+			}
+
+			.chat-shell {
+				height: calc(100svh - 220px);
+				min-height: 420px;
+				max-height: 600px;
+				border-radius: 4px;
+			}
+
+			.chat-header {
+				padding: 10px 14px;
+				gap: 10px;
+			}
+
+			.chat-header-name {
+				font-size: 0.65em;
+			}
+
+			.chat-header-sub {
+				font-size: 0.56em;
+			}
+
+			.chat-messages {
+				padding: 14px 14px;
+				gap: 10px;
+			}
+
+			.msg-row {
+				max-width: 92%;
+			}
+
+			.msg-bubble {
+				font-size: 0.82em;
+			}
+
+			/* Suggestions: scroll horizontally instead of wrapping */
+			.chat-suggestions {
+				flex-wrap: nowrap;
+				overflow-x: auto;
+				overflow-y: hidden;
+				padding: 0 14px 12px;
+				gap: 6px;
+				-webkit-overflow-scrolling: touch;
+				scrollbar-width: none;
+			}
+
+			.chat-suggestions::-webkit-scrollbar {
+				display: none;
+			}
+
+			.suggestion {
+				white-space: nowrap;
+				flex-shrink: 0;
+				font-size: 0.68em;
+				padding: 5px 10px;
+				/* Override global button styles on mobile */
+				height: auto !important;
+				line-height: normal !important;
+				letter-spacing: 0.04em !important;
+				text-transform: none !important;
+				padding: 5px 10px !important;
+				border-radius: 3px !important;
+				font-family: "Source Sans Pro", Helvetica, sans-serif !important;
+				font-weight: 300 !important;
+				background: transparent !important;
+				box-shadow: none !important;
+				color: rgba(255,255,255,0.5) !important;
+				border: solid 1px rgba(255,255,255,0.12) !important;
+				display: inline-block !important;
+				width: auto !important;
+			}
+
+			.suggestion:hover,
+			.suggestion:active {
+				border-color: rgba(205,253,80,0.5) !important;
+				color: #CDFD50 !important;
+				background: rgba(205,253,80,0.05) !important;
+			}
+
+			.chat-input-row {
+				padding: 10px 12px;
+				gap: 8px;
+			}
+
+			.chat-input-row textarea {
+				font-size: 0.82em;
+				padding: 8px 12px;
+				min-height: 38px;
+			}
+
+			.send-btn {
+				width: 38px !important;
+				height: 38px !important;
+				flex-shrink: 0;
+			}
+
+			.chatbot-intro {
+				margin-bottom: 1.75em;
+			}
+
+			.chatbot-intro p {
+				font-size: 0.85em;
+			}
+		}
+
+		@media screen and (max-width: 480px) {
+			.chat-shell {
+				height: calc(100svh - 200px);
+				min-height: 380px;
+			}
+
+			.msg-row {
+				max-width: 96%;
+			}
+		}
+
 		/* ── IMPORTANT: API key notice ── */
 		.api-notice {
 			margin-top: 2em;
@@ -479,8 +632,8 @@
 						<h2>Chat with my portfolio</h2>
 						<p>
 							Have a question about my experience, projects, tech stack, or availability?
-							Ask below. This assistant knows my full background and can answer on my behalf.
-							For anything requiring a direct conversation, use the booking link from the Menu.
+							Ask below — this assistant knows my full background and can answer on my behalf.
+							For anything requiring a direct conversation, use the booking link above.
 						</p>
 					</div>
 
@@ -491,7 +644,7 @@
 							<div class="chat-avatar">AS</div>
 							<div class="chat-header-text">
 								<div class="chat-header-name">Amir Sohil</div>
-								<div class="chat-header-sub">Senior Software Engineer · Analytics & Data Science</div>
+								<div class="chat-header-sub">Senior Analytics & BI Engineer · ML & Data Science</div>
 							</div>
 							<div class="chat-status">
 								<div class="status-dot"></div>
@@ -503,7 +656,6 @@
 
 						<div class="chat-suggestions" id="chatSuggestions">
 							<button class="suggestion" onclick="useSuggestion(this)">Power BI & Fabric experience?</button>
-							<button class="suggestion" onclick="useSuggestion(this)">Tell me about the HR SaaS product</button>
 							<button class="suggestion" onclick="useSuggestion(this)">What ML projects have you built?</button>
 							<button class="suggestion" onclick="useSuggestion(this)">Are you open to remote roles?</button>
 							<button class="suggestion" onclick="useSuggestion(this)">What awards have you won?</button>
@@ -807,7 +959,7 @@ Full portfolio: amirsohil.github.io/portfolio.html
 			const data = await res.json();
 			removeTyping();
 
-			let reply = "I'm having a connection issue right now. Please reach out directly at **bhmasohail@gmail.com**. I'll get back to you promptly.";
+			let reply = "I'm having a connection issue right now. Please reach out directly at **bhmasohail@gmail.com** — I'll get back to you promptly.";
 
 			if (data?.choices?.[0]?.message?.content) {
 				reply = data.choices[0].message.content;
@@ -829,7 +981,7 @@ Full portfolio: amirsohil.github.io/portfolio.html
 		} catch (err) {
 			removeTyping();
 			console.error('Fetch error:', err);
-			appendMessage('bot', "Connection issue. Please reach out directly at **bhmasohail@gmail.com**.");
+			appendMessage('bot', "Connection issue — please reach out directly at **bhmasohail@gmail.com**.");
 		}
 
 		isBusy = false;
@@ -859,7 +1011,7 @@ Full portfolio: amirsohil.github.io/portfolio.html
 
 		// Opening greeting
 		setTimeout(function() {
-			appendMessage('bot', "Hi. I'm here to answer any questions about **Amir's** background, experience, and projects.\n\nFeel free to ask about his **Power BI and Microsoft Fabric** work, **machine learning projects**, certifications, or availability for remote roles. What would you like to know?");
+			appendMessage('bot', "Hi — I'm here to answer any questions about **Amir's** background, experience, and projects.\n\nFeel free to ask about his **Power BI and Microsoft Fabric** work, **machine learning projects**, certifications, or availability for remote roles. What would you like to know?");
 		}, 500);
 	});
 	</script>
