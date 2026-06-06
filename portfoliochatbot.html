@@ -1,0 +1,868 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Ask Amir | Portfolio [Amir Sohil]</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<!-- Your existing portfolio CSS -->
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	<style>
+		#chatbot-section {
+			padding: 4em 0 5em 0;
+		}
+
+		#chatbot-section .inner {
+			max-width: 800px;
+			margin: 0 auto;
+		}
+
+		/* Page intro */
+		.chatbot-intro {
+			margin-bottom: 2.5em;
+		}
+
+		.chatbot-intro h2 {
+			color: #CDFD50;
+			font-family: Raleway, Helvetica, sans-serif;
+			font-weight: 700;
+			letter-spacing: 0.1em;
+			text-transform: uppercase;
+			font-size: 1.2em;
+			margin-bottom: 0.5em;
+			border-bottom: solid 2px rgba(205, 253, 80, 0.25);
+			padding-bottom: 0.75em;
+		}
+
+		.chatbot-intro p {
+			color: rgba(255,255,255,0.65);
+			font-size: 0.9em;
+			line-height: 1.7;
+			margin-bottom: 0;
+			font-family: "Source Sans Pro", Helvetica, sans-serif;
+			font-weight: 300;
+		}
+
+		/* ── Shell ── */
+		.chat-shell {
+			border: solid 2px rgba(255,255,255,0.1);
+			border-radius: 6px;
+			overflow: hidden;
+			background: rgba(0,0,0,0.35);
+			display: flex;
+			flex-direction: column;
+			height: 560px;
+			position: relative;
+		}
+
+		/* subtle noise texture overlay */
+		.chat-shell::before {
+			content: '';
+			position: absolute;
+			inset: 0;
+			background-image:
+				linear-gradient(rgba(205,253,80,0.015) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(205,253,80,0.015) 1px, transparent 1px);
+			background-size: 32px 32px;
+			pointer-events: none;
+			z-index: 0;
+		}
+
+		/* ── Chat header ── */
+		.chat-header {
+			background: rgba(205,253,80,0.08);
+			border-bottom: solid 2px rgba(255,255,255,0.08);
+			padding: 14px 22px;
+			display: flex;
+			align-items: center;
+			gap: 14px;
+			flex-shrink: 0;
+			position: relative;
+			z-index: 2;
+		}
+
+		.chat-avatar {
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			background: rgba(205,253,80,0.1);
+			border: solid 2px rgba(205,253,80,0.4);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-shrink: 0;
+			font-family: Raleway, Helvetica, sans-serif;
+			font-weight: 700;
+			font-size: 0.85em;
+			letter-spacing: 0.1em;
+			color: #CDFD50;
+		}
+
+		.chat-header-text { flex: 1; }
+
+		.chat-header-name {
+			font-family: Raleway, Helvetica, sans-serif;
+			font-weight: 700;
+			letter-spacing: 0.1em;
+			text-transform: uppercase;
+			font-size: 0.72em;
+			color: #ffffff;
+			line-height: 1.3;
+		}
+
+		.chat-header-sub {
+			font-family: "Source Sans Pro", Helvetica, sans-serif;
+			font-weight: 300;
+			font-size: 0.62em;
+			color: rgba(255,255,255,0.45);
+			letter-spacing: 0.05em;
+			margin-top: 2px;
+		}
+
+		.chat-status {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			font-family: "Source Sans Pro", Helvetica, sans-serif;
+			font-size: 0.6em;
+			font-weight: 300;
+			color: rgba(255,255,255,0.4);
+			letter-spacing: 0.05em;
+			text-transform: uppercase;
+		}
+
+		.status-dot {
+			width: 7px;
+			height: 7px;
+			border-radius: 50%;
+			background: #CDFD50;
+			box-shadow: 0 0 8px rgba(205,253,80,0.7);
+			animation: statusPulse 2.5s ease-in-out infinite;
+		}
+
+		@keyframes statusPulse {
+			0%, 100% { opacity: 1; }
+			50%       { opacity: 0.35; }
+		}
+
+		/* ── Messages area ── */
+		.chat-messages {
+			flex: 1;
+			overflow-y: auto;
+			padding: 20px 22px;
+			display: flex;
+			flex-direction: column;
+			gap: 14px;
+			position: relative;
+			z-index: 1;
+			scroll-behavior: smooth;
+		}
+
+		.chat-messages::-webkit-scrollbar { width: 3px; }
+		.chat-messages::-webkit-scrollbar-track { background: transparent; }
+		.chat-messages::-webkit-scrollbar-thumb {
+			background: rgba(205,253,80,0.2);
+			border-radius: 2px;
+		}
+
+		/* ── Message rows ── */
+		.msg-row {
+			display: flex;
+			gap: 10px;
+			animation: msgIn 0.28s ease;
+			max-width: 82%;
+		}
+
+		@keyframes msgIn {
+			from { opacity: 0; transform: translateY(6px); }
+			to   { opacity: 1; transform: translateY(0); }
+		}
+
+		.msg-row.user {
+			align-self: flex-end;
+			flex-direction: row-reverse;
+		}
+
+		.msg-row.bot { align-self: flex-start; }
+
+		.msg-icon {
+			width: 28px;
+			height: 28px;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-family: Raleway, Helvetica, sans-serif;
+			font-weight: 700;
+			font-size: 0.55em;
+			letter-spacing: 0.08em;
+			flex-shrink: 0;
+			margin-top: 3px;
+		}
+
+		.msg-icon.bot {
+			background: rgba(205,253,80,0.1);
+			border: solid 1px rgba(205,253,80,0.35);
+			color: #CDFD50;
+		}
+
+		.msg-icon.user {
+			background: rgba(255,255,255,0.05);
+			border: solid 1px rgba(255,255,255,0.12);
+			color: rgba(255,255,255,0.5);
+		}
+
+		.msg-bubble {
+			padding: 10px 14px;
+			border-radius: 5px;
+			font-family: "Source Sans Pro", Helvetica, sans-serif;
+			font-weight: 300;
+			font-size: 0.78em;
+			line-height: 1.75;
+			color: #ffffff;
+		}
+
+		.msg-row.bot .msg-bubble {
+			background: rgba(255,255,255,0.04);
+			border: solid 1px rgba(255,255,255,0.08);
+			border-top-left-radius: 2px;
+		}
+
+		.msg-row.user .msg-bubble {
+			background: rgba(205,253,80,0.07);
+			border: solid 1px rgba(205,253,80,0.18);
+			border-top-right-radius: 2px;
+			color: rgba(255,255,255,0.9);
+		}
+
+		.msg-bubble strong {
+			color: #CDFD50;
+			font-weight: 600;
+		}
+
+		/* ── Typing indicator ── */
+		.typing-dots {
+			display: flex;
+			align-items: center;
+			gap: 4px;
+			padding: 4px 2px;
+		}
+
+		.typing-dots span {
+			width: 5px;
+			height: 5px;
+			border-radius: 50%;
+			background: rgba(205,253,80,0.6);
+			animation: dotBounce 1.3s ease-in-out infinite;
+		}
+
+		.typing-dots span:nth-child(2) { animation-delay: 0.18s; }
+		.typing-dots span:nth-child(3) { animation-delay: 0.36s; }
+
+		@keyframes dotBounce {
+			0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+			30%            { transform: translateY(-5px); opacity: 1; }
+		}
+
+		/* ── Suggestions ── */
+		.chat-suggestions {
+			display: flex;
+			gap: 8px;
+			flex-wrap: wrap;
+			padding: 0 22px 14px;
+			position: relative;
+			z-index: 1;
+			flex-shrink: 0;
+		}
+
+		.suggestion {
+			background: transparent;
+			border: solid 1px rgba(255,255,255,0.12);
+			color: rgba(255,255,255,0.5);
+			font-family: "Source Sans Pro", Helvetica, sans-serif;
+			font-weight: 300;
+			font-size: 0.65em;
+			letter-spacing: 0.04em;
+			padding: 5px 12px;
+			border-radius: 3px;
+			cursor: pointer;
+			transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+		}
+
+		.suggestion:hover {
+			border-color: rgba(205,253,80,0.5);
+			color: #CDFD50;
+			background: rgba(205,253,80,0.05);
+		}
+
+		/* ── Input row ── */
+		.chat-input-row {
+			border-top: solid 2px rgba(255,255,255,0.08);
+			padding: 12px 16px;
+			display: flex;
+			gap: 10px;
+			align-items: flex-end;
+			background: rgba(0,0,0,0.2);
+			position: relative;
+			z-index: 2;
+			flex-shrink: 0;
+		}
+
+		.chat-input-row textarea {
+			flex: 1;
+			background: rgba(255,255,255,0.04);
+			border: solid 1px rgba(255,255,255,0.1);
+			border-radius: 4px;
+			color: #ffffff;
+			font-family: "Source Sans Pro", Helvetica, sans-serif;
+			font-size: 0.78em;
+			font-weight: 300;
+			line-height: 1.6;
+			padding: 9px 14px;
+			resize: none;
+			outline: none;
+			min-height: 40px;
+			max-height: 110px;
+			overflow-y: auto;
+			transition: border-color 0.2s ease;
+			-moz-appearance: none;
+			-webkit-appearance: none;
+			appearance: none;
+		}
+
+		.chat-input-row textarea::placeholder {
+			color: rgba(255,255,255,0.25);
+		}
+
+		.chat-input-row textarea:focus {
+			border-color: rgba(205,253,80,0.4);
+		}
+
+		.send-btn {
+			width: 40px !important;
+			height: 40px !important;
+			border-radius: 4px !important;
+			background: #CDFD50 !important;
+			border: none !important;
+			box-shadow: none !important;
+			cursor: pointer !important;
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			flex-shrink: 0;
+			transition: background 0.2s ease, transform 0.15s ease, opacity 0.2s ease;
+			color: #000000 !important;
+			padding: 0 !important;
+			line-height: normal !important;
+			text-transform: none !important;
+			letter-spacing: normal !important;
+		}
+
+		.send-btn:hover:not(:disabled) {
+			background: #d9ff6b !important;
+			transform: scale(1.05);
+		}
+
+		.send-btn:disabled {
+			background: #CDFD50 !important;
+			opacity: 0.35;
+			cursor: not-allowed !important;
+			transform: none;
+		}
+
+		.send-btn svg {
+			width: 16px;
+			height: 16px;
+			stroke: #000000 !important;
+		}
+
+		.send-btn svg line,
+		.send-btn svg polygon,
+		.send-btn svg path,
+		.send-btn svg polyline {
+			stroke: #000000 !important;
+		}
+
+		/* ── Footer note ── */
+		.chat-footer-note {
+			font-family: "Source Sans Pro", Helvetica, sans-serif;
+			font-weight: 300;
+			font-size: 0.6em;
+			color: rgba(255,255,255,0.2);
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			text-align: center;
+			padding: 8px;
+			position: relative;
+			z-index: 1;
+			flex-shrink: 0;
+		}
+
+		/* ── IMPORTANT: API key notice ── */
+		.api-notice {
+			margin-top: 2em;
+			border: solid 1px rgba(205,253,80,0.2);
+			border-radius: 4px;
+			padding: 1em 1.5em;
+			background: rgba(205,253,80,0.03);
+		}
+
+		.api-notice p {
+			font-family: "Source Sans Pro", Helvetica, sans-serif;
+			font-weight: 300;
+			font-size: 0.72em;
+			color: rgba(255,255,255,0.5);
+			line-height: 1.7;
+			margin-bottom: 0.5em;
+		}
+
+		.api-notice p:last-child { margin-bottom: 0; }
+
+		.api-notice strong { color: #CDFD50; font-weight: 600; }
+
+		.api-notice code {
+			background: rgba(255,255,255,0.06);
+			border: solid 1px rgba(255,255,255,0.1);
+			border-radius: 3px;
+			font-family: "Courier New", monospace;
+			font-size: 0.9em;
+			padding: 0.15em 0.5em;
+			color: rgba(255,255,255,0.75);
+		}
+
+		@media screen and (max-width: 736px) {
+			.chat-shell { height: 480px; }
+			.msg-row { max-width: 92%; }
+		}
+	</style>
+</head>
+<body class="is-preload">
+
+	<div id="page-wrapper">
+
+		<!-- Header -->
+		<header id="header">
+			<h1 style="color:#CDFD50"><a href="index.html">Mohamed Amir Sohil Bishrul Hafi</a></h1>
+			<nav>
+				<a href="#menu" style="color:#CDFD50">Menu</a>
+			</nav>
+		</header>
+
+		<!-- Menu -->
+		<nav id="menu">
+			<div class="inner">
+				<h2 style="color:#000000">Menu</h2>
+				<ul class="links">
+					<li><a href="index.html" style="color:#000000;font-weight:bold">Home</a></li>
+					<li><a href="about.html" style="color:#000000;font-weight:bold">About</a></li>
+					<li><a href="portfolio2.html" style="color:#000000;font-weight:bold">Portfolio</a></li>
+					<li><a href="essays.html" style="color:#000000;font-weight:bold">Essays</a></li>
+					<li><a href="https://calendly.com/amirspatterns" target="_blank" style="color:#000000;font-weight:bold">Book a session</a></li>
+				</ul>
+				<a href="#" class="close">Close</a>
+			</div>
+		</nav>
+
+		<!-- Page wrapper section -->
+		<section id="wrapper">
+			<header style="margin-bottom:0;padding-bottom:0;">
+				<div class="inner">
+					<h2>Ask Amir</h2>
+					<p>AI-powered portfolio assistant</p>
+				</div>
+			</header>
+
+			<div class="wrapper">
+				<div class="inner" id="chatbot-section">
+
+					<div class="chatbot-intro">
+						<h2>Chat with my portfolio</h2>
+						<p>
+							Have a question about my experience, projects, tech stack, or availability?
+							Ask below. This assistant knows my full background and can answer on my behalf.
+							For anything requiring a direct conversation, use the booking link from the Menu.
+						</p>
+					</div>
+
+					<!-- ── CHATBOT SHELL ── -->
+					<div class="chat-shell">
+
+						<div class="chat-header">
+							<div class="chat-avatar">AS</div>
+							<div class="chat-header-text">
+								<div class="chat-header-name">Amir Sohil</div>
+								<div class="chat-header-sub">Senior Software Engineer · Analytics & Data Science</div>
+							</div>
+							<div class="chat-status">
+								<div class="status-dot"></div>
+								<span>Online</span>
+							</div>
+						</div>
+
+						<div class="chat-messages" id="chatMessages"></div>
+
+						<div class="chat-suggestions" id="chatSuggestions">
+							<button class="suggestion" onclick="useSuggestion(this)">Power BI & Fabric experience?</button>
+							<button class="suggestion" onclick="useSuggestion(this)">Tell me about the HR SaaS product</button>
+							<button class="suggestion" onclick="useSuggestion(this)">What ML projects have you built?</button>
+							<button class="suggestion" onclick="useSuggestion(this)">Are you open to remote roles?</button>
+							<button class="suggestion" onclick="useSuggestion(this)">What awards have you won?</button>
+						</div>
+
+						<div class="chat-input-row">
+							<textarea
+								id="chatInput"
+								placeholder="Ask about my experience, projects, skills, or availability..."
+								rows="1"
+							></textarea>
+							<button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send">
+								<svg viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5"
+									stroke-linecap="round" stroke-linejoin="round">
+									<line x1="22" y1="2" x2="11" y2="13"></line>
+									<polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+								</svg>
+							</button>
+						</div>
+
+						<div class="chat-footer-note">Powered by Groq · Responses generated by AI</div>
+
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<section id="footer">
+			<div class="inner">
+				<ul class="icons" align="center">
+					<li><a href="https://www.linkedin.com/in/amir-sohil/" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+					<li><a href="mailto:bhmasohail@gmail.com" class="icon solid fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+				</ul>
+				<ul class="copyright">
+					<li>&copy; Mohamed Amir Sohil Bishrul Hafi. All rights reserved.</li>
+					<li>Base Template: <a href="http://html5up.net">HTML5 UP</a></li>
+				</ul>
+			</div>
+		</section>
+
+	</div><!-- end page-wrapper -->
+
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/jquery.scrollex.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+
+	<!-- Chatbot logic -->
+	<script>
+	// ============================================================
+	// CONFIGURATION
+	// ============================================================
+	const PROXY_URL = 'https://amir-portfolio-proxy.amirspatterns.workers.dev';
+
+	// ── CORE KB: sent on every call (~750 tokens) ────────────────
+	const KB_CORE = `
+You are the portfolio assistant for Mohamed Amir Sohil Bishrul Hafi. Speak in first person as Amir. Use "I", not "he" or "Amir". Be confident, specific, and professional. Reference concrete tools, outcomes, and numbers. Keep responses to 2-4 short paragraphs unless more detail is requested. Use **bold** for key terms and technologies. Use a dash (-) for bullet lists. Never fabricate information. If asked something not covered here, offer to connect at bhmasohail@gmail.com.
+
+CRITICAL RULE: If asked about a specific company, job opportunity, or role opening, never fabricate details about that company or fill in placeholders. Confirm openness, state the most relevant skills and experience, and direct the person to bhmasohail@gmail.com. Do not pretend to know anything about companies not mentioned in this knowledge base.
+
+SCOPE RULE: You only answer questions related to Amir's professional background, skills, experience, projects, education, availability, and career. If asked anything outside this scope — general knowledge, maths, coding help, current events, opinions, or anything unrelated to Amir as a professional — politely decline and redirect. Example response: "I'm only set up to answer questions about Amir's professional background and work. Is there something specific about his experience, projects, or skills I can help with?"
+
+## IDENTITY
+Name: Mohamed Amir Sohil Bishrul Hafi (Amir Sohil)
+Location: Colombo, Sri Lanka | Open to remote and international roles globally (UK, EU, US, UAE, Singapore and beyond)
+Email: bhmasohail@gmail.com | LinkedIn: linkedin.com/in/amir-sohil | Portfolio: amirsohil.github.io
+
+## CURRENT ROLE
+**Senior Software Engineer, Analytics & Data Science** — 1 Billion Technology (Aug 2025–Present)
+1 Billion Technology is a 100+ person technology consultancy. I am the sole analytics owner for a UK-based Microsoft Dynamics 365 SaaS company — with full design authority and no formal requirements process. Clients describe a need in a single sentence; I scope, model, and deploy the full production solution.
+- Architect and deliver analytics across sales, operations, finance, and customer success — unified hub for survey performance, operational KPIs, and ISV product intelligence
+- Replaced manual executive reporting with near-real-time **Power BI** dashboards, defining KPI frameworks, metric hierarchies, and reporting standards
+- Evaluated, configured, and demonstrated **Databricks AI/BI Genie** as a conversational analytics interface over enterprise datasets, enabling natural-language data exploration
+- Developed AI narrative reporting POCs using **Power BI Copilot**, designing prompt frameworks to improve accuracy and usability of AI-generated business insights
+- Lead technology evaluation for **Microsoft Fabric Lakehouse**, Databricks, and Fabric AI capabilities
+- Conduct technical interviews and mentor junior team members on Power BI, DAX, and semantic modelling
+
+## PREVIOUS ROLE
+**Engineer, Analytics & Data Science** — 1 Billion Technology (Apr 2024–Jul 2025)
+Promoted from External Consultant. Delivered across both client and internal C-suite analytics.
+- Cut dashboard delivery from 1-2 weeks (team of 5) to under 2 days solo — ~75% reduction — via reusable semantic modelling patterns, DAX optimisation, and a standardised Figma design system
+- Shipped **200+ production Power BI reports** across 7+ workspaces serving hundreds of end users across multiple client organisations
+- Designed and delivered an internal HR analytics platform for the C-suite covering workforce planning, recruitment pipelines, account structures, and project allocation — later commercialised as the foundation of a standalone **HR SaaS product**
+- Delivered executive-level business performance reporting for a GCC-based tech-enabled Employer of Record firm, replacing fragmented manual reporting with unified leadership dashboards
+- Applied **NLP-based text similarity** techniques to unstructured client requirement data, enabling automated grouping and classification of semantically related content
+- Contributed to **Microsoft Fabric** and **Databricks (PySpark)** pipelines, building Bronze and Silver layer transformations within a medallion architecture
+- Built a reusable **Figma-based analytics design system** adopted across all client projects, improving consistency and development speed
+
+## EARLIER ROLES
+**External Consultant (Client-Facing)** — 1 Billion Technology (Mar 2023–Mar 2024)
+Sole external-facing analytics consultant, independently managing the full project lifecycle across concurrent engagements with no PM or BA support. Led stakeholder discovery directly with client leadership. Established organisation-wide standards for **Power BI architecture**, **DAX**, semantic modelling, and Figma — still the team's default delivery framework today.
+
+**Intern Software Engineer, Data Analytics** — 1 Billion Technology (Apr 2022–Feb 2023)
+Power BI report development, multi-source data modelling, SQL Server stored procedures and view design.
+
+## TECHNICAL SKILLS
+**Analytics Engineering & BI:** Power BI, DAX, Microsoft Fabric (Lakehouse, Pipelines, Semantic Models), Tableau, Plotly, Dash
+**Applied Data Science & ML:** Python, scikit-learn, XGBoost, LightGBM, SHAP, NLTK, statsmodels, SciPy, pandas, NumPy, polars
+**Data Engineering & Cloud:** Databricks (PySpark), Microsoft Azure, Azure DevOps, SQL Server
+**Graph & Semantic Analytics:** Neo4j (AuraDB, Desktop), Cypher, graph data modelling
+**Applied AI Analytics:** Power BI Copilot, Databricks AI/BI Genie, prompt engineering
+**Design & Collaboration:** Figma, Git, GitHub, Git LFS, R, HTML, CSS
+
+## EDUCATION
+**BSc (Hons) Data Science, First Class Honours** — Coventry University, UK (2024) | GPA 4.0/4.0 | Gold Medal (Best Overall Performance) | Dean's List, School of Innovation, Humanities and Linguistics
+Dissertation: Multi-model ML classification system with SHAP explainability to identify elite footballers and generate season-wise best XIs, benchmarked against FIFA Team of the Season across Europe's top 5 leagues. Selected for university exhibition.
+**Higher National Diploma in Data Science** — NIBM, Sri Lanka (2022) | GPA 4.0/4.0 | Distinction | Gold Medal
+**Advanced Diploma in Data Science** — NIBM, Sri Lanka (2021) | GPA 4.0/4.0 | Distinction | Gold Medal
+
+## AWARDS & RECOGNITION
+- **Winner** — DataDNA Credit Risk Analytics Challenge (Sept 2025) | 100-150 global participants | judged by industry professionals
+- **Runner-Up** — DataDNA Dataset Challenge: Washington's Woes (March 2025)
+- **Winner** — DataDNA "The Storyteller" Award: The Tragic Times (Oct 2022) | Special category for creative data storytelling
+- **Runner-Up** — DataDNA Dataset Challenge: The Wonderful World of Pokemon (July 2022)
+- **3x Gold Medal** for Academic Excellence — Coventry University and NIBM | 4.0 GPA across all three qualifications
+
+## CERTIFICATIONS
+Neo4j Certified Professional (May 2026) | Databricks AI Agent Fundamentals (Oct 2025) | Databricks Fundamentals (Oct 2025) | Advanced Analytics in Power BI — Enterprise DNA (May 2025) | Machine Learning Models in Power BI — Enterprise DNA (May 2025) | Microsoft Power Up Program Plan Designer Fundamentals (Jan 2026) | Figma for Data Visualization — Open Visualization Academy (Mar 2026) | IBM Applied Data Science with Python Level 2 (Jul 2021) | Elements of AI — University of Helsinki (Aug 2021) | CIMA Certificate in Business Accounting
+
+## AVAILABILITY & SALARY
+Open to full-time remote roles globally. Ideal roles: Senior Analytics Engineer, Senior BI Engineer, Data Scientist, ML Engineer, Analytics Lead. Comfortable with async-first, globally distributed teams. Open to competitive senior-level compensation — happy to discuss based on role, market, and scope.
+`;
+
+	// ── PROJECTS KB: injected only when relevant (~900 tokens) ───
+	const KB_PROJECTS = `
+## PROJECTS
+
+### Competitive & Award-Winning Work
+**Transferium Player Intelligence** (Python, Neo4j, Streamlit) — Graph-database-powered football player replacement engine. Neo4j AuraDB, weighted cosine similarity across 18,000+ players, 276,075 computed similarity edges, position-specific vector spaces, overall rating penalty function, league/region contextual bonus. Deployed live via Streamlit with full architectural write-up published.
+App: transferium.streamlit.app | Write-up: amirsohil.github.io/transferiumwriteup.html
+
+**Nova Credit Risk Lab** (Python, Tableau, Figma) — End-to-end credit risk analytics system. XGBoost model validated across 32,581 real-world loans, custom risk-tiering and segmentation framework, five-page interactive Tableau dashboard blending technical accuracy, ethical modelling, and executive reporting. Winner, DataDNA Credit Risk Analytics Challenge (Sept 2025, 100-150 global participants).
+
+**EuroPharm Analytics** (Power BI, Vega, Figma) — Pharmacy sales and profitability decision-intelligence platform. Translates complex sales data into defensible decisions around margin quality, product strategy, and operational focus. Statistical benchmarking, margin analysis, portfolio performance evaluation, scenario-based commercial analysis. DataDNA Challenge entry (Jan-Feb 2026).
+
+**Washington's Woes** (Python, Tableau, Figma) — Full investigative-style geospatial crime pattern analysis across Washington D.C. Combines spatial clustering, temporal trend analysis, offense classifications, and clearance trends in a newspaper-inspired design. Runner-Up, DataDNA Challenge (March 2025), recognised for analytical depth and visual communication.
+
+**Email Communication Analysis** (Python, Tableau, Figma) — NLP-driven analysis of 1,132 internal emails across 9 departments and 47 employees over one month, uncovering communication bottlenecks, behavioural patterns, and organisational dynamics. DataDNA Challenge (July 2024).
+
+**Voltage Verdicts** (Python, Tableau, Figma) — Analysis of 7,299 electronics reviews across 38 brands and 50 products from 7 major websites. Explores how customers evaluate electronics across platforms, brands, and product features. DataDNA Challenge (Feb 2024).
+
+**Tidying the Tides** (Python, Tableau, Figma) — Marine cleanup data dashboard exploring ocean pollution mitigation across the US. Covers cleanup locations, volunteer activity, trash composition, and temporal patterns. DataDNA Challenge (June 2023).
+
+**"Brilliant. In every way." Are they really?** (R, Power BI) — Sentiment analytics, helpfulness behaviour, and text pattern analysis across 5,010 Amazon reviews of the iPhone XR. DataDNA Challenge (March 2023).
+
+**The Tragic Times** (Python, Tableau) — Titanic survival analysis presented as a 1912 newspaper front page, examining survival patterns across class, age, gender, and fare. Winner, DataDNA Storyteller Award (Oct 2022).
+
+**The Wonderful World of Pokemon** (R, Power BI) — Statistical analysis of 800+ Pokemon covering type distributions, stat patterns, and Legendary classifications. Runner-Up, DataDNA Challenge (July 2022).
+
+### Selected Independent Projects
+**Elite Footballer Selection via ML + SHAP — BSc Dissertation** (Python, Plotly, HTML) — Multi-model classification system (separate models for GK, DEF, MID, FWD) with SHAP-based explainability, benchmarked against FIFA Team of the Season across 5 European leagues. ML approach outperformed human selections in a majority of seasons. Selected for university exhibition.
+Site: amirsohil.github.io/BScDSWebsite
+
+**COVID-19 Insights** (Python, Plotly, Heroku) — Interactive analytics dashboard consolidating global COVID-19 datasets, allowing country comparisons and trend tracking. Showcased at Sri Lanka Skills Expo 2023.
+
+**Die Gegenpresse** (Python, Tableau, Figma) — Analytical tribute to Liverpool's Klopp era, mapping all 1,035 goals scored during his tenure across competitions.
+
+**Le Roi** (Python, Tableau, Figma) — Minimalist analytical poster visualising Pele's 1,284 goals across 1,375 matches using a dense grid composition.
+
+**Cristiano in the Big Five** (Python, Tableau, Figma) — Narrative tribute tracing Ronaldo's journey through Europe's Big Five leagues with data, prose, and editorial design.
+
+**All Goals in the Men's World Cup** (Tableau, Figma) — 2,720 goals across 22 World Cup tournaments, presented around the FIFA World Cup Trophy visual identity.
+
+**Studio Ghibli Budget vs. Revenue** (D3.js, HTML) — Interactive visualisation mapping 25 Ghibli films across four decades, budget against box office revenue.
+
+**Happy Little Colours** (Figma) — Voronoi diagram reconstructing Bob Ross's colour palette across all 31 seasons of The Joy of Painting.
+
+**Echoes of Earth** (R, Figma) — Global record of magnitude 7.0+ earthquakes from 2000 to 2025, combining spatial and temporal views.
+
+**Colombo's Temperature in Colour** (Tableau, Figma) — Heat-stripe visualisation of Colombo's 2024 daily temperature patterns across an entire year.
+
+Full portfolio: amirsohil.github.io/portfolio.html
+`;
+
+	// ── Keyword detection for dynamic injection ──────────────────
+	const PROJECT_KEYWORDS = [
+		// direct project names
+		'transferium','nova','credit risk','europharm','pharma','washington','tragic times',
+		'pokemon','email communication','voltage','tides','ghibli','bob ross','le roi',
+		'cristiano','gegenpresse','gegenpress','echoes','colombo','temperature','colour',
+		'color','liverpool','klopp','pele','pelé','ronaldo','world cup',
+		// generic intent triggers
+		'project','portfolio','work sample','show me','what have you','what did you',
+		'what have you built','tell me about your','examples of','demo','live app',
+		// technical triggers that imply project discussion
+		'dissertation','machine learning model','xgboost','shap','neo4j','streamlit',
+		'tableau','graph database','similarity','deployed','built','created','designed',
+		'developed','dashboard','visualis','visualiz','nlp','sentiment','geospatial',
+		'clustering','classification','covid','heroku','d3','voronoi','heat','earthquake',
+		// competitive context
+		'datadna','competition','challenge','award','winner','runner','storyteller'
+	];
+
+	function needsProjects(text) {
+		const lower = text.toLowerCase();
+		return PROJECT_KEYWORDS.some(kw => lower.includes(kw));
+	}
+
+	// ── State ────────────────────────────────────────────────────
+	let conversationHistory = [];
+	let isBusy = false;
+
+	// ── Build payload with dynamic context ───────────────────────
+	function buildGroqPayload(userMessage) {
+		// Check entire conversation context too, not just latest message
+		const fullContext = conversationHistory.map(t => t.text).join(' ') + ' ' + userMessage;
+		const systemContent = KB_CORE + (needsProjects(fullContext) ? '\n' + KB_PROJECTS : '');
+
+		const messages = [{ role: 'system', content: systemContent }];
+		for (const turn of conversationHistory) {
+			messages.push({
+				role: turn.role === 'user' ? 'user' : 'assistant',
+				content: turn.text
+			});
+		}
+		messages.push({ role: 'user', content: userMessage });
+		return { messages };
+	}
+
+	function appendMessage(role, text) {
+		const container = document.getElementById('chatMessages');
+
+		const row = document.createElement('div');
+		row.className = `msg-row ${role}`;
+
+		const icon = document.createElement('div');
+		icon.className = `msg-icon ${role}`;
+		icon.textContent = role === 'bot' ? 'AS' : 'YOU';
+
+		const bubble = document.createElement('div');
+		bubble.className = 'msg-bubble';
+		// render **bold**
+		const rendered = text
+			.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+			.replace(/\n\n/g, '<br><br>')
+			.replace(/\n/g, '<br>');
+		bubble.innerHTML = rendered;
+
+		row.appendChild(icon);
+		row.appendChild(bubble);
+		container.appendChild(row);
+		container.scrollTop = container.scrollHeight;
+		return row;
+	}
+
+	function showTyping() {
+		const container = document.getElementById('chatMessages');
+		const row = document.createElement('div');
+		row.className = 'msg-row bot';
+		row.id = 'typingRow';
+
+		const icon = document.createElement('div');
+		icon.className = 'msg-icon bot';
+		icon.textContent = 'AS';
+
+		const bubble = document.createElement('div');
+		bubble.className = 'msg-bubble';
+		bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+
+		row.appendChild(icon);
+		row.appendChild(bubble);
+		container.appendChild(row);
+		container.scrollTop = container.scrollHeight;
+	}
+
+	function removeTyping() {
+		const t = document.getElementById('typingRow');
+		if (t) t.remove();
+	}
+
+	async function sendMessage(overrideText) {
+		if (isBusy) return;
+		const input = document.getElementById('chatInput');
+		const text = (overrideText || input.value).trim();
+		if (!text) return;
+
+		// Hide suggestion chips after first use
+		const suggestions = document.getElementById('chatSuggestions');
+		if (suggestions) suggestions.style.display = 'none';
+
+		input.value = '';
+		input.style.height = 'auto';
+
+		appendMessage('user', text);
+		isBusy = true;
+		document.getElementById('sendBtn').disabled = true;
+		showTyping();
+
+		const payload = buildGroqPayload(text);
+
+		try {
+			const res = await fetch(PROXY_URL, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload)
+			});
+
+			const data = await res.json();
+			removeTyping();
+
+			let reply = "I'm having a connection issue right now. Please reach out directly at **bhmasohail@gmail.com**. I'll get back to you promptly.";
+
+			if (data?.choices?.[0]?.message?.content) {
+				reply = data.choices[0].message.content;
+			} else if (data?.error) {
+				console.error('Groq API error:', JSON.stringify(data.error));
+			}
+
+			conversationHistory.push({ role: 'user', text });
+			conversationHistory.push({ role: 'assistant', text: reply });
+
+			// Keep history to last 8 turns (16 entries) to control token growth
+			// Projects KB is injected dynamically so no need for large history window
+			if (conversationHistory.length > 16) {
+				conversationHistory = conversationHistory.slice(-16);
+			}
+
+			appendMessage('bot', reply);
+
+		} catch (err) {
+			removeTyping();
+			console.error('Fetch error:', err);
+			appendMessage('bot', "Connection issue. Please reach out directly at **bhmasohail@gmail.com**.");
+		}
+
+		isBusy = false;
+		document.getElementById('sendBtn').disabled = false;
+		input.focus();
+	}
+
+	function useSuggestion(btn) {
+		sendMessage(btn.textContent.trim());
+	}
+
+	// Auto-resize textarea
+	document.addEventListener('DOMContentLoaded', function() {
+		const input = document.getElementById('chatInput');
+
+		input.addEventListener('keydown', function(e) {
+			if (e.key === 'Enter' && !e.shiftKey) {
+				e.preventDefault();
+				sendMessage();
+			}
+		});
+
+		input.addEventListener('input', function() {
+			this.style.height = 'auto';
+			this.style.height = Math.min(this.scrollHeight, 110) + 'px';
+		});
+
+		// Opening greeting
+		setTimeout(function() {
+			appendMessage('bot', "Hi. I'm here to answer any questions about **Amir's** background, experience, and projects.\n\nFeel free to ask about his **Power BI and Microsoft Fabric** work, **machine learning projects**, certifications, or availability for remote roles. What would you like to know?");
+		}, 500);
+	});
+	</script>
+
+</body>
+</html>

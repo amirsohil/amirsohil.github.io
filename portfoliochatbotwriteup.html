@@ -1,0 +1,787 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Essays [Amir Sohil]</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="description" content="How I built an AI portfolio assistant using Llama 3.3, Groq, and Cloudflare Workers — with dynamic context injection, guardrails, and a two-layer knowledge base. Every decision, from experience.">
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<style>
+			/* ── Essay-specific overrides — consistent with existing writeups ── */
+
+			.essay-body {
+				max-width: 720px;
+				margin: 0 auto;
+				font-size: 1.05em;
+				line-height: 1.85;
+			}
+
+			.essay-body p {
+				margin: 0 0 1.4em 0;
+				color: rgba(255,255,255,0.82);
+				font-size: 1em;
+			}
+
+			.essay-body h3 {
+				margin: 2.2em 0 0.7em 0;
+				font-size: 1.35em;
+				letter-spacing: 0.04em;
+			}
+
+			.essay-body p,
+			.essay-body td,
+			.essay-body li {
+				text-align: justify;
+			}
+
+			.essay-body blockquote {
+				border-left: 3px solid #CDFD50;
+				background: rgba(205,253,80,0.05);
+				padding: 1.1em 1.5em;
+				margin: 1.8em 0;
+				font-family: Raleway, Helvetica, sans-serif;
+				font-style: italic;
+				font-size: 1.05em;
+				line-height: 1.65;
+				color: rgba(255,255,255,0.9);
+				border-radius: 0;
+			}
+
+			.essay-body blockquote cite {
+				display: block;
+				margin-top: 0.7em;
+				font-style: normal;
+				font-size: 0.75em;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				color: #CDFD50;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+			}
+
+			.section-eyebrow {
+				display: block;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.72em;
+				letter-spacing: 0.22em;
+				text-transform: uppercase;
+				color: #CDFD50;
+				margin-bottom: 0.5em;
+			}
+
+			.essay-body pre {
+				background: rgba(0,0,0,0.35);
+				border: 1px solid rgba(255,255,255,0.1);
+				border-left: 3px solid rgba(205,253,80,0.5);
+				padding: 1.3em 1.5em;
+				margin: 1.6em 0;
+				border-radius: 3px;
+				overflow-x: auto;
+				font-family: "JetBrains Mono", "Courier New", monospace;
+				font-size: 0.82em;
+				line-height: 1.7;
+				color: rgba(255,255,255,0.75);
+			}
+
+			.essay-body pre code {
+				background: none;
+				border: none;
+				padding: 0;
+				font-size: 1em;
+				color: inherit;
+			}
+
+			.essay-body code {
+				font-family: "JetBrains Mono", "Courier New", monospace;
+				font-size: 0.82em;
+				background: rgba(205,253,80,0.08);
+				border: 1px solid rgba(205,253,80,0.2);
+				padding: 1px 6px;
+				border-radius: 2px;
+				color: #CDFD50;
+			}
+
+			/* Decision cards */
+			.features.essay-decisions article {
+				background-color: rgba(255,255,255,0.04);
+				border: 1px solid rgba(255,255,255,0.1);
+				border-radius: 4px;
+				transition: border-color 0.25s, background-color 0.25s;
+				cursor: pointer;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.features.essay-decisions article::before {
+				content: '';
+				position: absolute;
+				left: 0; top: 0; bottom: 0;
+				width: 3px;
+				background: #CDFD50;
+				transform: scaleY(0);
+				transform-origin: bottom;
+				transition: transform 0.35s ease;
+			}
+
+			.features.essay-decisions article:hover,
+			.features.essay-decisions article.open {
+				background-color: rgba(205,253,80,0.06);
+				border-color: rgba(205,253,80,0.3);
+			}
+
+			.features.essay-decisions article:hover::before,
+			.features.essay-decisions article.open::before {
+				transform: scaleY(1);
+			}
+
+			.features.essay-decisions article h4.major {
+				color: #ffffff !important;
+				font-size: 1em;
+				margin-bottom: 0.5em;
+			}
+
+			.features.essay-decisions article .decision-tag {
+				display: inline-block;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.68em;
+				letter-spacing: 0.16em;
+				text-transform: uppercase;
+				color: #CDFD50;
+				border: 1px solid rgba(205,253,80,0.4);
+				padding: 2px 9px;
+				margin-bottom: 0.9em;
+				border-radius: 2px;
+			}
+
+			.features.essay-decisions article p {
+				color: rgba(255,255,255,0.6) !important;
+				font-size: 0.9em !important;
+				line-height: 1.65;
+			}
+
+			.features.essay-decisions article .decision-detail {
+				max-height: 0;
+				overflow: hidden;
+				transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1), opacity 0.3s;
+				opacity: 0;
+			}
+
+			.features.essay-decisions article.open .decision-detail {
+				max-height: 700px;
+				opacity: 1;
+			}
+
+			.features.essay-decisions article .decision-detail-inner {
+				border-top: 1px solid rgba(255,255,255,0.1);
+				margin-top: 1em;
+				padding-top: 1em;
+				font-size: 0.88em;
+				color: rgba(255,255,255,0.6);
+				line-height: 1.7;
+			}
+
+			.features.essay-decisions article .decision-detail-inner strong {
+				color: rgba(255,255,255,0.9);
+			}
+
+			.features.essay-decisions article .decision-detail-inner .lesson {
+				margin-top: 0.8em;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.78em;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				color: #CDFD50;
+			}
+
+			.card-toggle-hint {
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.72em;
+				color: rgba(255,255,255,0.3);
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				margin-bottom: 1.2em;
+			}
+
+			/* Stack table */
+			.stack-table td {
+				padding: 1.1em 0;
+				border-bottom: 1px solid rgba(255,255,255,0.07);
+				vertical-align: middle;
+				font-size: 0.92em;
+				color: rgba(255,255,255,0.75);
+				line-height: 1.6;
+			}
+
+			.stack-table td:first-child {
+				width: 38%;
+				font-family: Raleway, Helvetica, sans-serif;
+				font-weight: 700;
+				font-size: 0.88em;
+				color: #ffffff;
+				letter-spacing: 0.03em;
+				padding-right: 1.2em;
+			}
+
+			.stack-table td:last-child {
+				width: 12%;
+				text-align: right;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.72em;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				color: #CDFD50;
+			}
+
+			/* Architecture diagram */
+			.arch-diagram {
+				background: rgba(0,0,0,0.3);
+				border: 1px solid rgba(255,255,255,0.08);
+				border-radius: 4px;
+				padding: 1.8em 2em;
+				margin: 1.8em 0;
+				font-family: "JetBrains Mono", "Courier New", monospace;
+				font-size: 0.8em;
+				color: rgba(255,255,255,0.6);
+				line-height: 2;
+				overflow-x: auto;
+			}
+
+			.arch-diagram .highlight { color: #CDFD50; }
+			.arch-diagram .arrow { color: rgba(255,255,255,0.3); }
+
+			/* Scroll progress */
+			#essay-progress {
+				position: fixed;
+				top: 0; left: 0;
+				height: 2px;
+				background: #CDFD50;
+				width: 0%;
+				z-index: 9999;
+				transition: width 0.1s linear;
+			}
+
+			/* Fade in */
+			.fade-in {
+				opacity: 0;
+				transform: translateY(18px);
+				transition: opacity 0.55s ease, transform 0.55s ease;
+			}
+
+			.fade-in.visible {
+				opacity: 1;
+				transform: translateY(0);
+			}
+
+			/* CTA block */
+			.cta-block {
+				margin-top: 2em;
+			}
+
+			/* Stats row */
+			.stats-row {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 1px;
+				background: rgba(255,255,255,0.07);
+				border: 1px solid rgba(255,255,255,0.07);
+				border-radius: 4px;
+				overflow: hidden;
+				margin: 1.8em 0;
+			}
+
+			.stat-cell {
+				background: rgba(0,0,0,0.25);
+				padding: 1.4em 1em;
+				text-align: center;
+			}
+
+			.stat-num {
+				display: block;
+				font-family: Raleway, Helvetica, sans-serif;
+				font-weight: 700;
+				font-size: 2em;
+				color: #CDFD50;
+				letter-spacing: -0.02em;
+				line-height: 1;
+				margin-bottom: 0.3em;
+			}
+
+			.stat-label {
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.68em;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: rgba(255,255,255,0.4);
+			}
+
+			@media screen and (max-width: 736px) {
+				.stats-row { grid-template-columns: 1fr; }
+			}
+		</style>
+	</head>
+	<body class="is-preload">
+
+		<div id="essay-progress"></div>
+		<div id="page-wrapper">
+
+			<!-- Header -->
+			<header id="header">
+				<h1 style="color:#CDFD50"><a href="index.html">Mohamed Amir Sohil Bishrul Hafi</a></h1>
+				<nav>
+					<a href="#menu" style="color:#CDFD50">Menu</a>
+				</nav>
+			</header>
+
+			<!-- Menu -->
+			<nav id="menu">
+				<div class="inner">
+					<h2 style="color:#000000">Menu</h2>
+					<ul class="links">
+						<li><a href="index.html" style="color:#000000;font-weight:bold">Home</a></li>
+						<li><a href="about.html" style="color:#000000;font-weight:bold">About</a></li>
+						<li><a href="portfolio2.html" style="color:#000000;font-weight:bold">Portfolio</a></li>
+						<li><a href="essays.html" style="color:#000000;font-weight:bold">Essays</a></li>
+						<li><a href="https://calendly.com/amirspatterns" target="_blank" style="color:#000000;font-weight:bold">Book a session</a></li>
+					</ul>
+					<a href="#" class="close">Close</a>
+				</div>
+			</nav>
+
+			<section id="wrapper">
+				<header style="margin-bottom:0;padding-bottom:0;">
+					<div class="inner">
+						<h2><i>Ask Amir</i> — Building an AI Portfolio Assistant</h2>
+						<p>Essay · AI Engineering · Prompt Design · Zero-Cost Infrastructure</p>
+					</div>
+				</header>
+
+				<div class="wrapper">
+					<div class="inner">
+						<div class="essay-body">
+
+							<!-- ── The Problem ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">The Problem</span>
+								<h3>Static Portfolios Are a One-Way Broadcast</h3>
+
+								<p>
+									I've been on the receiving end of this enough times to know how it plays out. A recruiter or potential client lands on your portfolio. They have a specific question — does he work with Databricks? Has he done anything in finance? Is he actually available? — and the answer is somewhere on the page, buried in a bullet point they may or may not scroll to. Most don't scroll far. They move on.
+								</p>
+
+								<p>
+									A contact form doesn't fix this. Neither does a Calendly link. What fixes it is something that can answer the question immediately, accurately, and at any time — without me being online. I wanted a conversational interface that knew my full background and could speak on my behalf. Not a chatbot template dropped onto a page. Something built to match the site, built to answer well, and built in a way that demonstrated the same kind of thinking I claim professionally.
+								</p>
+
+								<p>
+									There was a second reason I wanted to build it from scratch rather than use an existing tool. Every technical decision in this project — model selection, knowledge base architecture, API security, token management — is the kind of decision I make for clients. Building this openly, and writing about it, is its own proof of work.
+								</p>
+
+								<blockquote>
+									The goal wasn't to build something that looked impressive. It was to build something that worked — and to build it in a way that was worth writing about.
+								</blockquote>
+							</div>
+							<br>
+
+							<!-- ── Stats ── -->
+							<div class="stats-row fade-in">
+								<div class="stat-cell">
+									<span class="stat-num" data-target="0">£0</span>
+									<span class="stat-label">Monthly cost</span>
+								</div>
+								<div class="stat-cell">
+									<span class="stat-num" data-target="1000" data-suffix="+">0</span>
+									<span class="stat-label">Free requests/day</span>
+								</div>
+								<div class="stat-cell">
+									<span class="stat-num" data-target="2" data-suffix="s">&lt;2s</span>
+									<span class="stat-label">Response time</span>
+								</div>
+							</div>
+							<br>
+
+							<!-- ── Architecture ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">Architecture</span>
+								<h3>How It Works</h3>
+
+								<p>
+									The system has three components: a static HTML frontend embedded in my portfolio, a serverless proxy running on
+									<i>Cloudflare Workers</i>, and <i>Groq's</i> inference API running <i>Llama 3.3 70B</i>. The frontend and proxy
+									are permanently free. The inference API has a generous free tier — 1,000 requests and 100,000 tokens per day —
+									which is more than sufficient for portfolio traffic.
+								</p>
+
+								<div class="arch-diagram">
+									<span class="highlight">Browser</span> <span class="arrow">──────►</span> <span class="highlight">Cloudflare Worker</span> <span class="arrow">──────►</span> <span class="highlight">Groq API (Llama 3.3 70B)</span><br>
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="arrow">◄──────</span> Response <span class="arrow">◄──────</span><br><br>
+									<span style="color:rgba(255,255,255,0.3)">No backend server. No database. No auth layer.</span><br>
+									<span style="color:rgba(255,255,255,0.3)">API key stored as encrypted Worker secret.</span>
+								</div>
+
+								<p>
+									The frontend sends a POST request to the Worker containing the full conversation history and the user's latest message. The Worker holds the Groq API key as an encrypted environment variable — it never touches client-side code — authenticates with Groq, and forwards the payload. The response comes back in under two seconds in the vast majority of cases.
+								</p>
+
+								<p>
+									The entire frontend is vanilla HTML and JavaScript. No React, no build step, no dependency management. Everything — structure, styles, and logic — lives in a single file. When I want to update the knowledge base, I edit a text block and upload one file to GitHub. That simplicity is a deliberate choice, not a limitation.
+								</p>
+							</div>
+							<br>
+
+							<!-- ── Knowledge base ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">The Hard Part</span>
+								<h3>Writing the Brief</h3>
+
+								<p>
+									The model has no memory of who I am. Every conversation starts from zero. The only context it has is what I send — a structured text block in the system instruction before every request. I call it the knowledge base, and I underestimated how much work it would take to get it right.
+								</p>
+
+								<p>
+									A knowledge base is not a CV. A CV lists what you did. A knowledge base has to anticipate what someone might ask and give the model enough grounding to answer confidently, specifically, and honestly — without inventing credentials that don't exist. I hit both failure modes before I got there. Too sparse, and the model hedges constantly: <i>"I believe Amir may have experience with..."</i> — which reads as uncertainty about your own background, exactly the opposite of what you want. Too dense, and it buries the important detail or loses the thread on which project belongs to which period.
+								</p>
+
+								<p>
+									The structure I settled on mirrors how a well-briefed colleague would describe me: identity and availability first, then role by role with specific outcomes and tool references, then certifications and education. Each role includes the actual numbers — 200+ reports, 75% cycle reduction, 7+ workspaces. The model speaks in the first person throughout and is explicitly told to be specific rather than general.
+								</p>
+
+								<p>
+									Two additional rules took iteration to get right. The first is a <strong>scope guardrail</strong>: if asked anything outside my professional background — general knowledge, maths, coding help, current events — the assistant politely declines and redirects. Without this, the model will happily answer any question it can, which looks impressive in isolation but undermines the trust signal the tool is supposed to create. A portfolio assistant that doubles as a general-purpose chatbot raises a question about what it's actually doing with visitor data.
+								</p>
+
+								<p>
+									The second is a <strong>company inquiry rule</strong>: if a recruiter or hiring manager asks about a specific role or company, the assistant confirms openness and relevant skills, then directs them to email — it never fabricates details about companies not in its knowledge base. I added this after seeing a model confidently describe a company's product offering from thin air. That kind of hallucination in a professional context is worse than saying nothing.
+								</p>
+
+								<p>
+									The projects layer — <code>KB_PROJECTS</code> — required the same discipline applied specifically to project descriptions. Each entry includes the technology stack, scale metrics where meaningful (276,075 similarity edges, 32,581 loans), competition outcomes, and live URLs where they exist. The full projects list now covers over a dozen pieces of work across ML, graph databases, geospatial analysis, data storytelling, and BI — a breadth that would make the core KB too heavy to send on every request, which is why the two-layer split exists.
+								</p>
+
+								<blockquote>
+									The hard part was not the code. It was writing a brief precise enough that the model could reason from it without inventing things I haven't done — and constrained enough that it wouldn't go off-script when someone tried to use it as a general assistant.
+								</blockquote>
+							</div>
+							<br>
+
+							<!-- ── Decisions ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">Architecture Decisions</span>
+								<h3>Every Choice, and Why</h3>
+								<p class="card-toggle-hint">Click any card to expand the reasoning.</p>
+
+								<section class="features essay-decisions">
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Inference · Provider</div>
+										<h4 class="major">Groq over Gemini, OpenAI, or self-hosted</h4>
+										<p style="text-align:left;">I started with Gemini. It didn't survive contact with reality.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												The first version of this was built on <strong>Google Gemini</strong>. The integration itself worked — responses came back, quality was reasonable, and the setup was quick. What I didn't anticipate was Google's new-project access controls. During development, my Cloud project was automatically flagged and access-denied with a "please contact support" error. It took over 24 hours to resolve. A second project I created hit the same wall immediately after. A tool that silently breaks because of an upstream policy decision — with no warning, no ETA, and no clear resolution path — is not something I'm willing to put on a permanently live portfolio page.
+											</p>
+											<p>
+												<strong>OpenAI</strong> requires a credit card even for free-tier access, which introduces billing exposure on a publicly accessible endpoint. <strong>Self-hosted</strong> open-source models require infrastructure I have no interest in maintaining for a static portfolio page. <strong>Groq</strong> requires only an email address, activates immediately, has no project-blocking behaviour, and runs high-quality open-source models at fast inference speeds. The free tier resets daily and has been completely stable throughout.
+											</p>
+											<div class="lesson">Outcome: Immediate setup, no billing risk, consistent sub-2-second responses. No incidents since switching.</div>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Model · Selection</div>
+										<h4 class="major">Llama 3.3 70B Versatile</h4>
+										<p style="text-align:left;">Best balance of response quality and daily token budget on Groq's free tier.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												Groq's free tier offers several models. The choice came down to two candidates:
+												<strong>llama-3.3-70b-versatile</strong> (100K tokens/day) and
+												<strong>meta-llama/llama-4-scout-17b-16e-instruct</strong> (500K tokens/day).
+											</p>
+											<p>
+												Scout has five times the daily token budget, which matters because the knowledge base is large and
+												gets sent with every request. However, at 17 billion parameters it is a smaller model than the
+												70B Versatile, and the quality difference is noticeable on nuanced or ambiguous questions — exactly
+												the kind a recruiter might ask. I opted for quality over headroom.
+											</p>
+											<p>
+												The fallback strategy handles the limit anyway: the Cloudflare Worker tries <strong>llama-3.3-70b-versatile</strong>
+												first, and automatically retries with <strong>llama-4-scout</strong> if a rate limit is returned.
+												The user never sees an error.
+											</p>
+											<div class="lesson">Outcome: Best quality primary model, automatic fallback if daily limit is reached.</div>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Security · API Key</div>
+										<h4 class="major">Cloudflare Worker as proxy</h4>
+										<p style="text-align:left;">The API key never appears in client-side code.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												Calling an LLM API directly from the browser requires the API key to be present in the JavaScript —
+												which means anyone who opens the page source can read it, copy it, and use it to exhaust your
+												quota or rack up charges on a paid plan.
+											</p>
+											<p>
+												A <strong>Cloudflare Worker</strong> is a serverless function that runs at the edge. It accepts
+												requests from the browser, retrieves the API key from an encrypted environment variable that
+												only the Worker can read, and forwards the request to Groq. The key is never transmitted to the client.
+												Cloudflare's free tier allows 100,000 Worker requests per day — sufficient for any reasonable
+												portfolio traffic.
+											</p>
+											<p>
+												This is the standard pattern for protecting API keys in frontend-only applications, and it adds
+												no meaningful latency since Cloudflare's edge network is geographically distributed.
+											</p>
+											<div class="lesson">Outcome: API key fully protected, zero added infrastructure cost.</div>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Frontend · Framework</div>
+										<h4 class="major">Vanilla HTML and JavaScript, no frameworks</h4>
+										<p style="text-align:left;">The simplest thing that works. No build step, no dependencies, no bundle size.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												My portfolio is a static site. Adding a React or Vue component would require a build pipeline,
+												a separate deployment process, and either an iframe or a significant restructuring of the
+												existing site. None of that was warranted for a single-page chat interface.
+											</p>
+											<p>
+												Vanilla JavaScript handles the DOM manipulation, message rendering, and API calls cleanly.
+												The entire chatbot — HTML structure, CSS styling, and all logic — lives in one file. Updating
+												the knowledge base is a text edit. Deploying an update is uploading one file to GitHub.
+											</p>
+											<p>
+												The constraint also forced discipline. Without a component library, every design decision was
+												intentional — which produced a cleaner result than reaching for pre-built components would have.
+											</p>
+											<div class="lesson">Outcome: Single-file deployment, zero dependencies, full design control.</div>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Design · Integration</div>
+										<h4 class="major">Native to the portfolio, not a dropped-in widget</h4>
+										<p style="text-align:left;">Recruiters notice when something doesn't belong. The chatbot had to feel like part of the site.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												Generic chat widget UIs — floating buttons, rounded white bubbles, off-brand colour schemes —
+												signal that a tool was added as an afterthought. They also signal a specific kind of technical
+												decision: I found something ready-made and dropped it in. That is a meaningful signal on a
+												portfolio that is supposed to demonstrate engineering judgement.
+											</p>
+											<p>
+												The chatbot uses the same <strong>Raleway</strong> headings and <strong>Source Sans Pro</strong>
+												body text as the rest of the site. The accent colour is the same <strong>#CDFD50</strong> lime
+												green that appears in headers, links, and section markers across all portfolio pages. The dark
+												background, border treatment, and button style follow the existing design language exactly.
+											</p>
+											<div class="lesson">Outcome: The chatbot feels native, not bolted on. The design decision is part of the demonstration.</div>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">UX · Suggestions</div>
+										<h4 class="major">Suggestion chips on load</h4>
+										<p style="text-align:left;">Most visitors won't know what to ask. The chips remove the blank-input problem.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												A blank text input is a conversion killer. If someone arrives at the chatbot without a specific
+												question already in mind, the empty placeholder text — no matter how well-written — creates
+												a moment of friction. They stall, then leave.
+											</p>
+											<p>
+												Five suggestion chips appear on load, each representing a question a recruiter or client is
+												genuinely likely to ask: Power BI experience, the HR SaaS product, ML projects, remote availability,
+												and awards. One tap sends the question. The chips disappear after the first message to clear
+												space for the conversation.
+											</p>
+											<div class="lesson">Outcome: Lower friction entry, higher engagement rate, guided conversation without feeling scripted.</div>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Prompt Design · Guardrails</div>
+										<h4 class="major">Scope rule and company inquiry rule</h4>
+										<p style="text-align:left;">A portfolio assistant that answers anything undermines the very trust signal it's supposed to create.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												Without explicit guardrails, an LLM will answer any question it can — general knowledge, maths, coding problems, current events. That might look capable in isolation, but it creates a trust problem on a portfolio page. A visitor wondering "what is this thing actually doing with my input?" is not a visitor who books a session or sends an email.
+											</p>
+											<p>
+												The scope rule is simple: if a question falls outside my professional background — experience, skills, projects, education, availability — the assistant politely declines and redirects. This isn't a technical limitation, it's an intentional design decision. The assistant is a specialist, not a general chatbot, and that specialisation is part of the signal.
+											</p>
+											<p>
+												The company inquiry rule addresses a specific hallucination risk: if a recruiter asks about a role at a company the assistant doesn't know about, it will sometimes confidently describe the company's products, team size, or culture from its training data — information that may be outdated, wrong, or fabricated. The rule redirects all company-specific enquiries to email, where a real conversation can happen with accurate information.
+											</p>
+											<div class="lesson">Outcome: Consistent, trustworthy behaviour. The assistant does one thing well rather than many things unreliably.</div>
+										</div></div>
+									</article>
+
+								</section>
+							</div>
+							<br><br>
+
+							<!-- ── What I'd Do Differently ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">Retrospective</span>
+								<h3>What I Would Do Differently</h3>
+
+								<p>
+									<strong>Streaming responses.</strong> Right now the chatbot waits for the complete reply before rendering anything — the typing indicator runs, then the full response appears at once. Groq supports streaming via server-sent events, which would let text appear incrementally as it's generated. The perceived latency difference is significant even when actual response time is identical. This is the highest-priority improvement I haven't made yet, mainly because it requires a more complex Worker implementation — streaming a chunked response rather than a JSON blob — and I haven't had a reason to prioritise it over other things.
+								</p>
+
+								<p>
+									<strong>Conversation analytics.</strong> I wrote the knowledge base based on what I assumed recruiters and hiring managers would ask. I have no way of knowing whether those assumptions are right. Anonymised logging — a Cloudflare Worker webhook writing to a Google Sheet, or a D1 database — would show me which questions actually get asked, which ones get a poor response, and what gaps exist in the knowledge base. Without that feedback loop, I'm iterating blind.
+								</p>
+
+								<p>
+									<strong>Conversation memory across sessions.</strong> Every page visit starts fresh. Someone who comes back the next day to follow up has to re-establish context from the beginning. Persisting the last conversation in <code>localStorage</code> is a small change that would make the experience noticeably more coherent for returning visitors — and returning visitors are exactly the people worth impressing most.
+								</p>
+
+								<p>
+									<strong>Smarter project keyword detection.</strong> The current <code>needsProjects()</code> function scans the latest message against a keyword list. It handles direct project names and explicit intent phrases well, but misses natural phrasing that doesn't match any keyword — "can I see something you've shipped?" or "show me what you've done" won't trigger injection even though they clearly should. A broader and more carefully maintained keyword list, or a lightweight intent classifier, would close that gap without meaningfully affecting token cost.
+								</p>
+							</div>
+							<br><br>
+
+							<!-- ── Stack ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">The Stack</span>
+								<h3>Everything Used, Free End to End</h3>
+
+								<table class="stack-table">
+									<tbody>
+										<tr>
+											<td>LLM inference</td>
+											<td><i>Groq API · Llama 3.3 70B Versatile</i></td>
+											<td>Free</td>
+										</tr>
+										<tr>
+											<td>API proxy</td>
+											<td><i>Cloudflare Workers</i></td>
+											<td>Free</td>
+										</tr>
+										<tr>
+											<td>Frontend</td>
+											<td><i>HTML · CSS · Vanilla JavaScript</i></td>
+											<td>Free</td>
+										</tr>
+										<tr>
+											<td>Hosting</td>
+											<td><i>GitHub Pages</i></td>
+											<td>Free</td>
+										</tr>
+										<tr>
+											<td>Fonts</td>
+											<td><i>Raleway · Source Sans Pro · Google Fonts</i></td>
+											<td>Free</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<br><br>
+
+							<!-- ── CTA ── -->
+							<div class="cta-block fade-in">
+								<span class="section-eyebrow">Try It</span>
+								<p>
+									<i>Ask Amir</i> is live on this portfolio. You can ask it anything about my background,
+									experience, projects, or availability.
+								</p>
+								<p>
+									If you're building something similar — for your own portfolio or for a client-facing use case —
+									I'm happy to talk through the architecture. The knowledge base design in particular is worth
+									thinking carefully about before you start.
+								</p>
+								<ul class="actions">
+									<li>
+										<a href="chatbot.html" class="button primary"><font style="color:#000000;">Open <i>Ask Amir</i></font></a>
+									</li>
+								</ul>
+							</div>
+
+							<hr><br><br>
+
+							<div class="cta-block fade-in">
+								<span class="section-eyebrow">About</span>
+								<p style="font-size:0.88em;color:rgba(255,255,255,0.5);line-height:1.9;">
+									Built by Mohamed Amir Sohil Bishrul Hafi.<br>
+									Inference: <i>Groq</i> &nbsp;·&nbsp; Model: <i>Llama 3.3 70B</i> &nbsp;·&nbsp; Proxy: <i>Cloudflare Workers</i> &nbsp;·&nbsp; Hosting: <i>GitHub Pages</i>
+								</p>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Footer -->
+			<section id="footer">
+				<div class="inner">
+					<ul class="icons" style="text-align:center;">
+						<li><a href="https://www.linkedin.com/in/amir-sohil/" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+						<li><a href="mailto:bhmasohail@gmail.com" class="icon solid fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+					</ul>
+					<ul class="copyright">
+						<li>&copy; Mohamed Amir Sohil Bishrul Hafi. All rights reserved.</li><li>Base Template: <a href="http://html5up.net">HTML5 UP</a></li>
+					</ul>
+				</div>
+			</section>
+
+		</div>
+
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/jquery.scrollex.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/main.js"></script>
+
+		<script>
+			// ── Scroll progress ──
+			window.addEventListener('scroll', () => {
+				const scrollTop = document.documentElement.scrollTop;
+				const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+				document.getElementById('essay-progress').style.width = (scrollTop / docHeight * 100) + '%';
+			});
+
+			// ── Scroll reveal ──
+			const revealObs = new IntersectionObserver((entries) => {
+				entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+			}, { threshold: 0.1 });
+			document.querySelectorAll('.fade-in').forEach(el => revealObs.observe(el));
+
+			// ── Count-up stats ──
+			const countObs = new IntersectionObserver((entries) => {
+				entries.forEach(e => {
+					if (e.isIntersecting && !e.target.dataset.counted) {
+						e.target.dataset.counted = true;
+						const raw = e.target.dataset.target;
+						if (!raw) return;
+						const target = +raw;
+						const suffix = e.target.dataset.suffix || '';
+						const duration = 1400;
+						const start = performance.now();
+						const update = (now) => {
+							const t = Math.min((now - start) / duration, 1);
+							const eased = 1 - Math.pow(1 - t, 3);
+							e.target.textContent = Math.round(target * eased).toLocaleString() + suffix;
+							if (t < 1) requestAnimationFrame(update);
+						};
+						requestAnimationFrame(update);
+					}
+				});
+			}, { threshold: 0.5 });
+			document.querySelectorAll('.stat-num').forEach(el => countObs.observe(el));
+
+			// ── Decision cards ──
+			function toggleDecision(card) {
+				const wasOpen = card.classList.contains('open');
+				document.querySelectorAll('.essay-decisions article').forEach(c => c.classList.remove('open'));
+				if (!wasOpen) card.classList.add('open');
+			}
+		</script>
+
+	</body>
+</html>
