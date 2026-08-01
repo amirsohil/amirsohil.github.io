@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<title>Essays [Amir Sohil]</title>
+		<title>Portfolio [Amir Sohil]</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -27,7 +27,8 @@
 							<ul class="links">
 								<li><a href="index.html" style="color:#000000;font-weight: bold">Home</a></li>
 								<li><a href="about.html" style="color:#000000;font-weight: bold">About</a></li>
-								<li><a href="portfolio.html" style="color:#000000;font-weight: bold">Portfolio</a></li>
+								<li><a href="portfolio2.html" style="color:#000000;font-weight: bold">Portfolio</a></li>
+								<li><a href="essays.html" style="color:#000000;font-weight: bold">Essays</a></li>
 								<li><a href="https://calendly.com/amirspatterns" target="_blank" style="color:#000000;font-weight: bold">Book a session</a></li>
 							</ul>
 							<a href="#" class="close">Close</a>
@@ -38,44 +39,46 @@
 					<section id="wrapper">
 						<header style="margin-bottom: 0px; padding-bottom: 0px;">
 							<div class="inner">
-								<h2>Essays</h2>
-								<p>A collection of written works.</p>
+								<h2><i>Pola</i></h2>
+								<p>Interactive Experience</p>		
 							</div>
 						</header>
 
 						<!-- Content -->
 							<div class="wrapper">
 								<div class="inner">
-									<section class="features">
-										<article>
-											<a href="polawriteup.html" class="image"><img src="images/polawriteup.png" alt="" /></a>
-											<h3 class="major" style="color:#000000">Pola — A Virtual Market of AI Shopkeepers</h3>
-											<p style="color:#000000">A full account of building <i>Pola</i>, a 3D open-air market run by seven AI shopkeepers with 
-												real agentic tool calls into <i>Kapruka</i>'s live commerce catalog. Covers the case for building a place instead 
-												of a chat widget, a hand-built <i>Ghibli</i>-style <i>Three.js</i> world, and a <i>FastAPI</i> backend that falls 
-												back across three LLM providers to run at zero hosting cost.
-											</p>
-											<a href="polawriteup.html" class="special" style="color:#000000">Read the Essay</a>
-										</article>
-										<article>
-											<a href="transferiumwriteup.html" class="image"><img src="images/transferiumwriteup.png" alt="" /></a>
-											<h3 class="major" style="color:#000000">My Football Player Replacement Finder</h3>
-											<p style="color:#000000">A full account of building <i>Transferium Player Intelligence</i>: every architectural decision, from 
-												choosing <i>Neo4j</i> over a relational database to designing a weighted cosine similarity engine that separates profile shape 
-												from absolute quality.
-											</p>
-											<a href="transferiumwriteup.html" class="special" style="color:#000000">Read the Essay</a>
-										</article>
-										<article>
-											<a href="goodhartslaw.html" class="image"><img src="images/goodhartslaw.png" alt="" /></a>
-											<h3 class="major" style="color:#000000">When Your Dashboards Deceive</h3>
-											<p style="color:#000000">An interactive essay on <i>Goodhart's Law</i>, the economic principle that silently corrupts KPI dashboards 
-												across every industry. Includes real case studies, a live metric simulator, and a practical framework for designing better measurements.
-											</p>
-											<a href="goodhartslaw.html" class="special" style="color:#000000">Read the Essay</a>
-										</article>
-									</section>
-
+									<p align="justify">
+										<i>Pola</i> is a 3D open-air market I built for the <i>Kapruka Agent Challenge 2026</i>. Instead of a chat widget, 
+										the interface is a small hand-built village — customers walk between seven lit pavilions, each staffed by an AI
+										shopkeeper with its own personality and territory, from fresh food to fashion to an age-gated lounge. Every 
+										shopkeeper runs real agentic tool calls against <i>Kapruka</i>'s live commerce MCP for search, delivery estimates,
+										cart, and checkout.
+									</p>
+									<p align="justify">
+										The backend is <i>FastAPI</i>, routed through a three-provider fallback chain (<i>Gemini</i> → <i>Cerebras</i> → 
+										<i>Groq</i>) so the	whole system stays online at zero hosting cost, no matter which provider is rate-limited at 
+										a given moment.
+										<br><br>
+										<b>Major tools utilised:</b>
+										&nbsp
+										<img src="images/python.png" title="Python" height="25">&nbsp &nbsp
+										<img src="images/threejs.png" title="Three.js" height="25">&nbsp &nbsp
+										<img src="images/fastapi.png" title="FastAPI" height="25">&nbsp &nbsp
+										<img src="images/github.png" title="GitHub" height="25">
+									</p>
+									<p align="justify">
+										A full write-up covering every architectural decision behind this project — from the world-building to the checkout 
+										flow — is available in the <a href="polawriteup.html" target="_blank">essays section</a>.
+									</p>
+									<p align="justify">
+										Click on the image below to launch the live application.
+									</p>
+									
+									<a href="https://amirsohil.github.io/pola/" target="_blank">
+										<img src="images/polafull.png" title="Click to launch the live application." width="950" height="448">
+									</a>
+									<br><br><br>
+									<a href="https://calendly.com/amirspatterns" target="_blank" class="button primary fit small" style="display: inline-block; width: auto; text-align: center;"><font style="color:#000000;font-weight: bold">Book a Session</font></a>
 								</div>
 							</div>
 

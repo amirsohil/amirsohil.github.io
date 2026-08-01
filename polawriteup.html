@@ -1,0 +1,1554 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Essays [Amir Sohil]</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="description" content="How I built Pola — a 3D market town of seven AI shopkeepers, each running real agentic tool calls against Kapruka's live commerce MCP. Every architectural decision, explained.">
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<style>
+			/* Essay-specific overrides */
+
+			/* Reading width and typography */
+			.essay-body {
+				max-width: 720px;
+				margin: 0 auto;
+				font-size: 1.05em;
+				line-height: 1.85;
+			}
+
+			.essay-body p {
+				margin: 0 0 1.4em 0;
+				color: rgba(255,255,255,0.82);
+				font-size: 1em;
+			}
+
+			.essay-body h3 {
+				margin: 2.2em 0 0.7em 0;
+				font-size: 1.35em;
+				letter-spacing: 0.04em;
+			}
+
+			.essay-body p,
+			.essay-body td,
+			.essay-body li {
+				text-align: justify;
+			}
+
+			/* Refined blockquote */
+			.essay-body blockquote {
+				border-left: 3px solid #CDFD50;
+				background: rgba(205,253,80,0.05);
+				padding: 1.1em 1.5em;
+				margin: 1.8em 0;
+				font-family: Raleway, Helvetica, sans-serif;
+				font-style: italic;
+				font-size: 1.05em;
+				line-height: 1.65;
+				color: rgba(255,255,255,0.9);
+				border-radius: 0;
+			}
+
+			.essay-body blockquote cite {
+				display: block;
+				margin-top: 0.7em;
+				font-style: normal;
+				font-size: 0.75em;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				color: #CDFD50;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+			}
+
+			/* Section label */
+			.section-eyebrow {
+				display: block;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.72em;
+				letter-spacing: 0.22em;
+				text-transform: uppercase;
+				color: #CDFD50;
+				margin-bottom: 0.5em;
+			}
+
+			/* Code blocks */
+			.essay-body pre {
+				background: rgba(0,0,0,0.35);
+				border: 1px solid rgba(255,255,255,0.1);
+				border-left: 3px solid rgba(205,253,80,0.5);
+				padding: 1.3em 1.5em;
+				margin: 1.6em 0;
+				border-radius: 3px;
+				overflow-x: auto;
+				font-family: "JetBrains Mono", "Courier New", monospace;
+				font-size: 0.82em;
+				line-height: 1.7;
+				color: rgba(255,255,255,0.75);
+			}
+
+			.essay-body pre code {
+				background: none;
+				border: none;
+				padding: 0;
+				font-size: 1em;
+				color: inherit;
+			}
+
+			.essay-body code {
+				font-family: "JetBrains Mono", "Courier New", monospace;
+				font-size: 0.82em;
+				background: rgba(205,253,80,0.08);
+				border: 1px solid rgba(205,253,80,0.2);
+				padding: 1px 6px;
+				border-radius: 2px;
+				color: #CDFD50;
+			}
+
+			/* Decision cards */
+			.features.essay-decisions article {
+				background-color: rgba(255,255,255,0.04);
+				border: 1px solid rgba(255,255,255,0.1);
+				border-radius: 4px;
+				transition: border-color 0.25s, background-color 0.25s;
+				cursor: pointer;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.features.essay-decisions article::before {
+				content: '';
+				position: absolute;
+				left: 0; top: 0; bottom: 0;
+				width: 3px;
+				background: #CDFD50;
+				transform: scaleY(0);
+				transform-origin: bottom;
+				transition: transform 0.35s ease;
+			}
+
+			.features.essay-decisions article:hover,
+			.features.essay-decisions article.open {
+				background-color: rgba(205,253,80,0.06);
+				border-color: rgba(205,253,80,0.3);
+			}
+
+			.features.essay-decisions article:hover::before,
+			.features.essay-decisions article.open::before {
+				transform: scaleY(1);
+			}
+
+			.features.essay-decisions article h4.major {
+				color: #ffffff !important;
+				font-size: 1em;
+				margin-bottom: 0.5em;
+			}
+
+			.features.essay-decisions article .decision-tag {
+				display: inline-block;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.68em;
+				letter-spacing: 0.16em;
+				text-transform: uppercase;
+				color: #CDFD50;
+				border: 1px solid rgba(205,253,80,0.4);
+				padding: 2px 9px;
+				margin-bottom: 0.9em;
+				border-radius: 2px;
+			}
+
+			.features.essay-decisions article p {
+				color: rgba(255,255,255,0.6) !important;
+				font-size: 0.9em !important;
+				line-height: 1.65;
+			}
+
+			.features.essay-decisions article .decision-detail {
+				max-height: 0;
+				overflow: hidden;
+				transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1), opacity 0.3s;
+				opacity: 0;
+			}
+
+			.features.essay-decisions article.open .decision-detail {
+				max-height: 900px;
+				opacity: 1;
+			}
+
+			.features.essay-decisions article .decision-detail-inner {
+				border-top: 1px solid rgba(255,255,255,0.1);
+				margin-top: 1em;
+				padding-top: 1em;
+				font-size: 0.88em;
+				color: rgba(255,255,255,0.6);
+				line-height: 1.7;
+			}
+
+			.features.essay-decisions article .decision-detail-inner strong {
+				color: rgba(255,255,255,0.9);
+			}
+
+			.features.essay-decisions article .decision-detail-inner .lesson {
+				margin-top: 0.8em;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.78em;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				color: #CDFD50;
+			}
+
+			.card-toggle-hint {
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.72em;
+				color: rgba(255,255,255,0.3);
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				margin-bottom: 1.2em;
+			}
+
+			/* Stack table */
+			.stack-table td {
+				padding: 1.1em 0;
+				border-bottom: 1px solid rgba(255,255,255,0.07);
+				vertical-align: middle;
+				font-size: 0.92em;
+				color: rgba(255,255,255,0.75);
+				line-height: 1.6;
+			}
+
+			.stack-table td:first-child {
+				width: 34%;
+				font-family: Raleway, Helvetica, sans-serif;
+				font-weight: 700;
+				font-size: 0.88em;
+				color: #ffffff;
+				letter-spacing: 0.03em;
+				padding-right: 1.2em;
+			}
+
+			.stack-table td:last-child {
+				width: 14%;
+				text-align: right;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.72em;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: #CDFD50;
+			}
+
+			.stack-table tr:last-child td {
+				border-bottom: none;
+			}
+
+			/* Weight / criteria tables */
+			.weight-table {
+				width: 100%;
+				border-collapse: collapse;
+				margin: 1.4em 0;
+			}
+
+			.weight-table thead th {
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.72em;
+				letter-spacing: 0.15em;
+				text-transform: uppercase;
+				color: rgba(255,255,255,0.45);
+				padding-bottom: 0.7em;
+				border-bottom: 1px solid rgba(255,255,255,0.15);
+				text-align: left;
+				font-weight: 600;
+			}
+
+			.weight-table tbody td {
+				font-size: 0.9em;
+				color: rgba(255,255,255,0.7);
+				padding: 0.85em 0.5em 0.85em 0;
+				border-bottom: 1px solid rgba(255,255,255,0.06);
+				vertical-align: top;
+				line-height: 1.55;
+			}
+
+			.weight-table tbody td:nth-child(2) {
+				font-family: "JetBrains Mono", monospace;
+				color: #CDFD50;
+				font-size: 0.88em;
+				white-space: nowrap;
+			}
+
+			.weight-table tbody tr:last-child td {
+				border-bottom: none;
+			}
+
+			/* Two-column guardrail table — descriptive prose in col 2, so it
+			   must wrap instead of inheriting the short-value nowrap rule above */
+			.guardrail-table {
+				table-layout: fixed;
+			}
+
+			.guardrail-table td:first-child,
+			.guardrail-table tbody td:first-child {
+				width: 30%;
+				font-family: Raleway, Helvetica, sans-serif;
+				font-weight: 700;
+				font-size: 0.85em;
+				color: #ffffff;
+				white-space: normal;
+				padding-right: 1.4em;
+			}
+
+			.guardrail-table td:nth-child(2),
+			.guardrail-table tbody td:nth-child(2) {
+				width: 70%;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.88em;
+				color: rgba(255,255,255,0.65);
+				white-space: normal !important;
+			}
+
+			.guardrail-table td:nth-child(2) code,
+			.guardrail-table tbody td:nth-child(2) code {
+				white-space: nowrap;
+			}
+
+			@media screen and (max-width: 600px) {
+				.guardrail-table, .guardrail-table tbody, .guardrail-table tr, .guardrail-table td {
+					display: block;
+					width: 100% !important;
+				}
+				.guardrail-table tr {
+					padding: 0.9em 0;
+					border-bottom: 1px solid rgba(255,255,255,0.06);
+				}
+				.guardrail-table td {
+					border-bottom: none;
+					padding: 0.2em 0 !important;
+				}
+				.guardrail-table thead {
+					display: none;
+				}
+			}
+
+			/* Stat counters */
+			.stat-strip {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 1px;
+				background: rgba(255,255,255,0.07);
+				border: 1px solid rgba(255,255,255,0.07);
+				border-radius: 4px;
+				overflow: hidden;
+				margin: 1.8em 0;
+			}
+
+			.stat-cell {
+				background: rgba(0,0,0,0.25);
+				padding: 1.6em 1.4em;
+				text-align: center;
+			}
+
+			.stat-num {
+				font-family: Raleway, Helvetica, sans-serif;
+				font-size: 2.4em;
+				font-weight: 700;
+				color: #CDFD50;
+				line-height: 1;
+				display: block;
+			}
+
+			.stat-label {
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.68em;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: rgba(255,255,255,0.35);
+				margin-top: 0.55em;
+				display: block;
+			}
+
+			@media screen and (max-width: 600px) {
+				.stat-strip { grid-template-columns: 1fr; }
+			}
+
+			/* CTA block */
+			.cta-block {
+				border-top: 1px solid rgba(255,255,255,0.1);
+				margin-top: 3em;
+				padding-top: 2.5em;
+			}
+
+			.cta-block p {
+				color: rgba(255,255,255,0.7);
+			}
+
+			/* Scroll progress bar */
+			#essay-progress {
+				position: fixed;
+				top: 0; left: 0;
+				height: 2px;
+				width: 0%;
+				background: #CDFD50;
+				z-index: 9999;
+				transition: width 0.1s linear;
+			}
+
+			/* Scroll reveal */
+			.fade-in {
+				opacity: 0;
+				transform: translateY(20px);
+				transition: opacity 0.6s ease, transform 0.6s ease;
+			}
+
+			.fade-in.visible {
+				opacity: 1;
+				transform: none;
+			}
+
+			/* Request-flow diagram (reuses the schema-diagram treatment) */
+			.schema-diagram {
+				background: rgba(0,0,0,0.3);
+				border: 1px solid rgba(255,255,255,0.1);
+				border-radius: 4px;
+				padding: 1.8em;
+				margin: 1.6em 0;
+				text-align: center;
+			}
+
+			.schema-nodes {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 0;
+				flex-wrap: wrap;
+				font-family: "JetBrains Mono", monospace;
+				font-size: 0.82em;
+				line-height: 2.4;
+				color: rgba(255,255,255,0.75);
+			}
+
+			.schema-node {
+				background: rgba(205,253,80,0.1);
+				border: 1px solid rgba(205,253,80,0.4);
+				color: #CDFD50;
+				padding: 0.25em 0.7em;
+				border-radius: 20px;
+				white-space: nowrap;
+			}
+
+			.schema-edge {
+				color: rgba(255,255,255,0.3);
+				padding: 0 0.3em;
+				font-size: 0.85em;
+			}
+
+			.schema-rel {
+				color: rgba(255,255,255,0.5);
+				font-size: 0.78em;
+				padding: 0 0.2em;
+			}
+
+			.schema-row {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 0;
+				flex-wrap: wrap;
+				margin: 0.3em 0;
+			}
+
+			/* Inline callout */
+			.callout {
+				background: rgba(205,253,80,0.05);
+				border: 1px solid rgba(205,253,80,0.2);
+				border-radius: 3px;
+				padding: 1em 1.3em;
+				margin: 1.6em 0;
+				font-size: 0.92em;
+				color: rgba(255,255,255,0.7);
+				line-height: 1.7;
+			}
+
+			.callout strong {
+				color: #CDFD50;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.78em;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				display: block;
+				margin-bottom: 0.4em;
+			}
+
+			/* ── Courtyard map (interactive) ── */
+			.courtyard-wrap {
+				margin: 2em 0 0.5em;
+			}
+
+			.courtyard-map {
+				position: relative;
+				width: 100%;
+				max-width: 380px;
+				aspect-ratio: 1 / 1;
+				margin: 0 auto;
+				background: radial-gradient(circle at 50% 50%, rgba(232,82,26,0.10), rgba(0,0,0,0) 62%);
+				border: 1px solid rgba(255,255,255,0.08);
+				border-radius: 28px;
+			}
+
+			.stall {
+				position: absolute;
+				width: 17%;
+				aspect-ratio: 1/1;
+				border-radius: 50%;
+				transform: translate(-50%, -50%);
+				background: var(--stall-color, #CDFD50);
+				border: 2px solid rgba(255,255,255,0.18);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 1.5em;
+				cursor: pointer;
+				box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+				transition: transform 0.22s ease, box-shadow 0.22s ease;
+				animation: stall-breathe 3.6s ease-in-out infinite;
+			}
+
+			.stall:hover,
+			.stall.active {
+				transform: translate(-50%, -50%) scale(1.14);
+				box-shadow: 0 0 0 4px rgba(244,196,48,0.4), 0 6px 20px rgba(0,0,0,0.5);
+				animation-play-state: paused;
+			}
+
+			@keyframes stall-breathe {
+				0%, 100% { box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+				50% { box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 0 3px rgba(244,196,48,0.18); }
+			}
+
+			.courtyard-center {
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%, -50%);
+				width: 15%;
+				aspect-ratio: 1/1;
+				border-radius: 50%;
+				background: rgba(255,255,255,0.06);
+				border: 2px dashed rgba(244,196,48,0.55);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 1.3em;
+				cursor: pointer;
+				transition: transform 0.22s ease;
+			}
+
+			.courtyard-center:hover,
+			.courtyard-center.active {
+				transform: translate(-50%, -50%) scale(1.16);
+			}
+
+			.courtyard-hint {
+				text-align: center;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.68em;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				color: rgba(255,255,255,0.3);
+				margin-top: 1em;
+			}
+
+			.stall-detail {
+				margin-top: 1.6em;
+				background: rgba(255,255,255,0.03);
+				border: 1px solid rgba(255,255,255,0.1);
+				border-left: 3px solid var(--panel-color, #CDFD50);
+				border-radius: 4px;
+				padding: 1.3em 1.5em;
+				min-height: 92px;
+				transition: border-color 0.3s ease;
+			}
+
+			.stall-detail .name-row {
+				display: flex;
+				align-items: baseline;
+				gap: 0.6em;
+				flex-wrap: wrap;
+			}
+
+			.stall-detail .name-row .emoji-badge {
+				font-size: 1.3em;
+			}
+
+			.stall-detail h4 {
+				margin: 0;
+				font-size: 1.05em;
+				color: #ffffff;
+				font-family: Raleway, Helvetica, sans-serif;
+			}
+
+			.stall-detail .role {
+				display: block;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.68em;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: var(--panel-color, #CDFD50);
+				margin-top: 0.2em;
+			}
+
+			.stall-detail .territory {
+				display: block;
+				font-size: 0.78em;
+				font-style: italic;
+				color: rgba(255,255,255,0.35);
+				margin-top: 0.3em;
+			}
+
+			.stall-bio {
+				font-size: 0.9em;
+				color: rgba(255,255,255,0.68);
+				line-height: 1.7;
+				margin: 1em 0 0;
+			}
+
+			.stall-quote {
+				font-style: italic;
+				font-size: 0.95em;
+				color: rgba(255,255,255,0.85);
+				margin: 0.9em 0 0.7em;
+				padding-left: 0.9em;
+				border-left: 2px solid rgba(255,255,255,0.15);
+			}
+
+			.stall-rule {
+				font-size: 0.85em;
+				color: rgba(255,255,255,0.55);
+				line-height: 1.65;
+				margin: 0;
+			}
+
+			.stall-rule strong {
+				color: rgba(255,255,255,0.82);
+			}
+
+			.stall-placeholder {
+				color: rgba(255,255,255,0.4);
+				font-size: 0.92em;
+				font-style: italic;
+			}
+
+			/* ── Checkout path tabs ── */
+			.checkout-tabs {
+				display: flex;
+				gap: 0.6em;
+				margin: 1.6em 0 0;
+			}
+
+			.tab-btn {
+				flex: 1;
+				background: rgba(255,255,255,0.04);
+				border: 1px solid rgba(255,255,255,0.12);
+				color: rgba(255,255,255,0.55);
+				padding: 0.85em 1em;
+				border-radius: 4px;
+				font-family: "Source Sans Pro", Helvetica, sans-serif;
+				font-size: 0.74em;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				cursor: pointer;
+				transition: all 0.2s ease;
+				text-align: center;
+			}
+
+			.tab-btn:hover {
+				border-color: rgba(255,255,255,0.25);
+				color: rgba(255,255,255,0.8);
+			}
+
+			.tab-btn.active {
+				background: rgba(205,253,80,0.08);
+				border-color: rgba(205,253,80,0.4);
+				color: #CDFD50;
+			}
+
+			.tab-panel {
+				display: none;
+				margin-top: 1.3em;
+				background: rgba(255,255,255,0.025);
+				border: 1px solid rgba(255,255,255,0.08);
+				border-radius: 4px;
+				padding: 1.4em 1.6em;
+			}
+
+			.tab-panel.active {
+				display: block;
+			}
+
+			.tab-panel p {
+				margin-bottom: 1em;
+			}
+
+			.tab-panel ul {
+				margin: 0 0 0 1.2em;
+				padding: 0;
+			}
+
+			.tab-panel li {
+				color: rgba(255,255,255,0.6);
+				font-size: 0.9em;
+				line-height: 1.7;
+				margin-bottom: 0.5em;
+			}
+		</style>
+	</head>
+	<body class="is-preload">
+
+		<div id="essay-progress"></div>
+
+		<div id="page-wrapper">
+
+			<!-- Header -->
+			<header id="header">
+				<h1 style="color:#CDFD50"><a href="index.html">Mohamed Amir Sohil Bishrul Hafi</a></h1>
+				<nav>
+					<a href="#menu" style="color:#CDFD50">Menu</a>
+				</nav>
+			</header>
+
+			<!-- Menu -->
+			<nav id="menu">
+				<div class="inner">
+					<h2 style="color:#000000">Menu</h2>
+					<ul class="links">
+						<li><a href="index.html" style="color:#000000;font-weight:bold">Home</a></li>
+						<li><a href="about.html" style="color:#000000;font-weight:bold">About</a></li>
+						<li><a href="portfolio.html" style="color:#000000;font-weight:bold">Portfolio</a></li>
+						<li><a href="essays.html" style="color:#000000;font-weight:bold">Essays</a></li>
+						<li><a href="https://calendly.com/amirspatterns" target="_blank" style="color:#000000;font-weight:bold">Book a session</a></li>
+					</ul>
+					<a href="#" class="close">Close</a>
+				</div>
+			</nav>
+
+			<!-- Wrapper -->
+			<section id="wrapper">
+				<header style="margin-bottom:0;padding-bottom:0;">
+					<div class="inner">
+						<span class="section-eyebrow">Project Write-Up · Agentic Commerce &amp; 3D World-Building</span>
+						<h2>Pola — A Virtual Market of AI Shopkeepers</h2>
+						<p style="color:rgba(255,255,255,0.55);font-size:0.92em;">
+							Seven AI shopkeepers, one live commerce MCP, and the bet that a market beats a chat widget.
+							Originally built for the
+							<a href="https://www.kapruka.com/contactUs/agentChallenge.html" target="_blank" rel="noopener noreferrer" style="color:#CDFD50;"><i>Kapruka Agent Challenge 2026</i></a>,
+							now sitting in my portfolio.
+						</p>
+					</div>
+				</header>
+
+				<div class="wrapper">
+					<div class="inner">
+						<div class="essay-body">
+
+							<div class="fade-in">
+								<blockquote>
+									When I was a kid I used to imagine tiny shopkeepers living inside ecommerce websites. A little person 
+									behind every category who actually knew what they were selling. That image never really left me. 
+									And that image was my inspiration.
+								</blockquote>
+							</div>
+							<br>
+
+							<!-- ── The Brief ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">The Brief</span>
+								<h3>Don't Build a Chat Widget, Build a Place</h3>
+								<p>
+									The <i>Kapruka Agent Challenge</i> asked for <i>"a polished, immersive conversation as the main surface —
+									not a tiny widget in a corner."</i> I thought most entries would read that as an instruction to build
+									a bigger chat box. I decided to read it literally: the chat <i>is</i> the destination, but you reach
+									it by walking into a small, warm, hand-built 3D village first.
+								</p>
+								<p>
+									<i>Pola</i> is the Sinhala word for an open-air marketplace. It's the kind of place where people browse,
+									linger, and talk before they buy. That was my base: a market square with seven lit-up stalls, 
+									each with its own shopkeeper, rather than a flat list of product categories. It also
+									gave every idea I wanted to explore a place to live. I believe personality needs a character.
+									<i>Kapruka</i>'s enormous, genuinely undifferentiated catalog (groceries next to electronics next to baby
+									trolleys) becomes something a customer can understand spatially in two seconds — gifts are over
+									there, tech is over there — instead of something they have to read through a menu to find.
+								</p>
+								<p>
+									The obvious risk is that a 3D scene reads as a tech demo, performs badly, or gets in the way of
+									actually shopping. Every decision below exists to make sure the 3D layer earns its place without
+									ever blocking the real loop: discovery → cart → checkout.
+								</p>
+
+								<div class="stat-strip">
+									<div class="stat-cell">
+										<span class="stat-num" data-target="7" data-suffix="">0</span>
+										<span class="stat-label">Shopkeeper pavilions</span>
+									</div>
+									<div class="stat-cell">
+										<span class="stat-num" data-target="6" data-suffix="">0</span>
+										<span class="stat-label">Model endpoints, 3 providers</span>
+									</div>
+									<div class="stat-cell">
+										<span class="stat-num" data-target="0" data-prefix="$">0</span>
+										<span class="stat-label">Hosting cost</span>
+									</div>
+								</div>
+							</div>
+							<br><br>
+
+
+							<!-- ── The World Itself ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">World-Building</span>
+								<h3>The World Itself</h3>
+								<p>
+									The whole frontend is a single <code>index.html</code> — <i>Three.js r128</i> loaded straight from a
+									CDN, vanilla JavaScript, zero bundler, zero build step. Inside it is a deliberate <i>Ghibli</i>-leaning,
+									toon-shaded, low-poly look, chosen instead of anything trying to be photorealistic.
+								</p>
+								<p>
+									<code>MeshToonMaterial</code> with a hand-built four-step gradient texture sits on almost every mesh,
+									and a slightly oversized, backface-culled duplicate of each shape gives the dark ink-outline look of
+									hand-drawn animation. It's a style choice: outlines and flat shading read as intentional in a
+									screenshot in a way default-lit PBR never does, and they happen to render for free on a laptop with
+									no GPU guarantee. A gradient sky dome, a firefly particle system, and a procedural 
+									cherry-blossom petal fall round out the atmosphere. All of these were built from primitive geometry,
+									which means nothing imported, nothing to license, and nothing to fail to load.
+								</p>
+								<p>
+									Seven pavilions sit on a lit courtyard, each a cylinder-and-cone hut coloured to its trade and
+									decorated with a small clue to what it sells: an apple for the grocer, a diamond for fashion, a gift
+									box for gifting, a flatscreen for tech, etc. Small details, but I included them because I wanted a 
+									difference between "seven identical boxes with labels" and "seven stalls that look like what they sell." 
+									A guide character, <i>Sudu</i>, anchors the courtyard's centre — more on her below.
+								</p>
+
+								<h3 style="font-size:1.1em;margin-top:1.8em;">Camera as Motion</h3>
+								<p>
+									Walking up to a stall doesn't teleport the camera. A render-loop lerp eases the camera position and
+									look-target in over several frames while a darkening overlay fades up and a <i>← Back to Courtyard</i>
+									button appears. I included this small bit of motion to try and turn "this is a webpage with a 3D 
+									background" into "I am walking up to a stall" — cheap to implement, disproportionately effective.
+								</p>
+
+								<div class="callout">
+									<strong>Failing gracefully</strong>
+									Below 760px, a full-screen card explains plainly that this is a 3D market town happier on a bigger
+									screen, with a "Continue anyway" override. Ambient market sound is opt-in and only starts on the 
+									first real click, respecting autoplay policy, with the mute preference remembered across visits. 
+									No one gets an unexpected audio blast on load.
+								</div>
+							</div>
+							<br><br>
+
+
+							<!-- ── Seven Pavilions (interactive) ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">Character Design</span>
+								<h3>Seven Pavilions, Turning a Catalog Into Characters</h3>
+								<p>
+									The hardest part of Kapruka's MCP for any single agent is that the catalog is enormous and the
+									categories cut across each other in non-obvious ways — liquor and non-alcoholic wine both file under
+									"Grocery," adult products and intimate pharmacy both file under "Pharmacy." A single generalist bot
+									would need a huge, brittle system prompt trying to hold the whole taxonomy in its head, and would
+									constantly answer from the wrong part of the catalog.
+								</p>
+								<p>
+									My answer was to split the catalog into seven pavilions that mirror how a Sri Lankan market is
+									actually organised, and give each one its own dedicated shopkeeper: a name, an age, a backstory, a
+									speaking style, and a narrow slice of the taxonomy. Walk through the courtyard below and tap a stall
+									to meet whoever's behind the counter.
+								</p>
+
+								<div class="courtyard-wrap">
+									<div class="courtyard-map">
+										<div class="courtyard-center" onclick="selectStall('sudu', this)" title="Sudu">🐈</div>
+
+										<div class="stall" style="--stall-color:#6E8F52; left:50%; top:10.5%;" onclick="selectStall('sampath', this)" title="Fresh Food &amp; Grocery">🍎</div>
+										<div class="stall" style="--stall-color:#D9668B; left:80.8%; top:25.3%; animation-delay:.3s;" onclick="selectStall('tharushi', this)" title="Gifts &amp; Celebrations">🎁</div>
+										<div class="stall" style="--stall-color:#E0A93A; left:88.4%; top:58.7%; animation-delay:.6s;" onclick="selectStall('chuti', this)" title="Kids, Toys &amp; Parents">👶</div>
+										<div class="stall" style="--stall-color:#A468C7; left:67.1%; top:85.5%; animation-delay:.9s;" onclick="selectStall('safi', this)" title="Fashion &amp; Beauty">👗</div>
+										<div class="stall" style="--stall-color:#4A9FD8; left:32.9%; top:85.5%; animation-delay:1.2s;" onclick="selectStall('kavindu', this)" title="Electronics &amp; Home">📱</div>
+										<div class="stall" style="--stall-color:#A9754A; left:11.6%; top:58.7%; animation-delay:1.5s;" onclick="selectStall('malsha', this)" title="Culture &amp; Services">📚</div>
+										<div class="stall" style="--stall-color:#7A3B4E; left:19.2%; top:25.3%; animation-delay:1.8s;" onclick="selectStall('dev', this)" title="The Lounge (21+)">🌙</div>
+									</div>
+									<p class="courtyard-hint">↓ tap a stall, or the cat in the middle</p>
+
+									<div class="stall-detail" id="stall-detail" style="--panel-color:#CDFD50;">
+										<p class="stall-placeholder">Tap any pavilion above to meet its shopkeeper.</p>
+									</div>
+								</div>
+
+								<p style="margin-top:1.8em;">
+									Each system prompt bakes in a full character sheet, not just an instruction to "be friendly" —
+									a name, an age, a speaking style, and behaviour rules tuned to what could actually go wrong in
+									that specific aisle, tap around above to see a few.
+								</p>
+								<p>
+									No shopkeeper is allowed to pretend they can sell everything, either. Every prompt carries the full
+									market directory and a standing rule to refer a customer elsewhere by name when their need fits
+									another pavilion better — <i>Sampath Aiya</i> genuinely wouldn't know which perfume to recommend, and
+									having him admit that and point you to <i>Safi</i> is more trustworthy than having him bluff it. And every
+									reply is written as a voice note, not a bullet list: markdown renders as literal asterisks in the
+									chat bubble, so a server-side <code>strip_markdown</code> pass backstops the rare turn where a model
+									ignores that instruction anyway.
+								</p>
+							</div>
+							<br><br>
+
+
+							<!-- ── Sudu ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">Navigation</span>
+								<h3><i>Sudu</i> — The Guide Who Doesn't Sell Anything</h3>
+								<p>
+									Most agent demos put one bot in charge of everything. I deliberately split "figuring out where to
+									go" from "actually buying something," and gave the first job to a separate, much simpler character:
+									<i>Sudu</i>, a small white cat who knows every corner of the market but explicitly sells nothing
+									herself.
+								</p>
+								<p>
+									<i>Sudu</i> is intentionally tool-free, i.e. no MCP round-trips, so replies are snappy and the architecture
+									stays cleanly split between navigation and commerce. Rather than forcing her into structured output,
+									which would fight against her loose, cat-like voice, a lightweight keyword scan turns any place-name
+									signal in her free-text reply into a tappable chip:
+								</p>
+								<blockquote style="margin:1.6em 0;">
+									<i>Sudu</i> says, "That's <i>Tharushi</i>, at <i>Gifts &amp; Celebrations</i> — go on, she'll sort you out."
+									<cite><i>Sudu</i>, when asked where to find a birthday gift</cite>
+								</blockquote>
+								<p>
+									<i>Sudu</i> offers four preset chips on first open so a visitor can get moving with one tap instead of
+									staring at a blank input. Every reply after that regenerates chips dynamically from what she
+									just said. It's the <i>Creativity</i> answer, too: instead of a settings menu or a category
+									sidebar, "I don't know where to go" is handled by a character in the world, in plain English.
+								</p>
+							</div>
+							<br><br>
+
+
+							<!-- ── System Architecture ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">Architecture</span>
+								<h3>System Architecture</h3>
+								<p>
+									The frontend never talks to <i>Gemini</i>, <i>Cerebras</i>, <i>Groq</i>, or the <i>Kapruka</i> MCP directly. It only ever calls
+									its own backend's four endpoints — <code>/api/chat</code>, <code>/api/delivery-cities</code>,
+									<code>/api/check-delivery</code>, <code>/api/cart-checkout</code> — which is what lets one backend
+									run the same MCP session lifecycle, the same product-card curation, and the same anti-hallucination
+									guardrails no matter which model provider actually answered a given turn.
+								</p>
+
+								<div class="schema-diagram">
+									<div style="font-family:'Source Sans Pro',Helvetica,sans-serif;font-size:0.68em;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:1.2em;">Request Flow</div>
+									<div class="schema-row">
+										<span class="schema-node">index.html (static)</span>
+										<span class="schema-edge">──</span>
+										<span class="schema-rel">POST /api/chat</span>
+										<span class="schema-edge">──▶</span>
+										<span class="schema-node">FastAPI backend</span>
+									</div>
+									<div class="schema-row" style="margin-top:0.6em;">
+										<span class="schema-node">FastAPI backend</span>
+										<span class="schema-edge">──</span>
+										<span class="schema-rel">[fallback: <i>Gemini</i> → <i>Cerebras</i> → <i>Groq</i>]</span>
+										<span class="schema-edge">──▶</span>
+										<span class="schema-node">chosen model</span>
+									</div>
+									<div class="schema-row" style="margin-top:0.6em;">
+										<span class="schema-node">FastAPI backend</span>
+										<span class="schema-edge">──</span>
+										<span class="schema-rel">[tools/call]</span>
+										<span class="schema-edge">──▶</span>
+										<span class="schema-node">mcp.kapruka.com/mcp</span>
+									</div>
+									<div style="font-family:'Source Sans Pro',Helvetica,sans-serif;font-size:0.68em;color:rgba(255,255,255,0.25);margin-top:1.2em;letter-spacing:0.06em;">4 client-facing endpoints · 1 health check · the frontend never sees which model or MCP call answered</div>
+								</div>
+
+								<p>
+									A fifth route, <code>GET /</code>, is a lightweight health check. This reports which model API keys
+									are loaded without triggering any model or MCP call, so the backend's state is readable in one
+									request, no model call required.
+								</p>
+							</div>
+							<br><br>
+
+
+							<!-- ── Backend in depth ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">Engineering</span>
+								<h3>The Backend, In Depth</h3>
+								<p>
+									The 3D scene gets the attention, but most of the actual engineering risk lived in three backend
+									decisions. Click any card to read the reasoning.
+								</p>
+
+								<p class="card-toggle-hint">↓ Click to expand</p>
+
+								<section class="features essay-decisions">
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Reliability</div>
+										<h4 class="major">A Model Fallback Chain — Because Free Tiers Rate-Limit</h4>
+										<p style="text-align:left;"><i>Gemini</i> → <i>Cerebras</i> → <i>Groq</i>. Three providers, six model 
+											endpoints, tried in order within a single request.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												<code>/api/chat</code> tries Gemini first, cheapest-first (<code>gemini-2.5-flash-lite</code> →
+												<code>gemini-2.5-flash</code> → <code>gemini-2.0-flash</code>), then falls back to Cerebras
+												(<code>gpt-oss-120b</code>, <code>zai-glm-4.7</code>), then Groq
+												(<code>llama-3.3-70b-versatile</code>, <code>llama-4-scout</code>).
+											</p>
+											<p>
+												Every provider here runs on a free tier, and free tiers rate-limit. A single-provider build
+												is one 429 away from failing live at exactly the wrong moment — mid-conversation, in front
+												of whoever's trying it. The fallback chain means a transient outage degrades response
+												quality slightly, with a different model finishing, the same agentic loop, rather than breaking
+												the demo outright. An honest <code>_fallback</code> field exists for my own debugging, but
+												it's never shown to customers, because a shopkeeper apologising for "switching AI providers"
+												would break character for no benefit.
+											</p>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Infrastructure</div>
+										<h4 class="major">A Hand-Rolled MCP Client</h4>
+										<p style="text-align:left;">Streamable-HTTP transport implemented directly, instead of an off-the-shelf MCP library.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												<code>initialize</code> → capture <code>Mcp-Session-Id</code> → <code>notifications/initialized</code>
+												→ repeatable <code>tools/call</code>, with both plain-JSON and Server-Sent-Events response
+												bodies handled by hand.
+											</p>
+											<p>
+												<strong>Session correctness under concurrency.</strong> A single chat turn can trigger
+												several parallel tool calls, so the lazy session-init path is guarded with an
+												<code>asyncio.Lock</code> and a double-check, so two coroutines racing to initialise at the
+												same moment can't each spin up their own session and silently clobber each other.
+											</p>
+											<p>
+												<strong>429 resilience.</strong> The free MCP tier caps at 60
+												requests/minute per IP, and a busy chat turn can burst past that — one short, capped retry
+												absorbs a momentary spike without making every dropped request fatal.
+											</p>
+											<p>
+												<strong>Self-healing sessions.</strong> If a tool call fails mid-conversation because a
+												session quietly expired, the backend re-initialises once and retries automatically instead
+												of surfacing a raw error and derailing the conversation.
+											</p>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Concurrency</div>
+										<h4 class="major">Two Agentic Loops, One Dialect Problem</h4>
+										<p style="text-align:left;"><i>Gemini</i> and the <i>OpenAI</i>-compatible providers don't speak the same tool-calling format.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												<code>gemini_loop()</code> uses <i>Gemini's</i> native <code>function_declarations</code> /
+												<code>functionCall</code> format; <code>openai_loop()</code>, shared by <i>Cerebras</i> and <i>Groq</i>,
+												uses the <i>OpenAI</i>-style <code>tools[]</code> / <code>tool_calls[]</code> format. Both run up
+												to <code>MAX_LOOPS = 8</code> rounds of "model decides to call a tool → tool runs → result
+												goes back → model decides again," so a fallback model gets exactly the same live-catalog
+												grounding the primary model does.
+											</p>
+											<p>
+												Within a round, tool calls run concurrently via <code>asyncio.gather</code> — if a model
+												wants to search two things and check delivery in the same turn, those happen in parallel.
+												<code>asyncio.gather</code> preserves input order in its output regardless of which call
+												finishes first, which matters for the OpenAI-style loop because <code>tool_call_id</code>s
+												have to pair back to the right result.
+											</p>
+											<p>
+												Both loops write into one shared <code>tool_history</code> list, so every downstream step
+												— product extraction, order-summary construction, card curation — works identically no
+												matter which of the six models answered.
+											</p>
+										</div></div>
+									</article>
+
+								</section>
+
+								<h3 style="font-size:1.1em;margin-top:2em;">Guardrails, Because Models Lie Confidently</h3>
+								<p>
+									A raw LLM-plus-tools loop against a real commerce API will, left alone, occasionally hallucinate a
+									category slug, invent a product ID, or surface an adult-section product to a general audience. Every
+									row below exists because I watched the failure happen during testing, and a fix in the system prompt
+									alone didn't reliably hold.
+								</p>
+
+								<table class="weight-table guardrail-table">
+									<thead>
+										<tr>
+											<th>Guardrail</th>
+											<th>What breaks without it</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>Category slugs only forwarded once confirmed</td>
+											<td>Kapruka's category filter is exact-match; a guessed slug returns zero results, and the model confidently tells the customer the product doesn't exist.</td>
+										</tr>
+										<tr>
+											<td><code>SHOW_CARDS</code> allowlist</td>
+											<td>Search spans the whole catalog, not one pavilion — a "rice" query legitimately returns rice cookers (Kavindu's) alongside rice meals (Sampath's). The model, not the raw API response, decides which IDs belong on screen for the shopkeeper you're actually talking to.</td>
+										</tr>
+										<tr>
+											<td>Lounge filter, both directions</td>
+											<td>A keyword filter drops adult/liquor/tobacco items outside <i>The Lounge</i> even if a persona's card line includes one, and the inverse filter keeps a rose bouquet out of the 21+ section.</td>
+										</tr>
+										<tr>
+											<td>IDF re-ranking on 20 fetched results</td>
+											<td>Kapruka's default ordering doesn't always surface the most relevant result first; a self-calibrating term-weight pass re-sorts before the model ever sees the list.</td>
+										</tr>
+										<tr>
+											<td><code>_query_matched: false</code> flag</td>
+											<td>Without it, a "fish tank" search returning cleaning supplies looks plausible enough that the model recommends it anyway instead of admitting the gap.</td>
+										</tr>
+										<tr>
+											<td>Hard cap of 8 cards, enforced twice</td>
+											<td>The prompt asks for 6–8; the backend caps it again regardless, so a model that ignores curation can't dump twenty cards on one message.</td>
+										</tr>
+										<tr>
+											<td>Today's date injected into every prompt</td>
+											<td>Left to infer "today" from training data, the three providers disagreed with each other and with the calendar — which rejected valid near-future delivery dates as "in the past."</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<br><br>
+
+
+							<!-- ── Closing the loop, twice ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">Commerce</span>
+								<h3>Closing the Loop, Twice</h3>
+								<p>
+									Getting all the way to a placed order mattered most here. I built two distinct, complete
+									checkout paths, because they serve two genuinely different shopping behaviours.
+								</p>
+
+								<div class="checkout-tabs">
+									<div class="tab-btn active" onclick="selectTab('conversational', this)">Conversational</div>
+									<div class="tab-btn" onclick="selectTab('cart', this)">Cart-Drawer</div>
+								</div>
+
+								<div class="tab-panel active" id="tab-conversational">
+									<p>
+										Inside the chat itself. The shopkeeper collects recipient name, phone, delivery address, city,
+										date, and — for <i>Tharushi</i> especially — an optional gift message, entirely through dialogue,
+										then calls <code>kapruka_create_order</code> directly. This path is scoped to each shopkeeper's
+										own pavilion, mirroring a real market stall: <i>Tharushi</i> handles gifting orders, <i>Kavindu</i> handles
+										electronics, and so on. Cross-pavilion carts are what the other tab is for.
+									</p>
+									<ul>
+										<li>The response is parsed as structured JSON so the price breakdown comes back as real numbers, not something scraped out of prose.</li>
+										<li>If checkout is called on a product ID that was never actually looked up this conversation, the backend detects the gap and backfills a fresh product lookup before the summary renders.</li>
+										<li>Dev, at <i>The Lounge</i>, is the only shopkeeper who also offers an anonymous sender option — the one context in the market where someone might actually want it.</li>
+									</ul>
+								</div>
+
+								<div class="tab-panel" id="tab-cart">
+									<p>
+										For the browse-then-decide shopper. Add to cart from any product card or the lightbox; the cart
+										drawer has its own quantity controls and running total, and "Checkout at the Till" opens a
+										delivery-details form. These three endpoints are deliberately thin, stateless, and model-free —
+										there's no conversation to extract structure from, so there's no reason to pay for an LLM
+										round-trip just to fill in a form.
+									</p>
+									<ul>
+										<li>Live city autocomplete and a live delivery-fee/date preview update the moment both city and date are chosen, before the order is even placed.</li>
+										<li>Delivery details are remembered in <code>localStorage</code>, updated only after a successful order, with an explicit "Clear saved details" escape hatch.</li>
+										<li>Submitting builds the same order-summary shape the chat flow does, and hands off to the same Order Summary modal — one UI, two ways to reach it.</li>
+									</ul>
+								</div>
+
+								<p style="margin-top:1.6em;">
+									One detail ties both paths together: conversation history is trimmed to the last 10 turns per
+									request, which would normally make checkout forget a product ID mentioned several turns earlier.
+									The frontend sends the current cart on every request, and the backend injects it as a confirmed-cart
+									block in the system prompt — the one piece of state that has to survive the trim.
+								</p>
+							</div>
+							<br><br>
+
+
+							<!-- ── Where effort went ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">Priorities</span>
+								<h3>Where the Effort Went</h3>
+								<p>
+									Six things mattered most while I was building this, roughly in the order I paid attention to
+									them. Click any card for the reasoning behind it.
+								</p>
+
+								<p class="card-toggle-hint">↓ Click to expand</p>
+
+								<section class="features essay-decisions">
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Polish</div>
+										<h4 class="major">One Visual Language, Held Together End to End</h4>
+										<p style="text-align:left;">Toon-shaded 3D scene, camera-lerp navigation, ambient sound, mobile gate — nothing that breaks the illusion.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												Every asset — the toon shading, the ink outlines, the gradient sky, the market sounds —
+												pulls from the same reference mood board. The camera-lerp and the mobile gate exist for
+												the same reason: the illusion has to hold whether someone's on a gaming laptop or a
+												mid-range one with three other tabs open.
+											</p>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Richness</div>
+										<h4 class="major">Making a Catalog Feel Tactile</h4>
+										<p style="text-align:left;">Product card grids, an image lightbox, an Order Summary modal with real photos, hand-built stall decorations per pavilion.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												A product card without a real photo reads as a placeholder, so the card, the lightbox,
+												and the final order summary all pull the same image. Each pavilion also got one small 
+												hand-modelled detail tied to what it sells, instead of seven identical huts with different labels on the door.
+											</p>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Character</div>
+										<h4 class="major">Seven Shopkeepers, Not One Bot in Different Hats</h4>
+										<p style="text-align:left;">Names, ages, backstories, speech patterns, and worked example lines baked into every system prompt.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												Each prompt reads more like a character brief than an instruction sheet — how they'd
+												actually talk, what they'd notice, what they'd never say. The difference shows up fast:
+												ask <i>Sampath Aiya</i> about skincare and he tells you flatly that's not his aisle, instead of
+												bluffing an answer.
+											</p>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Utility</div>
+										<h4 class="major">Behaviour Rules Tuned to Where Each Aisle Actually Breaks</h4>
+										<p style="text-align:left;"><i>Sudu</i> as a routing layer, IDF re-ranking, domain-specific rules per shopkeeper, two complete checkout paths.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												Most of this came from watching the agent fail during testing, not from planning it up
+												front — a category slug that silently returns nothing, a search that surfaces the wrong
+												half of the catalog, a customer with no idea which of seven stalls to even start at. Each
+												fix patches a specific failure rather than a vague "be more careful" instruction.
+											</p>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Completeness</div>
+										<h4 class="major">Both Paths Actually Place an Order</h4>
+										<p style="text-align:left;">Conversational and cart-drawer checkout both flow into the same Order Summary modal with working pay links.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												The easy version of this stops at "the shopkeeper can describe how checkout would
+												work". Plenty of agent demos do exactly that. Both paths here call the same
+												order-creation endpoint and land on the same confirmation screen, ending in an order
+												that's actually been placed.
+											</p>
+										</div></div>
+									</article>
+
+									<article onclick="toggleDecision(this)">
+										<div class="decision-tag">Concept</div>
+										<h4 class="major">A Place You Walk Into, Not a Widget You Type Into</h4>
+										<p style="text-align:left;">The market-as-place metaphor, and <i>Sudu</i> as a cat you ask in plain English instead of a menu.</p>
+										<div class="decision-detail"><div class="decision-detail-inner">
+											<p>
+												The easiest version of this project is one chatbot with a category dropdown. Building an
+												actual place — a courtyard, seven stalls, a guide who points you around instead of a
+												settings screen — was the slower, riskier option, and the one I actually wanted to see
+												exist.
+											</p>
+										</div></div>
+									</article>
+
+								</section>
+
+								<p style="margin-top:1.6em;">
+									A few other things just needed to work under the hood: a cart drawer with quantity controls and
+									a running total, a live delivery-date preview before an order is placed, and gift messaging from
+									<i>Tharushi</i> that flows straight through to the final order summary.
+								</p>
+							</div>
+							<br><br>
+
+
+							<!-- ── What's Next ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">Retrospective</span>
+								<h3>What's Next</h3>
+								<p>
+									<strong>Sinhala and Tanglish support.</strong> Every persona is currently English-only. The
+									underlying models are multilingual and would likely handle either reasonably, but that's untested,
+									not a claimed feature — and for a market meant to feel local, it's probably the one addition
+									that would matter most.
+								</p>
+								<p>
+									<strong>Structured cross-stall referrals.</strong> Shopkeepers already refer customers to each
+									other by name in conversation, and <i>Sudu</i>'s chips work today. The one-tap cross-pavilion banner UI is
+									built but not yet wired to a backend signal — a classifier step after the agentic loop, not a
+									frontend rebuild.
+								</p>
+								<p>
+									<strong>Proactive delivery-date warnings.</strong> The delivery-check tool and cart preview both
+									work correctly; no persona yet volunteers a tight-window warning unless asked. This would just be a prompt addition.
+								</p>
+							</div>
+							<br><br>
+
+
+							<!-- ── Stack ── -->
+							<div class="fade-in">
+								<span class="section-eyebrow">The Stack</span>
+								<h3>Everything Used</h3>
+
+								<table class="stack-table">
+									<tbody>
+										<tr>
+											<td>3D scene</td>
+											<td><i>Three.js r128</i> (CDN, no bundler)</td>
+											<td>Free</td>
+										</tr>
+										<tr>
+											<td>Frontend</td>
+											<td>Vanilla JS &amp; hand-written CSS, single <code>index.html</code></td>
+											<td>Free</td>
+										</tr>
+										<tr>
+											<td>Backend</td>
+											<td><i>FastAPI</i> + <i>httpx</i> (async), on <i>Render</i></td>
+											<td>Free tier</td>
+										</tr>
+										<tr>
+											<td>Primary model</td>
+											<td><i>Gemini</i> (flash-lite → flash → 2.0-flash)</td>
+											<td>Free tier</td>
+										</tr>
+										<tr>
+											<td>Fallback chain</td>
+											<td><i>Cerebras</i> → <i>Groq</i></td>
+											<td>Free tier</td>
+										</tr>
+										<tr>
+											<td>Commerce</td>
+											<td><i>Kapruka</i> MCP — search, delivery, checkout, orders</td>
+											<td>Provided</td>
+										</tr>
+										<tr>
+											<td>Frontend hosting</td>
+											<td><i>GitHub Pages</i></td>
+											<td>Free</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<br><br>
+
+
+							<!-- ── CTA ── -->
+							<div class="cta-block fade-in">
+								<span class="section-eyebrow">Try It</span>
+								<p>
+									<i>Pola</i> is live. Walk into the courtyard, find a pavilion, and talk to whoever's behind the
+									counter.
+								</p>
+								<p>
+									If you're thinking about agentic commerce or multi-persona system design, or you have questions
+									about any of the decisions above, I'd genuinely like to hear from you.
+								</p>
+								<ul class="actions">
+									<li>
+										<a href="https://amirsohil.github.io/pola/" target="_blank" class="button primary"><font style="color:#000000;">Open Pola</font></a>
+									</li>
+								</ul>
+							</div>
+
+							<hr><br><br>
+
+							<div class="cta-block fade-in">
+								<span class="section-eyebrow">About</span>
+								<p style="font-size:0.88em;color:rgba(255,255,255,0.5);line-height:1.9;">
+									Built by Mohamed Amir Sohil Bishrul Hafi.<br>
+									3D: <i>Three.js</i> &nbsp;·&nbsp; Backend: <i>FastAPI</i> &nbsp;·&nbsp; Commerce: <i>Kapruka MCP</i>
+								</p>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Footer -->
+			<section id="footer">
+				<div class="inner">
+					<ul class="icons" style="text-align:center;">
+						<li><a href="https://www.linkedin.com/in/amir-sohil/" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+						<li><a href="mailto:bhmasohail@gmail.com" class="icon solid fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+					</ul>
+					<ul class="copyright">
+						<li>&copy; Mohamed Amir Sohil Bishrul Hafi. All rights reserved.</li><li>Base Template: <a href="http://html5up.net">HTML5 UP</a></li>
+					</ul>
+				</div>
+			</section>
+
+		</div>
+
+		<!-- Scripts -->
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/jquery.scrollex.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/main.js"></script>
+
+		<script>
+			// ── Scroll progress ──
+			window.addEventListener('scroll', () => {
+				const scrollTop = document.documentElement.scrollTop;
+				const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+				document.getElementById('essay-progress').style.width = (scrollTop / docHeight * 100) + '%';
+			});
+
+			// ── Scroll reveal ──
+			const revealObs = new IntersectionObserver((entries) => {
+				entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+			}, { threshold: 0.1 });
+			document.querySelectorAll('.fade-in').forEach(el => revealObs.observe(el));
+
+			// ── Count-up stats ──
+			const countObs = new IntersectionObserver((entries) => {
+				entries.forEach(e => {
+					if (e.isIntersecting && !e.target.dataset.counted) {
+						e.target.dataset.counted = true;
+						const target = +e.target.dataset.target;
+						const prefix = e.target.dataset.prefix || '';
+						const suffix = e.target.dataset.suffix || '';
+						const duration = 1200;
+						const start = performance.now();
+						const update = (now) => {
+							const t = Math.min((now - start) / duration, 1);
+							const eased = 1 - Math.pow(1 - t, 3);
+							e.target.textContent = prefix + Math.round(target * eased).toLocaleString() + suffix;
+							if (t < 1) requestAnimationFrame(update);
+						};
+						requestAnimationFrame(update);
+					}
+				});
+			}, { threshold: 0.5 });
+			document.querySelectorAll('.stat-num').forEach(el => countObs.observe(el));
+
+			// ── Decision cards ──
+			function toggleDecision(card) {
+				const section = card.closest('.essay-decisions');
+				const wasOpen = card.classList.contains('open');
+				section.querySelectorAll('article').forEach(c => c.classList.remove('open'));
+				if (!wasOpen) card.classList.add('open');
+			}
+
+			// ── Checkout tabs ──
+			function selectTab(name, btn) {
+				document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+				btn.classList.add('active');
+				document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+				document.getElementById('tab-' + name).classList.add('active');
+			}
+
+			// ── Courtyard map ──
+			const STALL_DATA = {
+				sudu: {
+					name: 'Sudu', role: 'Guide · Sells nothing', emoji: '🐈', color: '#F4C430',
+					territory: 'Knows all seven pavilions',
+					bio: 'Friendly, playful, and impossible to fluster. She knows every stall in the market by name and never seems to run out of patience for someone who has no idea where to start.',
+					quote: "That's Tharushi, at Gifts & Celebrations — go on, she'll sort you out.",
+					rule: '<strong>Known for:</strong> pointing you to exactly the right shopkeeper, then getting out of the way.'
+				},
+				sampath: {
+					name: 'Sampath Aiya, 46', role: 'Fresh Food & Grocery', emoji: '🍎', color: '#6E8F52',
+					territory: 'Groceries, cakes, chocolates, fresh produce, ready meals',
+					bio: 'A lifetime spent working markets — knows prices, seasons, and suppliers better than most people know their own street. Gruff on the surface, quietly looking out for you underneath.',
+					quote: "Machan, don't buy that tomato. Wait till Friday. Better batch coming.",
+					rule: '<strong>Known for:</strong> calling everyone "machan" or "baba," and warning you off a bad buy before you even ask.'
+				},
+				tharushi: {
+					name: 'Tharushi, 28', role: 'Gifts & Celebrations', emoji: '🎁', color: '#D9668B',
+					territory: 'Flowers, combo gift packs, personalised gifts, every occasion on the calendar',
+					bio: 'Lives for birthdays, anniversaries, and dramatic reveals. Turns "I have no idea what to get them" into a fully formed plan, usually within thirty seconds.',
+					quote: "Okay okay, tell me one thing first — what's the vibe? Sweet, funny, romantic, or 'I forgot until yesterday'?",
+					rule: '<strong>Known for:</strong> suggesting a gift message before you think to ask for one — it\'s her signature move.'
+				},
+				chuti: {
+					name: 'Chuti Nanda, 53', role: 'Kids, Toys & Parents', emoji: '👶', color: '#E0A93A',
+					territory: 'Baby care, toys, school supplies, kids\' clothing & bicycles',
+					bio: 'Equal parts grandmother, toy expert, and parenting consultant. Every customer becomes one of her children within thirty seconds — endlessly patient, and not afraid to gently tell a parent they\'re overthinking it.',
+					quote: "First baby? Aney baba, come. You're looking at the wrong shelf already.",
+					rule: '<strong>Known for:</strong> never recommending a toy without asking the child\'s age first.'
+				},
+				safi: {
+					name: 'Safi, 32', role: 'Fashion & Beauty', emoji: '👗', color: '#A468C7',
+					territory: 'Clothing, accessories, cosmetics, perfumes, jewellery',
+					bio: 'Stylish, opinionated, and usually right. Has seen every fashion mistake imaginable and still likes people anyway — gently pushes you out of the "safe" choice when she can tell you\'re settling.',
+					quote: "No no. You're buying that because it's safe, not because you like it.",
+					rule: '<strong>Known for:</strong> asking who it\'s for and what the occasion is before recommending a single thing.'
+				},
+				kavindu: {
+					name: 'Kavindu, 24', role: 'Electronics & Home', emoji: '📱', color: '#4A9FD8',
+					territory: 'Electronics, home tools, furniture, cycling & fitness gear',
+					bio: 'A tech wizard trapped inside a slightly awkward salesperson. Gets genuinely excited when a customer knows what they\'re talking about, and translates patiently, without condescension, when they don\'t.',
+					quote: "Wait, before I answer — what's your budget and what's the actual use case?",
+					rule: '<strong>Known for:</strong> spec-checking things nobody asked him to spec-check.'
+				},
+				malsha: {
+					name: 'Malsha, 35', role: 'Culture & Services', emoji: '📚', color: '#A9754A',
+					territory: 'Books, professional services, pharmacy, religious items, pets',
+					bio: 'A former literature student who ended up helping people find books, services, and experiences instead. Thoughtful and a little philosophical — listens more than she speaks.',
+					quote: "That depends. Are you looking for information... or are you looking for something that stays with you?",
+					rule: '<strong>Known for:</strong> telling you honestly when the catalog can\'t help, rather than handing you a book as a consolation prize.'
+				},
+				dev: {
+					name: 'Dev, 38', role: 'The Lounge · 21+', emoji: '🌙', color: '#7A3B4E',
+					territory: 'The market\'s age-gated, more private aisle',
+					bio: 'Unflappable. Has heard every awkward question and embarrassing request imaginable, and has never once made anyone feel strange for asking. Calm exterior, genuine warmth underneath.',
+					quote: "Relax. Nobody's the first person to ask me that today.",
+					rule: '<strong>Known for:</strong> keeping the one age-gated stall in the market completely judgement-free.'
+				}
+			};
+
+			function selectStall(id, el) {
+				document.querySelectorAll('.stall, .courtyard-center').forEach(s => s.classList.remove('active'));
+				el.classList.add('active');
+
+				const d = STALL_DATA[id];
+				const panel = document.getElementById('stall-detail');
+				panel.style.setProperty('--panel-color', d.color);
+				panel.innerHTML = `
+					<div class="name-row">
+						<span class="emoji-badge">${d.emoji}</span>
+						<div>
+							<h4>${d.name}</h4>
+							<span class="role">${d.role}</span>
+							<span class="territory">${d.territory}</span>
+						</div>
+					</div>
+					<p class="stall-bio">${d.bio}</p>
+					<p class="stall-quote">"${d.quote}"</p>
+					<p class="stall-rule">${d.rule}</p>
+				`;
+			}
+
+			// ── Read time ──
+			const words = document.querySelector('.essay-body').innerText.split(/\s+/).length;
+		</script>
+
+	</body>
+</html>
