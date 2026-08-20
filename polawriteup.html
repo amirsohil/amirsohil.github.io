@@ -736,7 +736,7 @@
 						<span class="section-eyebrow">Project Write-Up · Agentic Commerce &amp; 3D World-Building</span>
 						<h2>Pola — A Virtual Market of AI Shopkeepers</h2>
 						<p style="color:rgba(255,255,255,0.55);font-size:0.92em;">
-							Seven AI shopkeepers, one live commerce MCP, and the bet that a market beats a chat widget.
+							Seven AI shopkeepers, one live commerce MCP, and the notion that a market beats a chat widget.
 							Originally built for the
 							<a href="https://www.kapruka.com/contactUs/agentChallenge.html" target="_blank" rel="noopener noreferrer" style="color:#CDFD50;"><i>Kapruka Agent Challenge 2026</i></a>,
 							now sitting in my portfolio.
@@ -769,17 +769,17 @@
 								</p>
 								<p>
 									<i>Pola</i> is the Sinhala word for an open-air marketplace. It's the kind of place where people browse,
-									linger, and talk before they buy. That was my base: a market square with seven lit-up stalls, 
-									each with its own shopkeeper, rather than a flat list of product categories. It also
-									gave every idea I wanted to explore a place to live. I believe personality needs a character.
-									<i>Kapruka</i>'s enormous, genuinely undifferentiated catalog (groceries next to electronics next to baby
-									trolleys) becomes something a customer can understand spatially in two seconds — gifts are over
-									there, tech is over there — instead of something they have to read through a menu to find.
+									linger, and talk before they buy. This was my base. It just made sense. I built a market square with seven 
+									lit-up stalls, each with its own shopkeeper, rather than a flat list of product categories. It also
+									gave every idea I wanted to explore a place to live. <i>Kapruka</i>'s enormous, genuinely undifferentiated 
+									catalog (groceries next to electronics next to baby trolleys) becomes something a customer can understand 
+									spatially in two seconds — gifts are over there, tech is over there — instead of something they have to 
+									read through a menu to find.
 								</p>
 								<p>
 									The obvious risk is that a 3D scene reads as a tech demo, performs badly, or gets in the way of
 									actually shopping. Every decision below exists to make sure the 3D layer earns its place without
-									ever blocking the real loop: discovery → cart → checkout.
+									ever blocking the real loop, which is discovery → cart → checkout.
 								</p>
 
 								<div class="stat-strip">
@@ -806,13 +806,13 @@
 								<h3>The World Itself</h3>
 								<p>
 									The whole frontend is a single <code>index.html</code> — <i>Three.js r128</i> loaded straight from a
-									CDN, vanilla JavaScript, zero bundler, zero build step. Inside it is a deliberate <i>Ghibli</i>-leaning,
+									CDN, vanilla JavaScript, with no bundler or build step. Inside it is a deliberate <i>Ghibli</i>-leaning,
 									toon-shaded, low-poly look, chosen instead of anything trying to be photorealistic.
 								</p>
 								<p>
 									<code>MeshToonMaterial</code> with a hand-built four-step gradient texture sits on almost every mesh,
 									and a slightly oversized, backface-culled duplicate of each shape gives the dark ink-outline look of
-									hand-drawn animation. It's a style choice: outlines and flat shading read as intentional in a
+									hand-drawn animation. It's a style choice, because outlines and flat shading read as intentional in a
 									screenshot in a way default-lit PBR never does, and they happen to render for free on a laptop with
 									no GPU guarantee. A gradient sky dome, a firefly particle system, and a procedural 
 									cherry-blossom petal fall round out the atmosphere. All of these were built from primitive geometry,
@@ -823,7 +823,7 @@
 									decorated with a small clue to what it sells: an apple for the grocer, a diamond for fashion, a gift
 									box for gifting, a flatscreen for tech, etc. Small details, but I included them because I wanted a 
 									difference between "seven identical boxes with labels" and "seven stalls that look like what they sell." 
-									A guide character, <i>Sudu</i>, anchors the courtyard's centre — more on her below.
+									A guide character, <i>Sudu</i>, anchors the courtyard's centre.
 								</p>
 
 								<h3 style="font-size:1.1em;margin-top:1.8em;">Camera as Motion</h3>
@@ -831,7 +831,7 @@
 									Walking up to a stall doesn't teleport the camera. A render-loop lerp eases the camera position and
 									look-target in over several frames while a darkening overlay fades up and a <i>← Back to Courtyard</i>
 									button appears. I included this small bit of motion to try and turn "this is a webpage with a 3D 
-									background" into "I am walking up to a stall" — cheap to implement, disproportionately effective.
+									background" into "I am walking up to a stall". This was cheap to implement, and disproportionately effective.
 								</p>
 
 								<div class="callout">
@@ -839,7 +839,7 @@
 									Below 760px, a full-screen card explains plainly that this is a 3D market town happier on a bigger
 									screen, with a "Continue anyway" override. Ambient market sound is opt-in and only starts on the 
 									first real click, respecting autoplay policy, with the mute preference remembered across visits. 
-									No one gets an unexpected audio blast on load.
+									This was to ensure no one got an unexpected audio blast on load.
 								</div>
 							</div>
 							<br><br>
@@ -850,15 +850,15 @@
 								<span class="section-eyebrow">Character Design</span>
 								<h3>Seven Pavilions, Turning a Catalog Into Characters</h3>
 								<p>
-									The hardest part of Kapruka's MCP for any single agent is that the catalog is enormous and the
-									categories cut across each other in non-obvious ways — liquor and non-alcoholic wine both file under
+									The hardest part of <i>Kapruka</i>'s MCP for any single agent is that the catalog is enormous and the
+									categories cut across each other in non-obvious ways. For example, liquor and non-alcoholic wine both file under
 									"Grocery," adult products and intimate pharmacy both file under "Pharmacy." A single generalist bot
 									would need a huge, brittle system prompt trying to hold the whole taxonomy in its head, and would
 									constantly answer from the wrong part of the catalog.
 								</p>
 								<p>
 									My answer was to split the catalog into seven pavilions that mirror how a Sri Lankan market is
-									actually organised, and give each one its own dedicated shopkeeper: a name, an age, a backstory, a
+									actually organised, and give each one its own dedicated shopkeeper, complete with a name, an age, a backstory, a
 									speaking style, and a narrow slice of the taxonomy. Walk through the courtyard below and tap a stall
 									to meet whoever's behind the counter.
 								</p>
@@ -883,16 +883,15 @@
 								</div>
 
 								<p style="margin-top:1.8em;">
-									Each system prompt bakes in a full character sheet, not just an instruction to "be friendly" —
-									a name, an age, a speaking style, and behaviour rules tuned to what could actually go wrong in
-									that specific aisle, tap around above to see a few.
+									Each system prompt bakes in a full character sheet: a name, an age, a speaking style, and behaviour rules 
+									tuned to what could actually go wrong in that specific aisle, tap around above to see a few.
 								</p>
 								<p>
 									No shopkeeper is allowed to pretend they can sell everything, either. Every prompt carries the full
 									market directory and a standing rule to refer a customer elsewhere by name when their need fits
-									another pavilion better — <i>Sampath Aiya</i> genuinely wouldn't know which perfume to recommend, and
+									another pavilion better. For example, <i>Sampath Aiya</i> genuinely wouldn't know which perfume to recommend, and
 									having him admit that and point you to <i>Safi</i> is more trustworthy than having him bluff it. And every
-									reply is written as a voice note, not a bullet list: markdown renders as literal asterisks in the
+									reply is written as a voice note instead of as bullet lists. Markdown renders as literal asterisks in the
 									chat bubble, so a server-side <code>strip_markdown</code> pass backstops the rare turn where a model
 									ignores that instruction anyway.
 								</p>
@@ -923,7 +922,7 @@
 								<p>
 									<i>Sudu</i> offers four preset chips on first open so a visitor can get moving with one tap instead of
 									staring at a blank input. Every reply after that regenerates chips dynamically from what she
-									just said. It's the <i>Creativity</i> answer, too: instead of a settings menu or a category
+									just said. It's the <i>Creativity</i> answer, too. Instead of a settings menu or a category
 									sidebar, "I don't know where to go" is handled by a character in the world, in plain English.
 								</p>
 							</div>
@@ -992,7 +991,7 @@
 
 									<article onclick="toggleDecision(this)">
 										<div class="decision-tag">Reliability</div>
-										<h4 class="major">A Model Fallback Chain — Because Free Tiers Rate-Limit</h4>
+										<h4 class="major">A Model Fallback Chain, Because Free Tiers Rate-Limit</h4>
 										<p style="text-align:left;"><i>Gemini</i> → <i>Cerebras</i> → <i>Groq</i>. Three providers, six model 
 											endpoints, tried in order within a single request.</p>
 										<div class="decision-detail"><div class="decision-detail-inner">
@@ -1004,12 +1003,11 @@
 											</p>
 											<p>
 												Every provider here runs on a free tier, and free tiers rate-limit. A single-provider build
-												is one 429 away from failing live at exactly the wrong moment — mid-conversation, in front
-												of whoever's trying it. The fallback chain means a transient outage degrades response
-												quality slightly, with a different model finishing, the same agentic loop, rather than breaking
-												the demo outright. An honest <code>_fallback</code> field exists for my own debugging, but
-												it's never shown to customers, because a shopkeeper apologising for "switching AI providers"
-												would break character for no benefit.
+												is one 429 away from failing live mid-conversation, in front of whoever's trying it. The fallback 
+												chain means a transient outage degrades response quality slightly, with a different model finishing, 
+												the same agentic loop, rather than breaking the demo outright. A <code>_fallback</code> field 
+												exists for my own debugging, but it's never shown to customers, because a shopkeeper apologising for 
+												"switching AI providers" would break character for no benefit.
 											</p>
 										</div></div>
 									</article>
@@ -1028,16 +1026,16 @@
 												<strong>Session correctness under concurrency.</strong> A single chat turn can trigger
 												several parallel tool calls, so the lazy session-init path is guarded with an
 												<code>asyncio.Lock</code> and a double-check, so two coroutines racing to initialise at the
-												same moment can't each spin up their own session and silently clobber each other.
+												same moment can't each spin up their own session and clobber each other.
 											</p>
 											<p>
 												<strong>429 resilience.</strong> The free MCP tier caps at 60
-												requests/minute per IP, and a busy chat turn can burst past that — one short, capped retry
+												requests/minute per IP, and a busy chat turn can burst past that. One short, capped retry
 												absorbs a momentary spike without making every dropped request fatal.
 											</p>
 											<p>
 												<strong>Self-healing sessions.</strong> If a tool call fails mid-conversation because a
-												session quietly expired, the backend re-initialises once and retries automatically instead
+												session expired, the backend re-initialises once and retries automatically instead
 												of surfacing a raw error and derailing the conversation.
 											</p>
 										</div></div>
@@ -1057,7 +1055,7 @@
 												grounding the primary model does.
 											</p>
 											<p>
-												Within a round, tool calls run concurrently via <code>asyncio.gather</code> — if a model
+												Within a round, tool calls run concurrently via <code>asyncio.gather</code>. If a model
 												wants to search two things and check delivery in the same turn, those happen in parallel.
 												<code>asyncio.gather</code> preserves input order in its output regardless of which call
 												finishes first, which matters for the OpenAI-style loop because <code>tool_call_id</code>s
@@ -1065,7 +1063,7 @@
 											</p>
 											<p>
 												Both loops write into one shared <code>tool_history</code> list, so every downstream step
-												— product extraction, order-summary construction, card curation — works identically no
+												(product extraction, order-summary construction, card curation) works identically no
 												matter which of the six models answered.
 											</p>
 										</div></div>
@@ -1091,11 +1089,11 @@
 									<tbody>
 										<tr>
 											<td>Category slugs only forwarded once confirmed</td>
-											<td>Kapruka's category filter is exact-match; a guessed slug returns zero results, and the model confidently tells the customer the product doesn't exist.</td>
+											<td><i>Kapruka</i>'s category filter is exact-match; a guessed slug returns zero results, and the model confidently tells the customer the product doesn't exist.</td>
 										</tr>
 										<tr>
 											<td><code>SHOW_CARDS</code> allowlist</td>
-											<td>Search spans the whole catalog, not one pavilion — a "rice" query legitimately returns rice cookers (Kavindu's) alongside rice meals (Sampath's). The model, not the raw API response, decides which IDs belong on screen for the shopkeeper you're actually talking to.</td>
+											<td>Search spans the whole catalog. A "rice" query legitimately returns rice cookers (<i>Kavindu</i>'s) alongside rice meals (<i>Sampath</i>'s). The model (not the raw API response) decides which IDs belong on screen for the shopkeeper you're actually talking to.</td>
 										</tr>
 										<tr>
 											<td>Lounge filter, both directions</td>
@@ -1103,7 +1101,7 @@
 										</tr>
 										<tr>
 											<td>IDF re-ranking on 20 fetched results</td>
-											<td>Kapruka's default ordering doesn't always surface the most relevant result first; a self-calibrating term-weight pass re-sorts before the model ever sees the list.</td>
+											<td><i>Kapruka</i>'s default ordering doesn't always surface the most relevant result first; a self-calibrating term-weight pass re-sorts before the model ever sees the list.</td>
 										</tr>
 										<tr>
 											<td><code>_query_matched: false</code> flag</td>
@@ -1115,7 +1113,7 @@
 										</tr>
 										<tr>
 											<td>Today's date injected into every prompt</td>
-											<td>Left to infer "today" from training data, the three providers disagreed with each other and with the calendar — which rejected valid near-future delivery dates as "in the past."</td>
+											<td>Left to infer "today" from training data, the three providers disagreed with each other and with the calendar, which rejected valid near-future delivery dates as "in the past."</td>
 										</tr>
 									</tbody>
 								</table>
@@ -1146,9 +1144,9 @@
 										electronics, and so on. Cross-pavilion carts are what the other tab is for.
 									</p>
 									<ul>
-										<li>The response is parsed as structured JSON so the price breakdown comes back as real numbers, not something scraped out of prose.</li>
+										<li>The response is parsed as structured JSON so the price breakdown comes back as real numbers.</li>
 										<li>If checkout is called on a product ID that was never actually looked up this conversation, the backend detects the gap and backfills a fresh product lookup before the summary renders.</li>
-										<li>Dev, at <i>The Lounge</i>, is the only shopkeeper who also offers an anonymous sender option — the one context in the market where someone might actually want it.</li>
+										<li><i>Dev</i>, at <i>The Lounge</i>, is the only shopkeeper who also offers an anonymous sender option — the one context in the market where someone might actually want it.</li>
 									</ul>
 								</div>
 
@@ -1156,14 +1154,14 @@
 									<p>
 										For the browse-then-decide shopper. Add to cart from any product card or the lightbox; the cart
 										drawer has its own quantity controls and running total, and "Checkout at the Till" opens a
-										delivery-details form. These three endpoints are deliberately thin, stateless, and model-free —
-										there's no conversation to extract structure from, so there's no reason to pay for an LLM
+										delivery-details form. These three endpoints are deliberately thin, stateless, and model-free.
+										There's no conversation to extract structure from, so there's no reason to pay for an LLM
 										round-trip just to fill in a form.
 									</p>
 									<ul>
 										<li>Live city autocomplete and a live delivery-fee/date preview update the moment both city and date are chosen, before the order is even placed.</li>
 										<li>Delivery details are remembered in <code>localStorage</code>, updated only after a successful order, with an explicit "Clear saved details" escape hatch.</li>
-										<li>Submitting builds the same order-summary shape the chat flow does, and hands off to the same Order Summary modal — one UI, two ways to reach it.</li>
+										<li>Submitting builds the same order-summary shape the chat flow does, and hands off to the same Order Summary modal. There is one UI, with two ways to reach it.</li>
 									</ul>
 								</div>
 
@@ -1196,10 +1194,9 @@
 										<p style="text-align:left;">Toon-shaded 3D scene, camera-lerp navigation, ambient sound, mobile gate — nothing that breaks the illusion.</p>
 										<div class="decision-detail"><div class="decision-detail-inner">
 											<p>
-												Every asset — the toon shading, the ink outlines, the gradient sky, the market sounds —
-												pulls from the same reference mood board. The camera-lerp and the mobile gate exist for
-												the same reason: the illusion has to hold whether someone's on a gaming laptop or a
-												mid-range one with three other tabs open.
+												Every asset (the toon shading, the ink outlines, the gradient sky, the market sounds)
+												pulls from the same reference mood board. The scene has been built in such a way that the illusion
+												holds regardless of whether someone's on a gaming laptop or a mid-range one with three other tabs open.
 											</p>
 										</div></div>
 									</article>
@@ -1210,7 +1207,7 @@
 										<p style="text-align:left;">Product card grids, an image lightbox, an Order Summary modal with real photos, hand-built stall decorations per pavilion.</p>
 										<div class="decision-detail"><div class="decision-detail-inner">
 											<p>
-												A product card without a real photo reads as a placeholder, so the card, the lightbox,
+												A product card without a real photo reads as a placeholder. I built this such that the card, the lightbox,
 												and the final order summary all pull the same image. Each pavilion also got one small 
 												hand-modelled detail tied to what it sells, instead of seven identical huts with different labels on the door.
 											</p>
@@ -1219,7 +1216,7 @@
 
 									<article onclick="toggleDecision(this)">
 										<div class="decision-tag">Character</div>
-										<h4 class="major">Seven Shopkeepers, Not One Bot in Different Hats</h4>
+										<h4 class="major">Seven Distinct Shopkeepers</h4>
 										<p style="text-align:left;">Names, ages, backstories, speech patterns, and worked example lines baked into every system prompt.</p>
 										<div class="decision-detail"><div class="decision-detail-inner">
 											<p>
@@ -1261,13 +1258,13 @@
 
 									<article onclick="toggleDecision(this)">
 										<div class="decision-tag">Concept</div>
-										<h4 class="major">A Place You Walk Into, Not a Widget You Type Into</h4>
+										<h4 class="major">A Place You Walk Into, Rather Than a Boring Widget</h4>
 										<p style="text-align:left;">The market-as-place metaphor, and <i>Sudu</i> as a cat you ask in plain English instead of a menu.</p>
 										<div class="decision-detail"><div class="decision-detail-inner">
 											<p>
 												The easiest version of this project is one chatbot with a category dropdown. Building an
-												actual place — a courtyard, seven stalls, a guide who points you around instead of a
-												settings screen — was the slower, riskier option, and the one I actually wanted to see
+												actual place, comeplete with a courtyard, seven stalls, a guide who points you around instead of a
+												settings screen, was the slower, riskier option, and the one I actually wanted to see
 												exist.
 											</p>
 										</div></div>
@@ -1290,15 +1287,13 @@
 								<h3>What's Next</h3>
 								<p>
 									<strong>Sinhala and Tanglish support.</strong> Every persona is currently English-only. The
-									underlying models are multilingual and would likely handle either reasonably, but that's untested,
-									not a claimed feature — and for a market meant to feel local, it's probably the one addition
-									that would matter most.
+									underlying models are multilingual and would likely handle either reasonably, but that's untested. 
+									For a market meant to feel local, it's probably the one addition that would matter most.
 								</p>
 								<p>
 									<strong>Structured cross-stall referrals.</strong> Shopkeepers already refer customers to each
 									other by name in conversation, and <i>Sudu</i>'s chips work today. The one-tap cross-pavilion banner UI is
-									built but not yet wired to a backend signal — a classifier step after the agentic loop, not a
-									frontend rebuild.
+									built but not yet wired to a backend signal. This would just be a classifier step after the agentic loop.
 								</p>
 								<p>
 									<strong>Proactive delivery-date warnings.</strong> The delivery-check tool and cart preview both
@@ -1469,14 +1464,14 @@
 				sudu: {
 					name: 'Sudu', role: 'Guide · Sells nothing', emoji: '🐈', color: '#F4C430',
 					territory: 'Knows all seven pavilions',
-					bio: 'Friendly, playful, and impossible to fluster. She knows every stall in the market by name and never seems to run out of patience for someone who has no idea where to start.',
+					bio: 'Friendly, playful, and impossible to fluster. She knows every stall in the market by name and never seems to lose patience with people who have no idea where to start',
 					quote: "That's Tharushi, at Gifts & Celebrations — go on, she'll sort you out.",
 					rule: '<strong>Known for:</strong> pointing you to exactly the right shopkeeper, then getting out of the way.'
 				},
 				sampath: {
 					name: 'Sampath Aiya, 46', role: 'Fresh Food & Grocery', emoji: '🍎', color: '#6E8F52',
 					territory: 'Groceries, cakes, chocolates, fresh produce, ready meals',
-					bio: 'A lifetime spent working markets — knows prices, seasons, and suppliers better than most people know their own street. Gruff on the surface, quietly looking out for you underneath.',
+					bio: 'A lifetime spent working markets. Knows prices, seasons, and suppliers better than most people know their own street. Gruff on the surface, looking out for you underneath.',
 					quote: "Machan, don't buy that tomato. Wait till Friday. Better batch coming.",
 					rule: '<strong>Known for:</strong> calling everyone "machan" or "baba," and warning you off a bad buy before you even ask.'
 				},
@@ -1490,14 +1485,14 @@
 				chuti: {
 					name: 'Chuti Nanda, 53', role: 'Kids, Toys & Parents', emoji: '👶', color: '#E0A93A',
 					territory: 'Baby care, toys, school supplies, kids\' clothing & bicycles',
-					bio: 'Equal parts grandmother, toy expert, and parenting consultant. Every customer becomes one of her children within thirty seconds — endlessly patient, and not afraid to gently tell a parent they\'re overthinking it.',
+					bio: 'Equal parts grandmother, toy expert, and parenting consultant. Every customer becomes one of her children within thirty seconds. Endlessly patient, and not afraid to gently tell a parent they\'re overthinking it.',
 					quote: "First baby? Aney baba, come. You're looking at the wrong shelf already.",
 					rule: '<strong>Known for:</strong> never recommending a toy without asking the child\'s age first.'
 				},
 				safi: {
 					name: 'Safi, 32', role: 'Fashion & Beauty', emoji: '👗', color: '#A468C7',
 					territory: 'Clothing, accessories, cosmetics, perfumes, jewellery',
-					bio: 'Stylish, opinionated, and usually right. Has seen every fashion mistake imaginable and still likes people anyway — gently pushes you out of the "safe" choice when she can tell you\'re settling.',
+					bio: 'Stylish, opinionated, and usually right. Has seen every fashion mistake imaginable and still likes people anyway. Gently pushes you out of the "safe" choice when she can tell you\'re settling.',
 					quote: "No no. You're buying that because it's safe, not because you like it.",
 					rule: '<strong>Known for:</strong> asking who it\'s for and what the occasion is before recommending a single thing.'
 				},
@@ -1511,7 +1506,7 @@
 				malsha: {
 					name: 'Malsha, 35', role: 'Culture & Services', emoji: '📚', color: '#A9754A',
 					territory: 'Books, professional services, pharmacy, religious items, pets',
-					bio: 'A former literature student who ended up helping people find books, services, and experiences instead. Thoughtful and a little philosophical — listens more than she speaks.',
+					bio: 'A former literature student who ended up helping people find books, services, and experiences instead. Thoughtful and a little philosophical. Listens more than she speaks.',
 					quote: "That depends. Are you looking for information... or are you looking for something that stays with you?",
 					rule: '<strong>Known for:</strong> telling you honestly when the catalog can\'t help, rather than handing you a book as a consolation prize.'
 				},
