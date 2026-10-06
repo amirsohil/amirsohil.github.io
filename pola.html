@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pola — Amir Sohil</title>
+<meta name="description" content="An AI shopping agent built as a 3D open-air market with seven distinct AI shopkeepers, running real agentic commerce against Kapruka's live product catalog.">
+<meta property="og:title" content="Pola — Amir Sohil">
+<meta property="og:description" content="A 3D open-air market where seven AI shopkeepers run real commerce, not a scripted demo.">
+<meta property="og:image" content="images/project-images/polafull.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="portfolio.html">Portfolio</a> <span>/</span> <span>Pola</span>
+    </div>
+
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Interactive Experience</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+      </div>
+      <h1 class="article-title">Pola</h1>
+      <p class="article-dek">A 3D open-air market where seven AI shopkeepers run real commerce.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <span class="tag tool">Python</span>
+          <span class="tag tool">Three.js</span>
+          <span class="tag tool">FastAPI</span>
+          <span class="tag tool">GitHub</span>
+          <span class="tag">Agentic AI</span>
+          <span class="tag">Product Design</span>
+        </div>
+        <div class="article-actions">
+          <a class="btn-cv" href="https://amirsohil.github.io/pola/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>
+            View Live
+          </a>
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/project-images/polafull.png" alt="Screenshot of the project page.">
+    </div>
+    <div class="cover-caption">Fig. 1 — Image of the project page.</div>
+
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#overview">The Problem</a></li>
+          <li><a href="#market">The Market</a></li>
+          <li><a href="#underthehood">Under the Hood</a></li>
+          <li><a href="#outcome">The Outcome</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section id="overview" class="reveal">
+          <h2>The Problem</h2>
+          <p>The brief for the Kapruka Agent Challenge 2026 was to build an AI shopping agent. I assumed most entries would default to a chat widget bolted onto a storefront — functional, but not much of a demonstration of what agentic commerce could actually feel like beyond text.</p>
+          <p>Pola set out to answer a different question: what does agentic commerce look like when the interface itself becomes the demonstration, rather than a text box sitting on top of an otherwise ordinary storefront? Rather than a chat window, the brief was reimagined as a small, navigable world.</p>
+        </section>
+
+        <section id="market" class="reveal">
+          <h2>The Market</h2>
+          <div class="stat-strip">
+            <div class="stat">
+              <div class="stat-num" data-target="7">0</div>
+              <div class="stat-label">SHOPKEEPER PERSONAS</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="3">0</div>
+              <div class="stat-label">PROVIDER FALLBACK CHAIN</div>
+            </div>
+             <div class="stat">
+            </div>
+          </div>
+
+          <p>Customers walk between seven lit pavilions, each staffed by an AI shopkeeper with its own personality and territory. Each pavilion actually spans two related sub-categories rather than one flat label, which is what keeps seven pavilions from feeling like seven arbitrary buckets, and gives the market real category depth instead of a shallow grid of icons:</p>
+          <ul>  
+            <li>- Fresh Food & Grocery / Pantry & Daily Run</li>
+            <li>- Fashion & Beauty / Lifestyle & Wellness</li>
+            <li>- Gifts & Celebrations / Occasions Hub</li>
+            <li>- Electronics & Home / Hardware & Infrastructure</li>
+            <li>- Culture & Services / Knowledge & Utilities</li>
+            <li>- Kids, Toys & Parents / Childhood Journey</li>
+            <li>- The Lounge / Restricted Store (age-gated, 21+)</li>
+          </ul>
+          <p>A central concierge, Sudu, sits at the hub the seven paths radiate from. That placement solves a genuine wayfinding problem a flat product list never has to deal with. In a spatial market, "where do I actually go for this" is a real question, and Sudu exists specifically to answer it.</p>          
+        </section>
+
+        <section id="underthehood" class="reveal">
+          <h2>Under the Hood</h2>
+          <p>None of this works if the market feels like a static 3D scene with a chatbot glued on top. The three decisions below are what make it feel transactional and distinct pavilion-to-pavilion, rather than one assistant wearing seven different outfits.</p>
+
+          <div class="accordion">
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">01</span>Real transactions</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Every shopkeeper runs real agentic tool calls against Kapruka's live commerce MCP for search, delivery estimates, cart, and checkout. Ask a shopkeeper for a recommendation and the answer comes from an actual query against the live catalog and inventory.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">02</span>Why a three-provider fallback chain</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>To keep the system running at zero hosting cost regardless of which provider hits a rate limit, the FastAPI backend routes through Gemini → Cerebras → Groq, in that order, so a rate-limited provider degrades gracefully to the next one rather than taking the whole market offline.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">03</span>What it took to get there</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Several iterations: a visual style refresh toward a warmer, more Ghibli-inspired look, behavioural bug fixes across all seven personas so each one stayed distinct in character rather than converging on the same generic assistant voice, and dedicated prompt engineering per shopkeeper.</p>
+              </div></div>
+            </div>
+          </div>
+
+        </section>
+        
+        
+        <section id="outcome" class="reveal">
+          <h2>The Outcome</h2>
+          <p>In my opinion, the multi-provider fallback architecture stands out as the project's core technical differentiator, being built for reliability. A lot of agent-challenge submissions demonstrate a single happy-path conversation and stop there. Pola's fallback chain was built because I believe the harder engineering problem in agentic commerce isn't getting one shopkeeper to respond well once. It's getting seven of them to keep responding reliably in the real world, especially when things go wrong.</p>
+          <p>A full architectural write-up, world-building through checkout flow, exists in the <a href="polawriteup.html">essays section</a>.</p>         
+        </section>
+
+        <section id="gallery" class="reveal">
+          <h2>Gallery</h2>
+          <div class="gallery-grid">
+            <button type="button">
+              <img src="images/project-images/polafull.png" alt="Screenshot of the product">
+            </button>
+            <button type="button">
+              <img src="images/project-images/pola2.png" alt="Screenshot of the product">
+            </button>
+            <button type="button">
+              <img src="images/project-images/pola3.png" alt="Screenshot of the product">
+            </button>
+            <button type="button">
+              <img src="images/project-images/pola4.png" alt="Screenshot of the product">
+            </button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">More work</div>
+          <h2 class="section-title">Keep exploring.</h2>
+        </div>
+        <a class="section-link" href="portfolio.html">All projects <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid" data-related-source="data/projects.json" data-related-exclude="Pola" data-related-limit="3"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

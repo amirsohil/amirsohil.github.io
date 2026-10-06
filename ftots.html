@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Selecting Elite Footballers into League- and Season-wise Teams of Best Players Utilising Machine Learning — Amir Sohil</title>
+<meta name="description" content="A BSc dissertation testing whether machine learning can out-select FIFA's own Team of the Season, using four position-specific models across five leagues.">
+<meta property="og:title" content="Selecting Elite Footballers into League- and Season-wise Teams of Best Players Utilising Machine Learning — Amir Sohil">
+<meta property="og:description" content="Testing whether machine learning can out-select FIFA's own Team of the Season.">
+<meta property="og:image" content="images/project-images/ftotsfull.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="portfolio.html">Portfolio</a> <span>/</span> <span>Selecting Elite Footballers into League- and Season-wise Teams of Best Players Utilising Machine Learning</span>
+    </div>
+
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">End-to-End Data Project</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+      </div>
+      <h1 class="article-title">Selecting Elite Footballers into League- and Season-wise Teams of Best Players Utilising Machine Learning</h1>
+      <p class="article-dek">Testing whether machine learning can out-select FIFA's own Team of the Season.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <span class="tag tool">Python</span>
+          <span class="tag tool">Plotly</span>
+          <span class="tag tool">HTML</span>
+          <span class="tag tool">Git</span>
+          <span class="tag">Machine Learning</span>
+          <span class="tag">Statistical Analysis</span>
+        </div>
+        <div class="article-actions">
+          <a class="btn-cv" href="https://amirsohil.github.io/BScDSWebsite/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>
+            View Website
+          </a>
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/project-images/ftotsfull.png" alt="Screenshot of the project landing page.">
+    </div>
+    <div class="cover-caption">Fig. 1 — Image of the project landing page.</div>
+
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#overview">The Problem</a></li>
+          <li><a href="#approach">How It Was Built</a></li>
+          <li><a href="#outcome">The Outcome</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section id="overview" class="reveal">
+          <h2>The Problem</h2>
+          <p>FIFA's Team of the Season (FTOTS) is chosen by human vote, and draws regular criticism for being subjective and popularity-driven rather than performance-based. For my final-year BSc (Hons) Data Science project at Coventry University, the goal was to test whether a machine-learning approach could select more objectively performance-aligned squads than the human voting system, across Europe's big five leagues.</p>
+          <p>FTOTS specifically was chosen as the benchmark to beat because it already has a clear, checkable ground truth: an actual named squad exists for every league-season, voted on by real fans, which makes it possible to score a model's picks against a real-world outcome instead of an abstract performance metric with no external reference point.</p>
+
+          <div class="stat-strip">
+            <div class="stat">
+              <div class="stat-num" data-target="4">0</div>
+              <div class="stat-label">POSITION-SPECIFIC MODELS</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="5">0</div>
+              <div class="stat-label">LEAGUES COVERED</div>
+            </div>
+             <div class="stat">
+            </div>
+          </div>
+
+        </section>
+
+        <section id="approach" class="reveal">
+          <h2>How It Was Built</h2>
+          
+          <div class="process-list">
+            <div class="process-item">
+              <div class="process-num"></div>
+              <div class="process-body">
+                <h3>Scrape &amp; Wrangle</h3>
+                <p>I scraped player data across Europe's big five leagues and processed it through wrangling and feature engineering, building the base dataset every downstream model would train on.</p>
+              </div>
+            </div>
+            <div class="process-item">
+              <div class="process-num"></div>
+              <div class="process-body">
+                <h3>Train Four Position-Specific Models</h3>
+                <p>Rather than one general model, I trained four separate classifiers — one each for goalkeepers, defenders, midfielders, and forwards — using historical actual FTOTS selections as ground truth.</p>
+              </div>
+            </div>
+            <div class="process-item">
+              <div class="process-num"></div>
+              <div class="process-body">
+                <h3>Generate Squads</h3>
+                <p>For each league-season, every model generated its top-n players matching the real squad's positional counts, producing a full model-selected XI to set against the human-voted one.</p>
+              </div>
+            </div>
+            <div class="process-item">
+              <div class="process-num"></div>
+              <div class="process-body">
+                <h3>Score Against a Custom Framework</h3>
+                <p>I scored model output using a points framework adapted from the UEFA Champions League fantasy scoring system, utilising a like-for-like comparison.</p>
+              </div>
+            </div>
+            <div class="process-item">
+              <div class="process-num"></div>
+              <div class="process-body">
+                <h3>Compare Across Seasons &amp; Leagues</h3>
+                <p>The comparison ran across multiple historical seasons, spanning all Big Five leagues: Premier League, Bundesliga, La Liga, Serie A, and Ligue 1.</p>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <section id="outcome" class="reveal">
+          <h2>The Outcome</h2>
+          <p>Across the tested seasons, the model-selected squads outscored the human-voted FTOTS squads in a majority of seasons, providing direct evidence that a stats-driven selection process can beat a popularity-influenced voting system on its own scoring terms. The <a href="https://amirsohil.github.io/BScDSWebsite/">companion site</a> documents the comparison season-by-season and league-by-league, and includes a bonus: an all-time "Best XI" per league, compiled from each league's strongest individual model-selected seasons.</p>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">More work</div>
+          <h2 class="section-title">Keep exploring.</h2>
+        </div>
+        <a class="section-link" href="portfolio.html">All projects <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid" data-related-source="data/projects.json" data-related-exclude="Echoes of Earth" data-related-limit="3"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

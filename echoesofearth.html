@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Echoes of Earth — Amir Sohil</title>
+<meta name="description" content="A global map of all 370 magnitude-7.0+ earthquakes recorded since 2000, plotted directly against tectonic plate boundaries.">
+<meta property="og:title" content="Echoes of Earth — Amir Sohil">
+<meta property="og:description" content="Every magnitude-7.0+ earthquake since 2000, mapped against the plates that caused it.">
+<meta property="og:image" content="images/project-images/echoesofearthfull.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="portfolio.html">Portfolio</a> <span>/</span> <span>Echoes of Earth</span>
+    </div>
+
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Visualisation</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+      </div>
+      <h1 class="article-title">Echoes of Earth</h1>
+      <p class="article-dek">Every magnitude-7.0+ earthquake since 2000, mapped against the plates that caused it.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <span class="tag tool">R</span>
+          <span class="tag tool">Figma</span>
+          <span class="tag">Geospatial Analysis</span>
+          <span class="tag">Data Visualisation</span>
+        </div>
+        <div class="article-actions">
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/project-images/echoesofearthfull.png" alt="Screenshot of the visualisation, showing the earthquakes plotted against tectonic plate boundaries.">
+    </div>
+    <div class="cover-caption">Fig. 1 — Image of the visualisation.</div>
+
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#overview">The Problem</a></li>
+          <li><a href="#approach">The Approach</a></li>
+          <li><a href="#outcome">The Outcome</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section id="overview" class="reveal">
+          <h2>The Problem</h2>
+          <p>Major earthquakes get reported one at a time, in the moment, with no lasting visual record connecting them to each other. This project compiles every magnitude-7.0+ earthquake from 2000 to 2025 into a single archive, tying where they happen to how often.</p>
+          <p>The magnitude-7.0 cutoff is itself a meaningful filter, isolating the earthquakes large enough to be genuinely newsworthy and destructive on their own, rather than diluting the archive with the much larger volume of smaller tremors that occur constantly and rarely make headlines.</p>
+        </section>
+
+        <section id="approach" class="reveal">
+          <h2>The Approach</h2>
+          <p>A world map plots all recorded events, sized by magnitude, overlaid directly on tectonic plate boundaries rather than just political borders, so the spatial pattern is visible on the map itself. A year-by-year frequency chart runs alongside it, adding time as a second axis to the same dataset.</p>
+        </section>
+
+        <section id="outcome" class="reveal">
+          <h2>The Outcome</h2>
+          <div class="stat-strip">
+            <div class="stat">
+              <div class="stat-num" data-target="376">0</div>
+              <div class="stat-label">M7.0+ QUAKES SINCE 2000</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="24">0</div>
+              <div class="stat-label">QUAKES IN PEAK YEAR (2010)</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="7">0</div>
+              <div class="stat-label">QUAKES IN LOWEST YEAR (2017)</div>
+            </div>
+          </div>
+
+          <blockquote>The Pacific Ring of Fire is impossible to miss without needing to say it in words.</blockquote>
+
+          <p>376 magnitude-7.0+ earthquakes have been recorded globally since 2000 (at the time the project was completed). The spatial layer makes the Pacific Ring of Fire impossible to miss without needing to say it in words — the overwhelming majority of large quakes cluster tightly along the Pacific coastlines of the Americas, Japan, Indonesia, and the wider western Pacific.</p>
+          <p>2010 stands out as the clear peak at 24 major quakes in a single year, against a baseline that otherwise swings noticeably year to year. In 2017, the count dips to just 7. 2025's low count on the chart is a partial-year artifact, since the project was completed mid-2025.</p>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">More work</div>
+          <h2 class="section-title">Keep exploring.</h2>
+        </div>
+        <a class="section-link" href="portfolio.html">All projects <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid" data-related-source="data/projects.json" data-related-exclude="Echoes of Earth" data-related-limit="3"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

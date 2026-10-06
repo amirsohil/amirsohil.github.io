@@ -1,0 +1,248 @@
+<!--
+  ESSAY PAGE TEMPLATE
+  ====================
+  Duplicate this file, rename it to match the `href` you set for this
+  essay in data/essays.json (e.g. goodhartslaw.html), then swap the
+  ALL-CAPS placeholder text for the real thing. This mirrors the
+  pattern your existing essays already use — an interactive demo plus
+  expandable case cards — just rebuilt in the new design system.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ESSAY TITLE — Amir Sohil</title>
+<meta name="description" content="ONE-SENTENCE DESCRIPTION FOR SEARCH ENGINES AND LINK PREVIEWS.">
+<meta property="og:title" content="ESSAY TITLE — Amir Sohil">
+<meta property="og:description" content="ONE-SENTENCE DESCRIPTION.">
+<meta property="og:image" content="images/YOUR-COVER-IMAGE.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="essays.html">Essays</a> <span>/</span> <span>ESSAY TITLE</span>
+    </div>
+
+    <!-- ============ HEADER ============ -->
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Essay</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+        <span class="sep">·</span>
+        <span class="plain">2026</span>
+      </div>
+      <h1 class="article-title">ESSAY TITLE</h1>
+      <p class="article-dek">ONE-LINE DEK — the argument or question this essay is actually making.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <!-- Mirror the tools/skills you gave this essay in data/essays.json -->
+          <span class="tag tool">TOOL (if any)</span>
+          <span class="tag">SKILL ONE</span>
+          <span class="tag">SKILL TWO</span>
+        </div>
+        <div class="article-actions">
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this essay">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/YOUR-COVER-IMAGE.png" alt="Cover image for ESSAY TITLE">
+    </div>
+    <div class="cover-caption">Fig. 1 — CAPTION DESCRIBING THE COVER IMAGE</div>
+
+    <!-- ============ BODY: TOC + PROSE ============ -->
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#premise">The Premise</a></li>
+          <li><a href="#demo">See It In Action</a></li>
+          <li><a href="#cases">Case Studies</a></li>
+          <li><a href="#framework">A Better Framework</a></li>
+          <li><a href="#takeaways">Takeaways</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section id="premise" class="reveal">
+          <h2>The Premise</h2>
+          <p>OPEN WITH THE HOOK — the counterintuitive claim, the quiet failure mode, or the question most people don't think to ask. This is the paragraph that decides whether someone keeps reading.</p>
+          <blockquote>A ONE-SENTENCE VERSION OF YOUR CENTRAL ARGUMENT, PULLED OUT AS A QUOTE.</blockquote>
+          <p>Follow up with the context — why this matters, who it affects, and what most explanations get wrong about it.<sup><a class="fn-ref" href="#fn-1">1</a></sup></p>
+        </section>
+
+        <section id="demo" class="reveal">
+          <h2>See It In Action</h2>
+          <p>An embedded, interactive figure beats a static chart every time. This one is a bare scaffold — rewire the math in <code>js/detail.js</code>'s <code>initDemoSlider()</code> to actually illustrate your argument.</p>
+
+          <div class="demo-panel" data-demo data-unit="">
+            <div class="eyebrow">Try it</div>
+            <div class="demo-row">
+              <input type="range" min="0" max="100" value="30">
+              <span class="demo-readout">30</span>
+            </div>
+            <div class="demo-bar-track"><div class="demo-bar-fill"></div></div>
+            <p class="demo-note">REPLACE THIS: explain what moving the slider demonstrates about your argument.</p>
+          </div>
+
+          <div class="stat-strip">
+            <div class="stat">
+              <div class="stat-num" data-target="62" data-suffix="%">0%</div>
+              <div class="stat-label">SUPPORTING STAT ONE</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="4" data-decimals="1" data-suffix="×">0×</div>
+              <div class="stat-label">SUPPORTING STAT TWO</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="12">0</div>
+              <div class="stat-label">SUPPORTING STAT THREE</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="cases" class="reveal">
+          <h2>Case Studies</h2>
+          <p>Real (or realistic) examples make the abstract argument land. Expand each one below.</p>
+
+          <div class="accordion">
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">01</span>CASE STUDY ONE — SHORT LABEL</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>WHAT HAPPENED, WHY IT ILLUSTRATES YOUR POINT, AND WHAT IT COST OR CHANGED.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">02</span>CASE STUDY TWO — SHORT LABEL</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>WHAT HAPPENED, WHY IT ILLUSTRATES YOUR POINT, AND WHAT IT COST OR CHANGED.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">03</span>CASE STUDY THREE — SHORT LABEL</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>WHAT HAPPENED, WHY IT ILLUSTRATES YOUR POINT, AND WHAT IT COST OR CHANGED.</p>
+              </div></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="framework" class="reveal">
+          <h2>A Better Framework</h2>
+          <p>Having shown the problem, lay out your alternative — a checklist, a mental model, a short set of principles.</p>
+          <ul>
+            <li><strong>PRINCIPLE ONE</strong> — one sentence explaining it.</li>
+            <li><strong>PRINCIPLE TWO</strong> — one sentence explaining it.</li>
+            <li><strong>PRINCIPLE THREE</strong> — one sentence explaining it.</li>
+          </ul>
+        </section>
+
+        <section id="takeaways" class="reveal">
+          <h2>Takeaways</h2>
+          <p>Close by restating the core claim plainly, and say what you want the reader to actually do differently.<sup><a class="fn-ref" href="#fn-2">2</a></sup></p>
+        </section>
+
+        <!-- Delete this block entirely if you don't need footnotes -->
+        <div class="footnotes">
+          <ol>
+            <li id="fn-1">A SAMPLE FOOTNOTE — SOURCE OR CAVEAT FOR THE OPENING CLAIM.</li>
+            <li id="fn-2">A SAMPLE FOOTNOTE — SOURCE OR CAVEAT FOR THE CLOSING CLAIM.</li>
+          </ol>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============ READ NEXT ============ -->
+    <!-- Pulls straight from data/essays.json; set data-related-exclude
+         to this essay's exact "title" so it doesn't recommend itself -->
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Read next</div>
+          <h2 class="section-title">More essays.</h2>
+        </div>
+        <a class="section-link" href="essays.html">All essays <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid two-col" data-related-source="data/essays.json" data-related-exclude="ESSAY TITLE" data-related-limit="2"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

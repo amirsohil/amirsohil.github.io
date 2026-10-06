@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Die Gegenpress — Amir Sohil</title>
+<meta name="description" content="Every goal of Klopp's Liverpool tenure — 1,035 across 491 games — plotted inside a Liver Bird silhouette, filterable by player, opponent, and venue.">
+<meta property="og:title" content="Die Gegenpress — Amir Sohil">
+<meta property="og:description" content="Every goal of Klopp's Liverpool, plotted inside a Liver Bird.">
+<meta property="og:image" content="images/project-images/diegegenpressfull.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="portfolio.html">Portfolio</a> <span>/</span> <span>Die Gegenpress</span>
+    </div>
+
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Dashboard</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+      </div>
+      <h1 class="article-title">Die Gegenpress</h1>
+      <p class="article-dek">Every goal of Klopp's Liverpool, plotted inside a Liver Bird.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <span class="tag tool">Python</span>
+          <span class="tag tool">Tableau Public</span>
+          <span class="tag tool">Figma</span>
+          <span class="tag">Data Visualisation</span>
+          <span class="tag">Data Storytelling</span>
+        </div>
+        <div class="article-actions">
+          <a class="btn-cv" href="https://public.tableau.com/app/profile/amir.sohil/viz/KloppsLiverpool/GoalsUnderKlopp" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>
+            View Live
+          </a>
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/project-images/diegegenpressfull.png" alt="The full dashboard, every goal plotted inside a Liver Bird silhouette.">
+    </div>
+    <div class="cover-caption">Fig. 1 — Image of the dashboard. Click the link above for the live version.</div>
+
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#overview">The Problem</a></li>
+          <li><a href="#approach">The Approach</a></li>
+          <li><a href="#outcome">The Outcome</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section id="overview" class="reveal">
+          <h2>The Problem</h2>
+          <p>Klopp's "Gegenpressing" era at Liverpool is remembered as a philosophy and a feeling, but that identity had never been translated into an actual goal-by-goal record across his entire 491-game tenure in one place.</p>
+          <p>The scale of that record is worth stating plainly before getting into any single finding: 1,035 goals from 63 different goalscorers, against 74 different opponents, at 74 different venues. That's not a small, easily-summarised dataset. It's roughly the entire scoring output of a major European club across the better part of a decade.</p>
+        </section>
+
+        <section id="approach" class="reveal">
+          <h2>The Approach</h2>
+          <p>Every one of the 1,035 goals scored during Klopp's tenure is plotted as an individual point within a Liver Bird silhouette, filterable by player, opponent, venue, and competition, backed by supporting breakdowns: goals by minute, top scorers, most-scored-against opponents, top venues.</p>
+        </section>
+
+        <section id="outcome" class="reveal">
+          <h2>The Outcome</h2>
+          <div class="stat-strip">
+            <div class="stat">
+              <div class="stat-num" data-target="1035">0</div>
+              <div class="stat-label">GOALS SCORED</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="2.11" data-decimals="2">0</div>
+              <div class="stat-label">GOALS PER GAME</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="53.24" data-decimals="2" data-suffix="%">0</div>
+              <div class="stat-label">OF ALL GOALS SCORED AT ANFIELD</div>
+            </div>
+             <div class="stat">
+            </div>
+          </div>
+
+          <p>The minute-by-minute breakdown backs the reputation with actual data. Goals cluster sharply toward the end of each half, and the single tallest bar on the entire chart sits in second-half stoppage time. This shows the same late-game clustering seen in national-level data elsewhere in the portfolio (the <a href="worldcupgoals.html">World Cup goals project</a> shows an identical pattern). Mohamed Salah's 211 goals are nearly double the next-highest scorer (Sadio Mané, 120). Arsenal, not a traditionally weaker opponent, are the team Liverpool scored against most under Klopp, with 55 goals. Anfield alone accounts for 551 of the 1,035 goals — 53%, more than every other venue combined.</p>
+          <blockquote>The single tallest bar on the entire chart sits in second-half stoppage time, showcasing the visual signature of a team built to break opponents down late.</blockquote>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">More work</div>
+          <h2 class="section-title">Keep exploring.</h2>
+        </div>
+        <a class="section-link" href="portfolio.html">All projects <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid" data-related-source="data/projects.json" data-related-exclude="Die Gegenpress" data-related-limit="3"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

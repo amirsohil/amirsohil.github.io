@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transferium Player Intelligence — Amir Sohil</title>
+<meta name="description" content="A graph-database player replacement finder covering 18,405 players and 276,075 pre-computed similarity edges, built on Neo4j and weighted cosine similarity.">
+<meta property="og:title" content="Transferium Player Intelligence — Amir Sohil">
+<meta property="og:description" content="A replacement finder that surfaces true similarity, not just filter-matching.">
+<meta property="og:image" content="images/project-images/transferiumfull.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="portfolio.html">Portfolio</a> <span>/</span> <span>Pola</span>
+    </div>
+
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Web Application</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+      </div>
+      <h1 class="article-title">Transferium Player Intelligence</h1>
+      <p class="article-dek">A replacement finder that surfaces true player similarity.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <span class="tag tool">Python</span>
+          <span class="tag tool">Neo4j</span>
+          <span class="tag tool">GitHub</span>
+          <span class="tag tool">Streamlit</span>
+          <span class="tag">Network Analysis</span>
+          <span class="tag">Machine Learning</span>
+        </div>
+        <div class="article-actions">
+          <a class="btn-cv" href="https://transferium.streamlit.app/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>
+            View Live
+          </a>
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/project-images/transferiumfull.png" alt="Screenshot of the application.">
+    </div>
+    <div class="cover-caption">Fig. 1 — Image of the application.</div>
+
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#overview">The Problem</a></li>
+          <li><a href="#approach">The Approach</a></li>
+          <li><a href="#example">Worked Example</a></li>
+          <li><a href="#outcome">The Outcome</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section id="overview" class="reveal">
+          <h2>The Problem</h2>
+          <p>Most player-replacement tools rely on rigid filters (same position, same league, similar age, etc.), which can exclude genuinely comparable players sitting just outside those boundaries, and are usually too slow or manual for real ad-hoc exploration. The goal was a fast, statistically grounded replacement finder that surfaces true similarity rather than just filter-matching, and returns results instantly.</p>
+          <p>"Statistically grounded" had to mean something more specific than "similar attributes," though — a 65-rated player and a 91-rated player can share a similar attribute shape (both pacey wingers with weak aerial ability, say) while being nowhere close to viable replacements for each other. That gap between attribute similarity and genuine replacement viability is what most of the design decisions below were built to close.</p>
+          <div class="stat-strip">
+            <div class="stat">
+              <div class="stat-num" data-target="18405">0</div>
+              <div class="stat-label">PLAYERS MODELLED</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="276075">0</div>
+              <div class="stat-label">SIMILARITY EDGES PRE-COMPUTED</div>
+            </div>
+             <div class="stat">
+            </div>
+          </div>
+        </section>
+
+        <section id="approach" class="reveal">
+          <h2>The Approach</h2>
+          <p>Player data is modelled as a graph in Neo4j, with similarity edges pre-computed using a weighted cosine similarity engine. Separate models were built for goalkeepers and outfield players, since the two roles don't share a meaningful attribute space.</p>
+          <p>Two extra safeguards sit on top of the raw similarity score. An overall-rating penalty pulls down matches that are attribute-similar but meaningfully weaker or stronger overall, which is what stops the 65-vs-91 problem above from ever surfacing a nonsensical "replacement." Position-overlap filtering does a related job from a different angle, keeping suggestions within a realistic tactical range of the original player's role rather than surfacing a statistically similar player who plays an entirely different position on the pitch.</p>
+          <p>The weighting splits 90/10 between raw skill attributes and contextual factors like league and region. Because the similarity graph is pre-computed rather than calculated on the fly, a query at run time is a single graph traversal, not a live recomputation, letting the Streamlit front-end return results instantly.</p>
+        </section>
+
+        <section id="example" class="reveal">
+          <h2>Worked Example</h2>
+          <p>Searching Kylian Mbappé Lottin (91 OVR, ST) returns eight ranked replacements with explicit match-strength labels:</p>
+          <ul>  
+            <li>- Omar Khaled Mohamed Marmoush (84 OVR, ST) - 82% Similarity</li>
+            <li>- Yoane Wissa (82 OVR, ST) - 79% Similarity</li>
+            <li>- Randal Kolo Muani (81 OVR, ST) - 77% Similarity</li>
+            <li>- Dodi Lukébakio Ngandoli (82 OVR, RM) - 76% Similarity</li>
+            <li>- Albert Guðmundsson (79 OVR, ST) - 74% Similarity</li>
+            <li>- Donyell Malen (79 OVR, RM) - 71% Similarity</li>
+            <li>- Sepe Elye Wahi (75 OVR, ST) - 68% Similarity</li>
+            <li>- Vítor Manuel Carvalho Oliveira (75 OVR, ST) - 68% Similarity</li>
+          </ul>
+        </section>
+        
+        
+        <section id="outcome" class="reveal">
+          <h2>The Outcome</h2>
+          <p>Critically, the tool doesn't hard-filter by position. It also surfaces genuinely useful off-position options, like Dodi Lukébakio and Donyell Malen — both right midfielders — ranked on real similarity rather than excluded outright, the kind of cross-positional find a rigid scouting filter would never return.</p>
+          <p>A full write-up exists in the <a href="transferiumwriteup.html">essays section</a>.</p>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">More work</div>
+          <h2 class="section-title">Keep exploring.</h2>
+        </div>
+        <a class="section-link" href="portfolio.html">All projects <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid" data-related-source="data/projects.json" data-related-exclude="Transferium Player Intelligence" data-related-limit="3"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

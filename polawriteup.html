@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pola — A Virtual Market of AI Shopkeepers — Amir Sohil</title>
+<meta name="description" content="How I built Pola — a 3D market town of seven AI shopkeepers, each running real agentic tool calls against Kapruka's live commerce MCP. Every architectural decision, explained.">
+<meta property="og:title" content="Pola — A Virtual Market of AI Shopkeepers — Amir Sohil">
+<meta property="og:description" content="Seven AI shopkeepers, one live commerce MCP, and the notion that a market beats a chat widget.">
+<meta property="og:image" content="images/project-images/polawriteupfull.jpg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  /* Page-specific: request-flow diagram, courtyard map, guardrail / stack
+     tables, decision-outcome label, callout. Everything else (nav, footer,
+     .prose, .accordion, .tabs, .toc, .stat-strip, .aside-card, pre/code)
+     comes from css/style.css. */
+
+  .schema-diagram{
+    background: var(--bg-raised); border: 1px solid var(--line-bright);
+    padding: 28px; margin: 32px 0; text-align: center;
+  }
+  .schema-diagram .toc-label{ margin-bottom: 18px; }
+  .schema-row{
+    display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+    gap: 0; margin: 10px 0; font-family: var(--font-mono); font-size: 13px;
+  }
+  .schema-node{
+    background: var(--accent-wash); border: 1px solid rgba(205,253,80,0.4); color: var(--accent);
+    padding: 5px 13px; border-radius: 20px; white-space: nowrap;
+  }
+  .schema-edge{ color: var(--text-dimmer); padding: 0 6px; font-size: 13px; }
+  .schema-rel{ color: var(--text-dim); font-size: 11.5px; padding: 0 4px; }
+  .schema-foot{
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-dimmer);
+    margin-top: 18px; letter-spacing: .04em;
+  }
+
+  .data-table{ width: 100%; border-collapse: collapse; margin: 24px 0; }
+  .data-table thead th{
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-dimmer); text-align: left; padding-bottom: 10px; border-bottom: 1px solid var(--line-bright);
+  }
+  .data-table tbody td{
+    font-size: 14px; color: var(--text-dim); padding: 12px 10px 12px 0; border-bottom: 1px solid var(--line);
+    vertical-align: top; line-height: 1.55;
+  }
+  .data-table tbody tr:last-child td{ border-bottom: none; }
+  .data-table tbody tr td:first-child{ color: var(--text); font-weight: 600; }
+  .data-table.guardrail-table{ table-layout: fixed; }
+  .data-table.guardrail-table td:first-child{ width: 30%; padding-right: 20px; }
+  .data-table.guardrail-table td:nth-child(2){ width: 70%; }
+  .data-table.stack-table tbody td:nth-child(3){
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); text-align: right; white-space: nowrap;
+  }
+
+  .decision-outcome{ margin-top: 16px; font-size: 13.5px; color: var(--text-dim); }
+  .decision-outcome span{
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); margin-right: 6px;
+  }
+
+  .callout{
+    border: 1px solid var(--line-bright); background: var(--bg-raised);
+    padding: 20px 24px; margin: 32px 0; font-size: 15px; line-height: 1.7; color: var(--text-dim);
+  }
+  .callout strong{
+    display: block; font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+  }
+
+  /* Accordion trigger metadata — same pattern as goodhartslaw / transferium */
+  .trigger-title-block{ display: flex; flex-direction: column; gap: 4px; text-align: left; min-width: 0; }
+  .trigger-meta{
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--text-dimmer); font-weight: 400; padding-left: 26px;
+  }
+
+  /* ── Courtyard map (interactive) ── */
+  .courtyard-wrap{ margin: 32px 0 8px; }
+  .courtyard-map{
+    position: relative; width: 100%; max-width: 380px; aspect-ratio: 1 / 1; margin: 0 auto;
+    background: radial-gradient(circle at 50% 50%, var(--accent-wash), rgba(0,0,0,0) 62%);
+    border: 1px solid var(--line); border-radius: 50%;
+  }
+  .stall{
+    position: absolute; width: 17%; aspect-ratio: 1/1; border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--stall-color, var(--accent)); border: 2px solid rgba(255,255,255,0.18);
+    display: flex; align-items: center; justify-content: center; font-size: 22px; padding: 0;
+    cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    transition: transform .22s var(--ease), box-shadow .22s var(--ease);
+    animation: stall-breathe 3.6s ease-in-out infinite;
+  }
+  .stall:hover, .stall.is-active{
+    transform: translate(-50%, -50%) scale(1.14);
+    box-shadow: 0 0 0 3px var(--accent), 0 6px 20px rgba(0,0,0,0.5);
+    animation-play-state: paused;
+  }
+  @keyframes stall-breathe{
+    0%, 100%{ box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+    50%{ box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 0 3px rgba(205,253,80,0.18); }
+  }
+  .courtyard-center{
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 15%; aspect-ratio: 1/1; border-radius: 50%;
+    background: var(--bg-raised); border: 2px dashed rgba(205,253,80,0.55);
+    display: flex; align-items: center; justify-content: center; font-size: 20px; padding: 0;
+    cursor: pointer; transition: transform .22s var(--ease);
+  }
+  .courtyard-center:hover, .courtyard-center.is-active{ transform: translate(-50%, -50%) scale(1.16); }
+  .courtyard-hint{
+    text-align: center; font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--text-dimmer); margin: 18px 0 0;
+  }
+  .stall-detail{
+    margin-top: 24px; background: var(--bg-raised); border: 1px solid var(--line);
+    border-left: 2px solid var(--panel-color, var(--accent));
+    padding: 22px 26px; min-height: 92px; transition: border-color .3s var(--ease);
+  }
+  .stall-detail .name-row{ display: flex; align-items: center; gap: 14px; }
+  .stall-detail .emoji-badge{ font-size: 28px; line-height: 1; }
+  .stall-detail h4{ margin: 0; font-size: 17px; font-weight: 700; color: var(--text); }
+  .stall-detail .role{
+    display: block; font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--panel-color, var(--accent)); margin-top: 4px;
+  }
+  .stall-detail .territory{ display: block; font-size: 13px; color: var(--text-dimmer); margin-top: 4px; }
+  .stall-detail .stall-bio{ font-size: 14.5px; color: var(--text-dim); line-height: 1.7; margin: 16px 0 0; }
+  .stall-detail .stall-quote{
+    font-size: 15px; font-style: italic; color: var(--text); line-height: 1.6;
+    margin: 14px 0; padding-left: 14px; border-left: 1px solid var(--line-bright);
+  }
+  .stall-detail .stall-rule{ font-size: 13.5px; color: var(--text-dimmer); line-height: 1.65; margin: 0; }
+  .stall-detail .stall-rule strong{ color: var(--text-dim); }
+  .stall-placeholder{ color: var(--text-dimmer); font-size: 14px; font-style: italic; margin: 0; }
+
+  /* Same CSS Grid fix as the other essays: .prose is a grid item in
+     .article-layout and defaults to min-width:auto. */
+  .prose{ min-width: 0; }
+  .toc{ min-width: 0; }
+
+  @media (max-width: 620px){
+    .data-table{ display: block; overflow-x: auto; }
+    .data-table.guardrail-table, .data-table.guardrail-table tbody,
+    .data-table.guardrail-table tr, .data-table.guardrail-table td{ display: block; width: 100% !important; }
+    .data-table.guardrail-table thead{ display: none; }
+    .data-table.guardrail-table tr{ padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .data-table.guardrail-table td{ border-bottom: none; padding: 3px 0; }
+    .stall-detail{ padding: 18px 20px; }
+
+    /* Mobile overflow fixes: nothing inside the article may be wider than the screen */
+    .article-layout, .article-layout > *{ min-width: 0; max-width: 100%; }
+    .prose{ overflow-wrap: anywhere; }
+    .prose code{ white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
+    .prose pre{ max-width: 100%; overflow-x: auto; }
+    .prose pre code{ white-space: pre; overflow-wrap: normal; word-break: normal; }
+    .schema-diagram{ padding: 20px 14px; overflow-x: auto; max-width: 100%; }
+    .schema-row{ flex-direction: column; gap: 4px; }
+    .schema-node{ white-space: normal; overflow-wrap: anywhere; text-align: center; max-width: 100%; }
+    .schema-rel, .schema-edge{ text-align: center; overflow-wrap: anywhere; }
+    .courtyard-map{ max-width: 100%; }
+    .stall-detail{ overflow-wrap: anywhere; }
+  }
+</style>
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="essays.html">Essays</a> <span>/</span> <span>Pola — A Virtual Market of AI Shopkeepers</span>
+    </div>
+
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Essay</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+      </div>
+      <h1 class="article-title">Pola — A Virtual Market of AI Shopkeepers</h1>
+      <p class="article-dek">Seven AI shopkeepers, one live commerce MCP, and the notion that a market beats a chat widget. Originally built for the <em>Kapruka Agent Challenge 2026</em>, now sitting in my portfolio.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <span class="tag tool">Three.js</span>
+          <span class="tag tool">FastAPI</span>
+          <span class="tag tool">MCP</span>
+          <span class="tag">Agentic Commerce</span>
+          <span class="tag">3D World-Building</span>
+          <span class="tag">Technical Writing</span>
+        </div>
+        <div class="article-actions">
+          <a class="btn-cv" href="https://amirsohil.github.io/pola/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>
+            View Live
+          </a>
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this essay">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/project-images/polawriteupfull.jpg" alt="Pola — a 3D market town of seven AI shopkeepers, built on Kapruka's live commerce MCP">
+    </div>
+    <div class="cover-caption">Fig. 1 — A walkable market square where every stall has its own AI shopkeeper.</div>
+
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#the-brief">The Brief</a></li>
+          <li><a href="#the-world">The World Itself</a></li>
+          <li><a href="#pavilions">Seven Pavilions</a></li>
+          <li><a href="#sudu">Sudu, the Guide</a></li>
+          <li><a href="#architecture">System Architecture</a></li>
+          <li><a href="#backend">The Backend, In Depth</a></li>
+          <li><a href="#commerce">Closing the Loop</a></li>
+          <li><a href="#effort">Where the Effort Went</a></li>
+          <li><a href="#whats-next">What's Next</a></li>
+          <li><a href="#stack">The Stack</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section class="reveal">
+          <blockquote>When I was a kid I used to imagine tiny shopkeepers living inside ecommerce websites. A little person behind every category who actually knew what they were selling. That image never really left me. And that image was my inspiration.</blockquote>
+        </section>
+
+        <section id="the-brief" class="reveal">
+          <h2>Don't Build a Chat Widget, Build a Place</h2>
+          <p>The <em>Kapruka Agent Challenge</em> asked for <em>"a polished, immersive conversation as the main surface — not a tiny widget in a corner."</em> I thought most entries would read that as an instruction to build a bigger chat box. I decided to read it literally: the chat <em>is</em> the destination, but you reach it by walking into a small, warm, hand-built 3D village first.</p>
+          <p><em>Pola</em> is the Sinhala word for an open-air marketplace. It's the kind of place where people browse, linger, and talk before they buy. This was my base. It just made sense. I built a market square with seven lit-up stalls, each with its own shopkeeper, rather than a flat list of product categories. It also gave every idea I wanted to explore a place to live. <em>Kapruka</em>'s enormous, genuinely undifferentiated catalog (groceries next to electronics next to baby trolleys) becomes something a customer can understand spatially in two seconds — gifts are over there, tech is over there — instead of something they have to read through a menu to find.</p>
+          <p>The obvious risk is that a 3D scene reads as a tech demo, performs badly, or gets in the way of actually shopping. Every decision below exists to make sure the 3D layer earns its place without ever blocking the real loop, which is discovery → cart → checkout.</p>
+
+          <div class="stat-strip">
+            <div class="stat">
+              <div class="stat-num" data-target="7">0</div>
+              <div class="stat-label">Shopkeeper Pavilions</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="6">0</div>
+              <div class="stat-label">Model Endpoints, 3 Providers</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num">$0</div>
+              <div class="stat-label">Hosting Cost</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="the-world" class="reveal">
+          <h2>The World Itself</h2>
+          <p>The whole frontend is a single <code>index.html</code> — <em>Three.js r128</em> loaded straight from a CDN, vanilla JavaScript, with no bundler or build step. Inside it is a deliberate <em>Ghibli</em>-leaning, toon-shaded, low-poly look, chosen instead of anything trying to be photorealistic.</p>
+          <p><code>MeshToonMaterial</code> with a hand-built four-step gradient texture sits on almost every mesh, and a slightly oversized, backface-culled duplicate of each shape gives the dark ink-outline look of hand-drawn animation. It's a style choice, because outlines and flat shading read as intentional in a screenshot in a way default-lit PBR never does, and they happen to render for free on a laptop with no GPU guarantee. A gradient sky dome, a firefly particle system, and a procedural cherry-blossom petal fall round out the atmosphere. All of these were built from primitive geometry, which means nothing imported, nothing to license, and nothing to fail to load.</p>
+          <p>Seven pavilions sit on a lit courtyard, each a cylinder-and-cone hut coloured to its trade and decorated with a small clue to what it sells: an apple for the grocer, a diamond for fashion, a gift box for gifting, a flatscreen for tech, etc. Small details, but I included them because I wanted a difference between "seven identical boxes with labels" and "seven stalls that look like what they sell." A guide character, <em>Sudu</em>, anchors the courtyard's centre.</p>
+
+          <h3>Camera as Motion</h3>
+          <p>Walking up to a stall doesn't teleport the camera. A render-loop lerp eases the camera position and look-target in over several frames while a darkening overlay fades up and a <em>← Back to Courtyard</em> button appears. I included this small bit of motion to try and turn "this is a webpage with a 3D background" into "I am walking up to a stall". This was cheap to implement, and disproportionately effective.</p>
+
+          <div class="callout">
+            <strong>Failing gracefully</strong>
+            Below 760px, a full-screen card explains plainly that this is a 3D market town happier on a bigger screen, with a "Continue anyway" override. Ambient market sound is opt-in and only starts on the first real click, respecting autoplay policy, with the mute preference remembered across visits. This was to ensure no one got an unexpected audio blast on load.
+          </div>
+        </section>
+
+        <section id="pavilions" class="reveal">
+          <h2>Seven Pavilions, Turning a Catalog Into Characters</h2>
+          <p>The hardest part of <em>Kapruka</em>'s MCP for any single agent is that the catalog is enormous and the categories cut across each other in non-obvious ways. For example, liquor and non-alcoholic wine both file under "Grocery," adult products and intimate pharmacy both file under "Pharmacy." A single generalist bot would need a huge, brittle system prompt trying to hold the whole taxonomy in its head, and would constantly answer from the wrong part of the catalog.</p>
+          <p>My answer was to split the catalog into seven pavilions that mirror how a Sri Lankan market is actually organised, and give each one its own dedicated shopkeeper, complete with a name, an age, a backstory, a speaking style, and a narrow slice of the taxonomy. Walk through the courtyard below and tap a stall to meet whoever's behind the counter.</p>
+
+          <div class="courtyard-wrap">
+            <div class="courtyard-map">
+              <button type="button" class="courtyard-center" data-stall="sudu" title="Sudu" aria-label="Meet Sudu, the guide">🐈</button>
+              <button type="button" class="stall" data-stall="sampath" style="--stall-color:#6E8F52; left:50%; top:10.5%;" title="Fresh Food &amp; Grocery" aria-label="Fresh Food and Grocery">🍎</button>
+              <button type="button" class="stall" data-stall="tharushi" style="--stall-color:#D9668B; left:80.8%; top:25.3%; animation-delay:.3s;" title="Gifts &amp; Celebrations" aria-label="Gifts and Celebrations">🎁</button>
+              <button type="button" class="stall" data-stall="chuti" style="--stall-color:#E0A93A; left:88.4%; top:58.7%; animation-delay:.6s;" title="Kids, Toys &amp; Parents" aria-label="Kids, Toys and Parents">👶</button>
+              <button type="button" class="stall" data-stall="safi" style="--stall-color:#A468C7; left:67.1%; top:85.5%; animation-delay:.9s;" title="Fashion &amp; Beauty" aria-label="Fashion and Beauty">👗</button>
+              <button type="button" class="stall" data-stall="kavindu" style="--stall-color:#4A9FD8; left:32.9%; top:85.5%; animation-delay:1.2s;" title="Electronics &amp; Home" aria-label="Electronics and Home">📱</button>
+              <button type="button" class="stall" data-stall="malsha" style="--stall-color:#A9754A; left:11.6%; top:58.7%; animation-delay:1.5s;" title="Culture &amp; Services" aria-label="Culture and Services">📚</button>
+              <button type="button" class="stall" data-stall="dev" style="--stall-color:#7A3B4E; left:19.2%; top:25.3%; animation-delay:1.8s;" title="The Lounge (21+)" aria-label="The Lounge, 21 plus">🌙</button>
+            </div>
+            <p class="courtyard-hint">↓ tap a stall, or the cat in the middle</p>
+
+            <div class="stall-detail" id="stall-detail" style="--panel-color:#CDFD50;" aria-live="polite">
+              <p class="stall-placeholder">Tap any pavilion above to meet its shopkeeper.</p>
+            </div>
+          </div>
+
+          <p style="margin-top:28px;">Each system prompt bakes in a full character sheet: a name, an age, a speaking style, and behaviour rules tuned to what could actually go wrong in that specific aisle. Tap around above to see a few.</p>
+          <p>No shopkeeper is allowed to pretend they can sell everything, either. Every prompt carries the full market directory and a standing rule to refer a customer elsewhere by name when their need fits another pavilion better. For example, <em>Sampath Aiya</em> genuinely wouldn't know which perfume to recommend, and having him admit that and point you to <em>Safi</em> is more trustworthy than having him bluff it. And every reply is written as a voice note instead of as bullet lists. Markdown renders as literal asterisks in the chat bubble, so a server-side <code>strip_markdown</code> pass backstops the rare turn where a model ignores that instruction anyway.</p>
+        </section>
+
+        <section id="sudu" class="reveal">
+          <h2><em>Sudu</em> — The Guide Who Doesn't Sell Anything</h2>
+          <p>Most agent demos put one bot in charge of everything. I deliberately split "figuring out where to go" from "actually buying something," and gave the first job to a separate, much simpler character: <em>Sudu</em>, a small white cat who knows every corner of the market but explicitly sells nothing herself.</p>
+          <p><em>Sudu</em> is intentionally tool-free, i.e. no MCP round-trips, so replies are snappy and the architecture stays cleanly split between navigation and commerce. Rather than forcing her into structured output, which would fight against her loose, cat-like voice, a lightweight keyword scan turns any place-name signal in her free-text reply into a tappable chip:</p>
+          <blockquote><em>Sudu</em> says, "That's <em>Tharushi</em>, at <em>Gifts &amp; Celebrations</em> — go on, she'll sort you out."</blockquote>
+          <p><em>Sudu</em> offers four preset chips on first open so a visitor can get moving with one tap instead of staring at a blank input. Every reply after that regenerates chips dynamically from what she just said. It's the <em>Creativity</em> answer, too. Instead of a settings menu or a category sidebar, "I don't know where to go" is handled by a character in the world, in plain English.</p>
+        </section>
+
+        <section id="architecture" class="reveal">
+          <h2>System Architecture</h2>
+          <p>The frontend never talks to <em>Gemini</em>, <em>Cerebras</em>, <em>Groq</em>, or the <em>Kapruka</em> MCP directly. It only ever calls its own backend's four endpoints — <code>/api/chat</code>, <code>/api/delivery-cities</code>, <code>/api/check-delivery</code>, <code>/api/cart-checkout</code> — which is what lets one backend run the same MCP session lifecycle, the same product-card curation, and the same anti-hallucination guardrails no matter which model provider actually answered a given turn.</p>
+
+          <div class="schema-diagram">
+            <div class="toc-label">Request Flow</div>
+            <div class="schema-row">
+              <span class="schema-node">index.html (static)</span><span class="schema-edge">──</span><span class="schema-rel">POST /api/chat</span><span class="schema-edge">──▶</span>
+              <span class="schema-node">FastAPI backend</span>
+            </div>
+            <div class="schema-row">
+              <span class="schema-node">FastAPI backend</span><span class="schema-edge">──</span><span class="schema-rel">[fallback: Gemini → Cerebras → Groq]</span><span class="schema-edge">──▶</span>
+              <span class="schema-node">chosen model</span>
+            </div>
+            <div class="schema-row">
+              <span class="schema-node">FastAPI backend</span><span class="schema-edge">──</span><span class="schema-rel">[tools/call]</span><span class="schema-edge">──▶</span>
+              <span class="schema-node">mcp.kapruka.com/mcp</span>
+            </div>
+            <div class="schema-foot">4 client-facing endpoints · 1 health check · the frontend never sees which model or MCP call answered</div>
+          </div>
+
+          <p>A fifth route, <code>GET /</code>, is a lightweight health check. This reports which model API keys are loaded without triggering any model or MCP call, so the backend's state is readable in one request, no model call required.</p>
+        </section>
+
+        <section id="backend" class="reveal">
+          <h2>The Backend, In Depth</h2>
+          <p>The 3D scene gets the attention, but most of the actual engineering risk lived in three backend decisions. Open any card to read the reasoning.</p>
+
+          <div class="accordion">
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">01</span>A Model Fallback Chain, Because Free Tiers Rate-Limit</span>
+                  <span class="trigger-meta">Reliability</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p><em>Gemini</em> → <em>Cerebras</em> → <em>Groq</em>. Three providers, six model endpoints, tried in order within a single request.</p>
+                <p><code>/api/chat</code> tries <em>Gemini</em> first, cheapest-first (<code>gemini-2.5-flash-lite</code> → <code>gemini-2.5-flash</code> → <code>gemini-2.0-flash</code>), then falls back to <em>Cerebras</em> (<code>gpt-oss-120b</code>, <code>zai-glm-4.7</code>), then <em>Groq</em> (<code>llama-3.3-70b-versatile</code>, <code>llama-4-scout</code>).</p>
+                <p>Every provider here runs on a free tier, and free tiers rate-limit. A single-provider build is one 429 away from failing live mid-conversation, in front of whoever's trying it. The fallback chain means a transient outage degrades response quality slightly, with a different model finishing, the same agentic loop, rather than breaking the demo outright. A <code>_fallback</code> field exists for my own debugging, but it's never shown to customers, because a shopkeeper apologising for "switching AI providers" would break character for no benefit.</p>
+              </div></div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">02</span>A Hand-Rolled MCP Client</span>
+                  <span class="trigger-meta">Infrastructure</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Streamable-HTTP transport implemented directly, instead of an off-the-shelf MCP library. <code>initialize</code> → capture <code>Mcp-Session-Id</code> → <code>notifications/initialized</code> → repeatable <code>tools/call</code>, with both plain-JSON and Server-Sent-Events response bodies handled by hand.</p>
+                <p><strong>Session correctness under concurrency.</strong> A single chat turn can trigger several parallel tool calls, so the lazy session-init path is guarded with an <code>asyncio.Lock</code> and a double-check, so two coroutines racing to initialise at the same moment can't each spin up their own session and clobber each other.</p>
+                <p><strong>429 resilience.</strong> The free MCP tier caps at 60 requests/minute per IP, and a busy chat turn can burst past that. One short, capped retry absorbs a momentary spike without making every dropped request fatal.</p>
+                <p><strong>Self-healing sessions.</strong> If a tool call fails mid-conversation because a session expired, the backend re-initialises once and retries automatically instead of surfacing a raw error and derailing the conversation.</p>
+              </div></div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">03</span>Two Agentic Loops, One Dialect Problem</span>
+                  <span class="trigger-meta">Concurrency</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p><em>Gemini</em> and the <em>OpenAI</em>-compatible providers don't speak the same tool-calling format. <code>gemini_loop()</code> uses <em>Gemini's</em> native <code>function_declarations</code> / <code>functionCall</code> format; <code>openai_loop()</code>, shared by <em>Cerebras</em> and <em>Groq</em>, uses the <em>OpenAI</em>-style <code>tools[]</code> / <code>tool_calls[]</code> format. Both run up to <code>MAX_LOOPS = 8</code> rounds of "model decides to call a tool → tool runs → result goes back → model decides again," so a fallback model gets exactly the same live-catalog grounding the primary model does.</p>
+                <p>Within a round, tool calls run concurrently via <code>asyncio.gather</code>. If a model wants to search two things and check delivery in the same turn, those happen in parallel. <code>asyncio.gather</code> preserves input order in its output regardless of which call finishes first, which matters for the OpenAI-style loop because <code>tool_call_id</code>s have to pair back to the right result.</p>
+                <p>Both loops write into one shared <code>tool_history</code> list, so every downstream step (product extraction, order-summary construction, card curation) works identically no matter which of the six models answered.</p>
+              </div></div>
+            </div>
+          </div>
+
+          <h3>Guardrails, Because Models Lie Confidently</h3>
+          <p>A raw LLM-plus-tools loop against a real commerce API will, left alone, occasionally hallucinate a category slug, invent a product ID, or surface an adult-section product to a general audience. Every row below exists because I watched the failure happen during testing, and a fix in the system prompt alone didn't reliably hold.</p>
+
+          <table class="data-table guardrail-table">
+            <thead><tr><th>Guardrail</th><th>What breaks without it</th></tr></thead>
+            <tbody>
+              <tr><td>Category slugs only forwarded once confirmed</td><td><em>Kapruka</em>'s category filter is exact-match; a guessed slug returns zero results, and the model confidently tells the customer the product doesn't exist.</td></tr>
+              <tr><td><code>SHOW_CARDS</code> allowlist</td><td>Search spans the whole catalog. A "rice" query legitimately returns rice cookers (<em>Kavindu</em>'s) alongside rice meals (<em>Sampath</em>'s). The model (not the raw API response) decides which IDs belong on screen for the shopkeeper you're actually talking to.</td></tr>
+              <tr><td>Lounge filter, both directions</td><td>A keyword filter drops adult/liquor/tobacco items outside <em>The Lounge</em> even if a persona's card line includes one, and the inverse filter keeps a rose bouquet out of the 21+ section.</td></tr>
+              <tr><td>IDF re-ranking on 20 fetched results</td><td><em>Kapruka</em>'s default ordering doesn't always surface the most relevant result first; a self-calibrating term-weight pass re-sorts before the model ever sees the list.</td></tr>
+              <tr><td><code>_query_matched: false</code> flag</td><td>Without it, a "fish tank" search returning cleaning supplies looks plausible enough that the model recommends it anyway instead of admitting the gap.</td></tr>
+              <tr><td>Hard cap of 8 cards, enforced twice</td><td>The prompt asks for 6–8; the backend caps it again regardless, so a model that ignores curation can't dump twenty cards on one message.</td></tr>
+              <tr><td>Today's date injected into every prompt</td><td>Left to infer "today" from training data, the three providers disagreed with each other and with the calendar, which rejected valid near-future delivery dates as "in the past."</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="commerce" class="reveal">
+          <h2>Closing the Loop, Twice</h2>
+          <p>Getting all the way to a placed order mattered most here. I built two distinct, complete checkout paths, because they serve two genuinely different shopping behaviours.</p>
+
+          <div class="tabs">
+            <div class="tab-list" role="tablist">
+              <button type="button" class="tab-btn is-active" role="tab" data-pola-tab="conversational">Conversational</button>
+              <button type="button" class="tab-btn" role="tab" data-pola-tab="cart">Cart-Drawer</button>
+            </div>
+
+            <div class="tab-panel is-active" id="pola-tab-conversational" role="tabpanel">
+              <p>Inside the chat itself. The shopkeeper collects recipient name, phone, delivery address, city, date, and — for <em>Tharushi</em> especially — an optional gift message, entirely through dialogue, then calls <code>kapruka_create_order</code> directly. This path is scoped to each shopkeeper's own pavilion, mirroring a real market stall: <em>Tharushi</em> handles gifting orders, <em>Kavindu</em> handles electronics, and so on. Cross-pavilion carts are what the other tab is for.</p>
+              <ul>
+                <li>The response is parsed as structured JSON so the price breakdown comes back as real numbers.</li>
+                <li>If checkout is called on a product ID that was never actually looked up this conversation, the backend detects the gap and backfills a fresh product lookup before the summary renders.</li>
+                <li><em>Dev</em>, at <em>The Lounge</em>, is the only shopkeeper who also offers an anonymous sender option — the one context in the market where someone might actually want it.</li>
+              </ul>
+            </div>
+
+            <div class="tab-panel" id="pola-tab-cart" role="tabpanel">
+              <p>For the browse-then-decide shopper. Add to cart from any product card or the lightbox; the cart drawer has its own quantity controls and running total, and "Checkout at the Till" opens a delivery-details form. These three endpoints are deliberately thin, stateless, and model-free. There's no conversation to extract structure from, so there's no reason to pay for an LLM round-trip just to fill in a form.</p>
+              <ul>
+                <li>Live city autocomplete and a live delivery-fee/date preview update the moment both city and date are chosen, before the order is even placed.</li>
+                <li>Delivery details are remembered in <code>localStorage</code>, updated only after a successful order, with an explicit "Clear saved details" escape hatch.</li>
+                <li>Submitting builds the same order-summary shape the chat flow does, and hands off to the same Order Summary modal. There is one UI, with two ways to reach it.</li>
+              </ul>
+            </div>
+          </div>
+
+          <p>One detail ties both paths together: conversation history is trimmed to the last 10 turns per request, which would normally make checkout forget a product ID mentioned several turns earlier. The frontend sends the current cart on every request, and the backend injects it as a confirmed-cart block in the system prompt — the one piece of state that has to survive the trim.</p>
+        </section>
+
+        <section id="effort" class="reveal">
+          <h2>Where the Effort Went</h2>
+          <p>Six things mattered most while I was building this, roughly in the order I paid attention to them. Open any card for the reasoning behind it.</p>
+
+          <div class="accordion">
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">01</span>One Visual Language, Held Together End to End</span>
+                  <span class="trigger-meta">Polish</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Toon-shaded 3D scene, camera-lerp navigation, ambient sound, mobile gate — nothing that breaks the illusion.</p>
+                <p>Every asset (the toon shading, the ink outlines, the gradient sky, the market sounds) pulls from the same reference mood board. The scene has been built in such a way that the illusion holds regardless of whether someone's on a gaming laptop or a mid-range one with three other tabs open.</p>
+              </div></div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">02</span>Making a Catalog Feel Tactile</span>
+                  <span class="trigger-meta">Richness</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Product card grids, an image lightbox, an Order Summary modal with real photos, hand-built stall decorations per pavilion.</p>
+                <p>A product card without a real photo reads as a placeholder. I built this such that the card, the lightbox, and the final order summary all pull the same image. Each pavilion also got one small hand-modelled detail tied to what it sells, instead of seven identical huts with different labels on the door.</p>
+              </div></div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">03</span>Seven Distinct Shopkeepers</span>
+                  <span class="trigger-meta">Character</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Names, ages, backstories, speech patterns, and worked example lines baked into every system prompt.</p>
+                <p>Each prompt reads more like a character brief than an instruction sheet — how they'd actually talk, what they'd notice, what they'd never say. The difference shows up fast: ask <em>Sampath Aiya</em> about skincare and he tells you flatly that's not his aisle, instead of bluffing an answer.</p>
+              </div></div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">04</span>Behaviour Rules Tuned to Where Each Aisle Actually Breaks</span>
+                  <span class="trigger-meta">Utility</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p><em>Sudu</em> as a routing layer, IDF re-ranking, domain-specific rules per shopkeeper, two complete checkout paths.</p>
+                <p>Most of this came from watching the agent fail during testing, not from planning it up front — a category slug that silently returns nothing, a search that surfaces the wrong half of the catalog, a customer with no idea which of seven stalls to even start at. Each fix patches a specific failure rather than a vague "be more careful" instruction.</p>
+              </div></div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">05</span>Both Paths Actually Place an Order</span>
+                  <span class="trigger-meta">Completeness</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Conversational and cart-drawer checkout both flow into the same Order Summary modal with working pay links.</p>
+                <p>The easy version of this stops at "the shopkeeper can describe how checkout would work". Plenty of agent demos do exactly that. Both paths here call the same order-creation endpoint and land on the same confirmation screen, ending in an order that's actually been placed.</p>
+              </div></div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">06</span>A Place You Walk Into, Rather Than a Boring Widget</span>
+                  <span class="trigger-meta">Concept</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>The market-as-place metaphor, and <em>Sudu</em> as a cat you ask in plain English instead of a menu.</p>
+                <p>The easiest version of this project is one chatbot with a category dropdown. Building an actual place, complete with a courtyard, seven stalls, a guide who points you around instead of a settings screen, was the slower, riskier option, and the one I actually wanted to see exist.</p>
+              </div></div>
+            </div>
+          </div>
+
+          <p>A few other things just needed to work under the hood: a cart drawer with quantity controls and a running total, a live delivery-date preview before an order is placed, and gift messaging from <em>Tharushi</em> that flows straight through to the final order summary.</p>
+        </section>
+
+        <section id="whats-next" class="reveal">
+          <h2>What's Next</h2>
+          <p><strong>Sinhala and Tanglish support.</strong> Every persona is currently English-only. The underlying models are multilingual and would likely handle either reasonably, but that's untested. For a market meant to feel local, it's probably the one addition that would matter most.</p>
+          <p><strong>Structured cross-stall referrals.</strong> Shopkeepers already refer customers to each other by name in conversation, and <em>Sudu</em>'s chips work today. The one-tap cross-pavilion banner UI is built but not yet wired to a backend signal. This would just be a classifier step after the agentic loop.</p>
+          <p><strong>Proactive delivery-date warnings.</strong> The delivery-check tool and cart preview both work correctly; no persona yet volunteers a tight-window warning unless asked. This would just be a prompt addition.</p>
+        </section>
+
+        <section id="stack" class="reveal">
+          <h2>Everything Used</h2>
+
+          <table class="data-table stack-table">
+            <tbody>
+              <tr><td>3D scene</td><td><em>Three.js r128</em> (CDN, no bundler)</td><td>Free</td></tr>
+              <tr><td>Frontend</td><td>Vanilla JS &amp; hand-written CSS, single <code>index.html</code></td><td>Free</td></tr>
+              <tr><td>Backend</td><td><em>FastAPI</em> + <em>httpx</em> (async), on <em>Render</em></td><td>Free tier</td></tr>
+              <tr><td>Primary model</td><td><em>Gemini</em> (flash-lite → flash → 2.0-flash)</td><td>Free tier</td></tr>
+              <tr><td>Fallback chain</td><td><em>Cerebras</em> → <em>Groq</em></td><td>Free tier</td></tr>
+              <tr><td>Commerce</td><td><em>Kapruka</em> MCP — search, delivery, checkout, orders</td><td>Provided</td></tr>
+              <tr><td>Frontend hosting</td><td><em>GitHub Pages</em></td><td>Free</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="reveal" style="border-top: 1px solid var(--line); padding-top: 40px; margin-top: 16px;">
+          <p><em>Pola</em> is live. Walk into the courtyard, find a pavilion, and talk to whoever's behind the counter.</p>
+          <p>If you're thinking about agentic commerce or multi-persona system design, or you have questions about any of the decisions above, I'd genuinely like to hear from you.</p>
+          <a class="btn btn-primary" href="https://amirsohil.github.io/pola/" target="_blank" rel="noopener">Open Pola <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Read next</div>
+          <h2 class="section-title">More essays.</h2>
+        </div>
+        <a class="section-link" href="essays.html">All essays <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid two-col" data-related-source="data/essays.json" data-related-exclude="Pola — A Virtual Market of AI Shopkeepers" data-related-limit="2"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+
+<!-- Pola — page-specific: courtyard map + checkout tabs. Scroll progress,
+     reveal, count-up, accordion and reading time come from main.js / detail.js. -->
+<script>
+  // ── Checkout tabs ──
+  document.querySelectorAll('[data-pola-tab]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var tabs = btn.closest('.tabs');
+      tabs.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('is-active'); });
+      tabs.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+      document.getElementById('pola-tab-' + btn.dataset.polaTab).classList.add('is-active');
+    });
+  });
+
+  // ── Courtyard map ──
+  var STALL_DATA = {
+    sudu: {
+      name: 'Sudu', role: 'Guide · Sells nothing', emoji: '🐈', color: '#F4C430',
+      territory: 'Knows all seven pavilions',
+      bio: 'Friendly, playful, and impossible to fluster. She knows every stall in the market by name and never seems to lose patience with people who have no idea where to start.',
+      quote: "That's Tharushi, at Gifts & Celebrations — go on, she'll sort you out.",
+      rule: '<strong>Known for:</strong> pointing you to exactly the right shopkeeper, then getting out of the way.'
+    },
+    sampath: {
+      name: 'Sampath Aiya, 46', role: 'Fresh Food & Grocery', emoji: '🍎', color: '#6E8F52',
+      territory: 'Groceries, cakes, chocolates, fresh produce, ready meals',
+      bio: 'A lifetime spent working markets. Knows prices, seasons, and suppliers better than most people know their own street. Gruff on the surface, looking out for you underneath.',
+      quote: "Machan, don't buy that tomato. Wait till Friday. Better batch coming.",
+      rule: '<strong>Known for:</strong> calling everyone "machan" or "baba," and warning you off a bad buy before you even ask.'
+    },
+    tharushi: {
+      name: 'Tharushi, 28', role: 'Gifts & Celebrations', emoji: '🎁', color: '#D9668B',
+      territory: 'Flowers, combo gift packs, personalised gifts, every occasion on the calendar',
+      bio: 'Lives for birthdays, anniversaries, and dramatic reveals. Turns "I have no idea what to get them" into a fully formed plan, usually within thirty seconds.',
+      quote: "Okay okay, tell me one thing first — what's the vibe? Sweet, funny, romantic, or 'I forgot until yesterday'?",
+      rule: "<strong>Known for:</strong> suggesting a gift message before you think to ask for one — it's her signature move."
+    },
+    chuti: {
+      name: 'Chuti Nanda, 53', role: 'Kids, Toys & Parents', emoji: '👶', color: '#E0A93A',
+      territory: "Baby care, toys, school supplies, kids' clothing & bicycles",
+      bio: "Equal parts grandmother, toy expert, and parenting consultant. Every customer becomes one of her children within thirty seconds. Endlessly patient, and not afraid to gently tell a parent they're overthinking it.",
+      quote: "First baby? Aney baba, come. You're looking at the wrong shelf already.",
+      rule: "<strong>Known for:</strong> never recommending a toy without asking the child's age first."
+    },
+    safi: {
+      name: 'Safi, 32', role: 'Fashion & Beauty', emoji: '👗', color: '#A468C7',
+      territory: 'Clothing, accessories, cosmetics, perfumes, jewellery',
+      bio: "Stylish, opinionated, and usually right. Has seen every fashion mistake imaginable and still likes people anyway. Gently pushes you out of the \"safe\" choice when she can tell you're settling.",
+      quote: "No no. You're buying that because it's safe, not because you like it.",
+      rule: '<strong>Known for:</strong> asking who it\'s for and what the occasion is before recommending a single thing.'
+    },
+    kavindu: {
+      name: 'Kavindu, 24', role: 'Electronics & Home', emoji: '📱', color: '#4A9FD8',
+      territory: 'Electronics, home tools, furniture, cycling & fitness gear',
+      bio: "A tech wizard trapped inside a slightly awkward salesperson. Gets genuinely excited when a customer knows what they're talking about, and translates patiently, without condescension, when they don't.",
+      quote: "Wait, before I answer — what's your budget and what's the actual use case?",
+      rule: '<strong>Known for:</strong> spec-checking things nobody asked him to spec-check.'
+    },
+    malsha: {
+      name: 'Malsha, 35', role: 'Culture & Services', emoji: '📚', color: '#A9754A',
+      territory: 'Books, professional services, pharmacy, religious items, pets',
+      bio: 'A former literature student who ended up helping people find books, services, and experiences instead. Thoughtful and a little philosophical. Listens more than she speaks.',
+      quote: "That depends. Are you looking for information... or are you looking for something that stays with you?",
+      rule: "<strong>Known for:</strong> telling you honestly when the catalog can't help, rather than handing you a book as a consolation prize."
+    },
+    dev: {
+      name: 'Dev, 38', role: 'The Lounge · 21+', emoji: '🌙', color: '#7A3B4E',
+      territory: "The market's age-gated, more private aisle",
+      bio: 'Unflappable. Has heard every awkward question and embarrassing request imaginable, and has never once made anyone feel strange for asking. Calm exterior, genuine warmth underneath.',
+      quote: "Relax. Nobody's the first person to ask me that today.",
+      rule: '<strong>Known for:</strong> keeping the one age-gated stall in the market completely judgement-free.'
+    }
+  };
+
+  function selectStall(id, el){
+    document.querySelectorAll('.stall, .courtyard-center').forEach(function(s){ s.classList.remove('is-active'); });
+    el.classList.add('is-active');
+    var d = STALL_DATA[id];
+    var panel = document.getElementById('stall-detail');
+    panel.style.setProperty('--panel-color', d.color);
+    panel.innerHTML =
+      '<div class="name-row">' +
+        '<span class="emoji-badge">' + d.emoji + '</span>' +
+        '<div><h4>' + d.name + '</h4>' +
+        '<span class="role">' + d.role + '</span>' +
+        '<span class="territory">' + d.territory + '</span></div>' +
+      '</div>' +
+      '<p class="stall-bio">' + d.bio + '</p>' +
+      '<p class="stall-quote">"' + d.quote + '"</p>' +
+      '<p class="stall-rule">' + d.rule + '</p>';
+  }
+
+  document.querySelectorAll('[data-stall]').forEach(function(el){
+    el.addEventListener('click', function(){ selectStall(el.dataset.stall, el); });
+  });
+</script>
+</body>
+</html>

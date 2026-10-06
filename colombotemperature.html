@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colombo's Temperature In Colour — Amir Sohil</title>
+<meta name="description" content="A colour-stripe portrait of Colombo's full 2024 climate, mapping every day's high, low, and diurnal range onto one shared colour scale.">
+<meta property="og:title" content="Colombo's Temperature in Colour — Amir Sohil">
+<meta property="og:description" content="A full year of Colombo's climate, read in seconds instead of axis by axis.">
+<meta property="og:image" content="images/project-images/colombotemperaturefull.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="portfolio.html">Portfolio</a> <span>/</span> <span>Colombo's Temperature In Colour</span>
+    </div>
+
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Dashboard</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+      </div>
+      <h1 class="article-title">Colombo's Temperature In Colour</h1>
+      <p class="article-dek">A full year of Colombo's climate, read in seconds instead of axis by axis.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <span class="tag tool">Tableau Public</span>
+          <span class="tag tool">Figma</span>
+          <span class="tag">Data Visualisation</span>
+          <span class="tag">Data Storytelling</span>
+        </div>
+        <div class="article-actions">
+          <a class="btn-cv" href="https://public.tableau.com/app/profile/amir.sohil/viz/TemperatureInColombo/InColour" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>
+            View Live
+          </a>
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/project-images/colombotemperaturefull.png" alt="The full Colombo Temperature dashboard, every recorded temperature mapped inside a colour scale.">
+    </div>
+    <div class="cover-caption">Fig. 1 — Image of the dashboard. Click the link above for the live version.</div>
+
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#overview">The Problem</a></li>
+          <li><a href="#approach">The Approach</a></li>
+          <li><a href="#outcome">The Outcome</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section id="overview" class="reveal">
+          <h2>The Problem</h2>
+          <p>A full year of daily high/low temperature data usually gets reduced to a single number (an annual average, a record high, etc.) that loses the actual day-to-day texture of a place's climate. This project was built to render an entire year of Colombo's daily temperatures as one continuous, scannable image instead of a line chart or summary statistic.</p>
+        </section>
+
+        <section id="approach" class="reveal">
+          <h2>The Approach</h2>
+          <p>Daily highs and lows for 2024 are each rendered as their own horizontal band of colour-coded stripes, with one stripe per day, both mapped to a single shared colour scale. A third band beneath tracks each day's diurnal range (high minus low). Stacking all three bands together turns a full year of data into something readable in seconds.</p>
+          <p>Colombo is a deliberately meaningful choice of city for this format. The near-equatorial location without a strong seasonal temperature cycle is exactly the kind of place where a conventional line chart, built to show peaks and troughs across a year, undersells the story, because there often isn't a dramatic seasonal peak or trough to show.</p>
+        </section>
+
+        <section id="outcome" class="reveal">
+          <h2>The Outcome</h2>
+          <div class="stat-strip">
+            <div class="stat">
+              <div class="stat-num" data-target="22.78" data-decimals="2" data-suffix="°C">0</div>
+              <div class="stat-label">LOWEST READING</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="34.44" data-decimals="2" data-suffix="°C">0</div>
+              <div class="stat-label">HIGHEST READING</div>
+            </div>
+             <div class="stat">
+            </div>
+          </div>
+
+          <p>No stripe in the Highs band ever reads cool, and no stripe in the Lows band ever reads hot. Colombo's daily temperature stays inside a comparatively narrow year-round band, without the seasonal winter/summer swing the same colour scale would show for a temperate-climate city. The difference band adds a layer the two temperature bands alone can't: the day-to-night swing itself visibly widens and narrows in its own rhythm across the year.</p>
+          <blockquote>No stripe in the Highs band ever reads cool, and no stripe in the Lows band ever reads hot.</blockquote>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">More work</div>
+          <h2 class="section-title">Keep exploring.</h2>
+        </div>
+        <a class="section-link" href="portfolio.html">All projects <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid" data-related-source="data/projects.json" data-related-exclude="Colombo's Temperature in Colour" data-related-limit="3"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

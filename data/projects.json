@@ -1,0 +1,212 @@
+[
+  {
+    "title": "All Goals in the Men's World Cup",
+    "subtitle": "92 years, one trophy-shaped canvas",
+    "description": "A striking data-art visualisation of every goal ever scored in the Men's World Cup from 1930\u20132022, using the iconic trophy as its canvas.",
+    "image": "images/project-cards/worldcup.png",
+    "href": "worldcupgoals.html",
+    "tools": ["Tableau Public", "Figma"],
+    "skills": ["Data Visualisation", "Data Storytelling"],
+    "featured": false
+  },
+  {
+    "title": "\u201cBrilliant. In every way.\u201d Are they really?",
+    "subtitle": "5,010 iPhone XR reviews, dissected",
+    "description": "A deep dive into 5,010 Amazon reviews of the iPhone XR, analysing star ratings, sentiment, helpfulness behaviour, and temporal trends against Apple's own marketing claim.",
+    "image": "images/project-cards/iphonexr.png",
+    "href": "iphonexr.html",
+    "tools": ["R", "Power BI"],
+    "skills": ["NLP & Sentiment Analysis", "Statistical Analysis"],
+    "featured": false
+  },
+  {
+    "title": "Colombo's Temperature in Colour",
+    "subtitle": "A year of climate, as heat-stripes",
+    "description": "A colour-driven portrait of Colombo's 2024 climate, mapping every day's high and low as vertical heat-stripes \u2014 warm oranges against cool violets.",
+    "image": "images/project-cards/colombotemperature.png",
+    "href": "colombotemperature.html",
+    "tools": ["Tableau Public", "Figma"],
+    "skills": ["Data Visualisation", "Data Storytelling"],
+    "featured": false
+  },
+  {
+    "title": "COVID-19 Insights",
+    "subtitle": "Global-to-country pandemic tracking",
+    "description": "An interactive analytics app offering global, regional, and country-level insight into COVID-19 trends, testing effectiveness, and case dynamics with real-time visualisation.",
+    "image": "images/project-cards/covid.png",
+    "href": "covidinsights.html",
+    "tools": ["Python", "Plotly", "Git", "Heroku"],
+    "skills": ["Dashboard Design", "Data Visualisation"],
+    "featured": false
+  },
+  {
+    "title": "Cristiano in the Big Five",
+    "subtitle": "One icon, five leagues",
+    "description": "A sweeping, narrative-driven visual exploring Cristiano Ronaldo's journey across Europe's Big Five leagues, blending storytelling, club symbolism, and trophy data.",
+    "image": "images/project-cards/cristiano.png",
+    "href": "crisinthebigfive.html",
+    "tools": ["Python", "Tableau Public", "Figma"],
+    "skills": ["Data Storytelling", "Data Visualisation"],
+    "featured": false
+  },
+  {
+    "title": "Die Gegenpress",
+    "subtitle": "Every Liverpool goal under Klopp",
+    "description": "A comprehensive, interactive visual archive of every goal scored by Liverpool under J\u00fcrgen Klopp \u2014 scorers, opponents, venues, and minute-by-minute patterns.",
+    "image": "images/project-cards/diegegenpress.png",
+    "href": "diegegenpress.html",
+    "tools": ["Python", "Tableau Public", "Figma"],
+    "skills": ["Data Storytelling", "Data Visualisation"],
+    "featured": false
+  },
+  {
+    "title": "Echoes of Earth",
+    "subtitle": "Every M7.0+ quake, 2000\u20132025",
+    "description": "A global map of every magnitude 7.0+ earthquake from 2000\u20132025, plotted against coastlines and tectonic boundaries.",
+    "image": "images/project-cards/echoesofearth.png",
+    "href": "echoesofearth.html",
+    "tools": ["R", "Figma"],
+    "skills": ["Geospatial Analysis", "Data Visualisation"],
+    "featured": false
+  },
+  {
+    "title": "Elite Footballers, Team of the Season",
+    "subtitle": "ML-selected squads vs. FIFA TOTS",
+    "description": "Data-driven models that evaluate player performance across Europe's top five leagues to generate objective Team of the Season squads, outperforming human-selected FIFA TOTS lineups in a majority of seasons.",
+    "image": "images/project-cards/ftots.png",
+    "href": "ftots.html",
+    "tools": ["Python", "Plotly", "HTML", "Git"],
+    "skills": ["Machine Learning", "Statistical Analysis"],
+    "featured": false
+  },
+  {
+    "title": "Email Communication Analysis",
+    "subtitle": "Organisational communication dashboard",
+    "description": "A multi-layer analytical dashboard exploring emails across a company's departments: time-based patterns, sentiment, topics, departmental flows, and employee-level networks.",
+    "image": "images/project-cards/emailanalysis.png",
+    "href": "emailanalysis.html",
+    "tools": ["Python", "Tableau Public", "Figma"],
+    "skills": ["NLP & Sentiment Analysis", "Network Analysis", "Dashboard Design"],
+    "featured": false
+  },
+  {
+    "title": "EuroPharm Analytics",
+    "subtitle": "Decision-intelligence dashboard",
+    "description": "A decision-intelligence dashboard transforming pharmacy sales data into strategic insight, integrating benchmarking, portfolio analytics, and simulation to drive profit-focused decisions.",
+    "image": "images/project-cards/europharma.png",
+    "href": "europharmanalytics.html",
+    "tools": ["Power BI", "Vega", "Figma"],
+    "skills": ["Dashboard Design", "Simulation & Modeling", "Data Storytelling"],
+    "featured": false
+  },
+  {
+    "title": "Happy Little Colours",
+    "subtitle": "31 seasons of Bob Ross, as Voronoi art",
+    "description": "A season-by-season visual exploration of Bob Ross's iconic painting palette, transforming his most-used hues into a Voronoi art piece across 31 seasons of The Joy of Painting.",
+    "image": "images/project-cards/happylittlecolours.png",
+    "href": "happylittlecolours.html",
+    "tools": ["Figma"],
+    "skills": ["Data Visualisation", "Data Storytelling"],
+    "featured": false
+  },
+  {
+    "title": "Le Roi",
+    "subtitle": "Pel\u00e9's 1,284 goals, one grid",
+    "description": "A minimalist tribute to Pel\u00e9's historic 1,284-goal career, using a dense gold-toned grid where every square marks a match.",
+    "image": "images/project-cards/pele.png",
+    "href": "pele.html",
+    "tools": ["Python", "Tableau Public", "Figma"],
+    "skills": ["Data Visualisation", "Data Storytelling"],
+    "featured": false
+  },
+  {
+    "title": "Nova Credit Risk Lab",
+    "subtitle": "XGBoost-driven credit risk system",
+    "description": "A credit risk analytics system built around an XGBoost model and a custom profit proxy, with policy simulation tooling and an ethics-by-design approach that excludes sensitive features.",
+    "image": "images/project-cards/nova.png",
+    "href": "novacreditrisklab.html",
+    "tools": ["Python", "Tableau Public", "Figma"],
+    "skills": ["Machine Learning", "Simulation & Modeling"],
+    "featured": true
+  },
+  {
+    "title": "Pola",
+    "subtitle": "A Virtual Market of AI Shopkeepers",
+    "description": "A 3D open-air market where seven AI shopkeepers, each with a distinct personality, hold live agentic conversations and run real commerce actions against Kapruka's product catalog.",
+    "image": "images/project-cards/pola.png",
+    "href": "pola.html",
+    "tools": ["Python", "Three.js", "FastAPI", "GitHub"],
+    "skills": ["Agentic AI", "Product Design"],
+    "featured": true
+  },
+  {
+    "title": "Studio Ghibli \u2014 Budget vs. Revenue",
+    "subtitle": "40 years, one scatterplot",
+    "description": "Exploring 40 years of Studio Ghibli films through an interactive budget-versus-revenue scatterplot, with rich tooltips, film stills, and a break-even reference.",
+    "image": "images/project-cards/ghibli.png",
+    "href": "ghibliboxoffice.html",
+    "tools": ["D3.js", "HTML"],
+    "skills": ["Data Visualisation", "Data Storytelling"],
+    "featured": false
+  },
+   {
+    "title": "The Tragic Times",
+    "subtitle": "The Titanic, as a 1912 newspaper",
+    "description": "A historically styled analytical report exploring how class, age, gender, and fare influenced survival among 418 Titanic passengers \u2014 visualised as a period newspaper front page.",
+    "image": "images/project-cards/titanic.png",
+    "href": "titanic.html",
+    "tools": ["Python", "Tableau Public"],
+    "skills": ["Statistical Analysis", "Data Storytelling", "Data Visualisation"],
+    "featured": false
+  },
+  {
+    "title": "The Wonderful World of Pok\u00e9mon",
+    "subtitle": "Types, stats, and optimal teams",
+    "description": "A comprehensive analysis of Pok\u00e9mon types, stats, and battle dynamics, paired with interactive visuals, to uncover patterns and build optimal teams.",
+    "image": "images/project-cards/poke.png",
+    "href": "poketeam.html",
+    "tools": ["R", "Power BI"],
+    "skills": ["Data Visualisation", "Statistical Analysis"],
+    "featured": false
+  },
+  {
+    "title": "Tidying the Tides",
+    "subtitle": "19M-item ocean cleanup study",
+    "description": "A comprehensive visual exploration of ocean cleanup efforts across the US: locations, trash volume, item types, seasonal patterns, and correlations across 19 million collected items.",
+    "image": "images/project-cards/tidyingthetides.png",
+    "href": "tidyingthetides.html",
+    "tools": ["Python", "Tableau Public", "Figma"],
+    "skills": ["Geospatial Analysis", "Data Visualisation", "Statistical Analysis"],
+    "featured": false
+  },
+  {
+    "title": "Transferium Player Intelligence",
+    "subtitle": "Graph-powered replacement finder",
+    "description": "A graph database-powered football player replacement finder built on Neo4j, Python, and Streamlit \u2014 searching 18,405 FC 26 players with a weighted cosine similarity engine.",
+    "image": "images/project-cards/transferium.png",
+    "href": "transferium.html",
+    "tools": ["Python", "Neo4j", "GitHub", "Streamlit"],
+    "skills": ["Network Analysis", "Machine Learning"],
+    "featured": true
+  },
+  {
+    "title": "Voltage Verdicts",
+    "subtitle": "Electronics review intelligence",
+    "description": "An analytical dashboard built from online electronics reviews across seven major retailers, exploring rating patterns, brand and category trends, and inter-brand networks.",
+    "image": "images/project-cards/voltageverdicts.png",
+    "href": "voltageverdicts.html",
+    "tools": ["Python", "Tableau Public", "Figma", "GitHub"],
+    "skills": ["NLP & Sentiment Analysis", "Dashboard Design", "Network Analysis"],
+    "featured": false
+  },  
+  {
+    "title": "Washington's Woes",
+    "subtitle": "Investigative crime-pattern narrative",
+    "description": "A newsroom-style deep dive into Washington D.C. crime patterns, blending geospatial mapping, temporal analysis, and UCR classifications into a single investigative visual narrative.",
+    "image": "images/project-cards/washingtonswoes.png",
+    "href": "washingtonswoes.html",
+    "tools": ["Python", "Tableau Public", "Figma"],
+    "skills": ["Geospatial Analysis", "Data Storytelling"],
+    "featured": false
+  }
+]

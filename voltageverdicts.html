@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voltage Verdicts — Amir Sohil</title>
+<meta name="description" content="A multi-layer Tableau dashboard analysing 7,299 electronics reviews across 38 brands and seven retailers, testing what actually moves a customer rating.">
+<meta property="og:title" content="Voltage Verdicts — Amir Sohil">
+<meta property="og:description" content="7,299 electronics reviews, tested for what actually moves a rating.">
+<meta property="og:image" content="images/project-images/voltageverdictsfull.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="portfolio.html">Portfolio</a> <span>/</span> <span>Voltage Verdicts</span>
+    </div>
+
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Dashboard</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+      </div>
+      <h1 class="article-title">Voltage Verdicts</h1>
+      <p class="article-dek">7,299 electronics reviews, tested for what actually moves a rating.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <span class="tag tool">Python</span>
+          <span class="tag tool">Tableau Public</span>
+          <span class="tag tool">Figma</span>
+          <span class="tag tool">GitHub</span>
+          <span class="tag">NLP & Sentiment Analysis</span>
+          <span class="tag">Dashboard Design</span>
+          <span class="tag">Network Analysis</span>
+        </div>
+        <div class="article-actions">
+          <a class="btn-cv" href="https://public.tableau.com/app/profile/amir.sohil/viz/VoltageVerdicts/VoltageVerdicts" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>
+            View Live
+          </a>
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/project-images/voltageverdictsfull.png" alt="The full Voltage Verdicts dashboard">
+    </div>
+    <div class="cover-caption">Fig. 1 — Image of the dashboard. Click the link above for the live version.</div>
+
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#overview">The Problem</a></li>
+          <li><a href="#approach">The Approach</a></li>
+          <li><a href="#outcome">The Outcome</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section id="overview" class="reveal">
+          <h2>The Problem</h2>
+          <p>For the Onyx Data DataDNA Dataset Challenge (February 2024), the brief was to turn 7,299 electronics reviews — spanning 38 brands, 50 products, and seven retail websites — into a coherent picture of how customers actually evaluate electronics.</p>
+          <p>Seven websites sounds like a naturally balanced sample until the actual split is checked. Best Buy alone supplied 5,943 of the 7,299 total reviews (81.42%), with Amazon a distant second at 1,154 (15.81%) and the remaining five sites — Walmart, eBay, CDW, Home Depot, Petco — splitting under 3% of the total between them. Any conclusion drawn by simply averaging "across seven websites" would, in practice, be reporting on Best Buy's customers with a thin Amazon garnish.</p>
+        </section>
+
+        <section id="approach" class="reveal">
+          <h2>The Approach</h2>
+          <p>Cross-platform volume analysis compares review counts and ratings across all seven sources. Brand and category-level aggregation rolls 346 product categories into a packed-bubble view, sized by review volume, coloured by average rating. A network graph maps brands to the categories they're actually reviewed in, surfacing shared-broad categories versus brand-specific niches.</p>
+        </section>
+
+        <section id="outcome" class="reveal">
+          <h2>The Outcome</h2>
+          <p>Best Buy alone supplied 81.42% of all 7,299 reviews, meaning the seven sources can't be treated as equally-weighted samples. Brand concentration tells a similar story: Logitech (23.18%) and Sony (14.34%) together account for over a third of all reviews.</p>
+          <p>The rating distribution reinforces the "don't average blindly" lesson from a different angle. 84.33% of all reviews land in the "Good" category, but 164 reviews are entirely unrated — and every single one of them came from Amazon, meaning any completeness check on the dataset has to be platform-aware. The recommendation-status data ties it together: ratings in the "Good" bracket correlate strongly with an actual purchase recommendation, while "Bad" ratings carry comparatively few, meaning satisfied reviewers are actively vouching for the product to the next buyer.</p>
+         
+          <blockquote>Microsoft appearing in 'Pet Cameras' and Sony in 'Training Aids' are unexpected footholds a flat brand list would never surface.</blockquote>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">More work</div>
+          <h2 class="section-title">Keep exploring.</h2>
+        </div>
+        <a class="section-link" href="portfolio.html">All projects <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid" data-related-source="data/projects.json" data-related-exclude="Voltage Verdicts" data-related-limit="3"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

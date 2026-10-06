@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Football Player Replacement Finder — Amir Sohil</title>
+<meta name="description" content="How I built Transferium — a football player replacement finder powered by a graph database, a weighted similarity engine, and a live Streamlit app. Every architectural decision, explained.">
+<meta property="og:title" content="My Football Player Replacement Finder — Amir Sohil">
+<meta property="og:description" content="A replacement finder that surfaces true similarity, not just filter-matching — built on Neo4j, a weighted cosine similarity engine, and a live Streamlit app.">
+<meta property="og:image" content="images/project-images/transferiumwriteupfull.jpg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  /* Page-specific: schema diagram, weight/stack tables, decision-outcome
+     label. Everything else (nav, footer, .prose, .accordion, .toc,
+     .stat-strip, .aside-card, pre/code) comes from css/style.css. */
+
+  .schema-diagram{
+    background: var(--bg-raised); border: 1px solid var(--line-bright);
+    padding: 28px; margin: 32px 0; text-align: center;
+  }
+  .schema-diagram .toc-label{ margin-bottom: 18px; }
+  .schema-row{
+    display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+    gap: 0; margin: 10px 0; font-family: var(--font-mono); font-size: 13px;
+  }
+  .schema-node{
+    background: var(--accent-wash); border: 1px solid rgba(205,253,80,0.4); color: var(--accent);
+    padding: 5px 13px; border-radius: 20px; white-space: nowrap;
+  }
+  .schema-edge{ color: var(--text-dimmer); padding: 0 6px; font-size: 13px; }
+  .schema-rel{ color: var(--text-dim); font-size: 11.5px; padding: 0 4px; }
+  .schema-foot{
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-dimmer);
+    margin-top: 18px; letter-spacing: .04em;
+  }
+
+  .data-table{ width: 100%; border-collapse: collapse; margin: 24px 0; }
+  .data-table thead th{
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-dimmer); text-align: left; padding-bottom: 10px; border-bottom: 1px solid var(--line-bright);
+  }
+  .data-table tbody td{
+    font-size: 14px; color: var(--text-dim); padding: 12px 10px 12px 0; border-bottom: 1px solid var(--line);
+    vertical-align: top; line-height: 1.55;
+  }
+  .data-table tbody tr:last-child td{ border-bottom: none; }
+  .data-table tbody tr td:first-child{ color: var(--text); font-weight: 600; }
+  .data-table.weight-table tbody td:nth-child(2){ font-family: var(--font-mono); color: var(--accent); white-space: nowrap; }
+  .data-table.stack-table tbody td:nth-child(3){
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); text-align: right; white-space: nowrap;
+  }
+
+  .decision-outcome{ margin-top: 16px; font-size: 13.5px; color: var(--text-dim); }
+  .decision-outcome span{
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); margin-right: 6px;
+  }
+
+  /* Accordion trigger metadata — stacked under the title rather than run
+     inline. Same pattern used on goodhartslaw.html; worth promoting to
+     the shared stylesheet since it's now used on two pages. */
+  .trigger-title-block{ display: flex; flex-direction: column; gap: 4px; text-align: left; min-width: 0; }
+  .trigger-meta{
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--text-dimmer); font-weight: 400; padding-left: 26px;
+  }
+
+  /* Same CSS Grid fix as goodhartslaw.html: .prose is a grid item in
+     .article-layout and defaults to min-width:auto, so a wide flex child
+     anywhere in the column (the data tables, the schema diagram) can
+     force the whole column wider than the viewport on mobile. */
+  .prose{ min-width: 0; }
+  .toc{ min-width: 0; }
+
+  @media (max-width: 620px){
+    .data-table{ display: block; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="essays.html">Essays</a> <span>/</span> <span>My Football Player Replacement Finder</span>
+    </div>
+
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Essay</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+      </div>
+      <h1 class="article-title">My Football Player Replacement Finder</h1>
+      <p class="article-dek"><em>Transferium Player Intelligence</em> — every architectural decision, including the ones I got wrong first.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <span class="tag tool">Neo4j</span>
+          <span class="tag tool">Python</span>
+          <span class="tag tool">Streamlit</span>
+          <span class="tag">Network Analysis</span>
+          <span class="tag">Technical Writing</span>
+        </div>
+        <div class="article-actions">
+          <a class="btn-cv" href="https://transferium.streamlit.app" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>
+            View Live
+          </a>
+          <a class="icon-btn" href="https://github.com/amirsohil/transferium" target="_blank" rel="noopener" aria-label="View source on GitHub">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+          </a>
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this essay">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/project-images/transferiumwriteupfull.jpg" alt="My Football Player Replacement Finder — an essay on building Transferium Player Intelligence">
+    </div>
+    <div class="cover-caption">Fig. 1 — Every architectural decision behind Transferium, including the ones I got wrong first.</div>
+
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#starting-point">Starting Point</a></li>
+          <li><a href="#graph-database">Why a Graph Database</a></li>
+          <li><a href="#dataset">The Dataset Problem</a></li>
+          <li><a href="#similarity-model">The Similarity Model</a></li>
+          <li><a href="#loading-edges">Loading the Edges</a></li>
+          <li><a href="#product-decisions">Product Decisions</a></li>
+          <li><a href="#retrospective">What I'd Do Differently</a></li>
+          <li><a href="#stack">The Stack</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section class="reveal">
+          <blockquote>There's a version of this project that's boring. You load a CSV into pandas, compute cosine similarity, and return the top ten results. It works. It's fine. It's also exactly what everyone else does.</blockquote>
+        </section>
+
+        <section id="starting-point" class="reveal">
+          <h2>Starting Point</h2>
+          <p>Most data science portfolios look the same. A regression here, a dashboard there, maybe a neural network trained on <em>MNIST</em>. I wanted to build something where the interesting problem wasn't just the model. What I was truly looking for was a project that would force me to make real architectural decisions and come out the other side having genuinely learned something.</p>
+          <p>The brief I gave myself was to build something visually impressive, technically differentiated, and useful enough that a non-technical person could immediately understand the value. Enter, football player replacement. Think about it. The domain is universally relatable, the problem ("who can replace this player?") is immediately understandable, and the data structure, as I'll explain, is a genuinely natural fit for a graph database. Oh, and most importantly, I love football.</p>
+          <p>The result is <em>Transferium Player Intelligence</em>: a player replacement finder powered by <em>Neo4j</em>, a weighted cosine similarity engine, and a live <em>Streamlit</em> app. It took several wrong turns to get there, and I think those wrong turns are worth writing about too.</p>
+
+          <div class="stat-strip">
+            <div class="stat">
+              <div class="stat-num" data-target="18405">0</div>
+              <div class="stat-label">Players Modelled</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="276075">0</div>
+              <div class="stat-label">Similarity Edges Written</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num">£0</div>
+              <div class="stat-label">Total Cost</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="graph-database" class="reveal">
+          <h2>Why a Graph Database?</h2>
+          <p>This was the first major decision, and the one I want to defend properly, because it's easy to dismiss as over-engineering.</p>
+          <p>In a relational database, relationships between entities are implicit. For example, if you want to find all players in the <em>Premier League</em>, you join players to clubs to leagues at query time. The database doesn't inherently know that <em>Liverpool FC</em> is connected to the <em>Premier League</em>. It finds out by scanning and matching rows. In a graph database, relationships are first-class citizens. They're stored explicitly with their own properties. A path like <code>(Player)→(Club)→(League)</code> is a literal edge in the graph, not something computed at query time.</p>
+          <p>For this project, the key payoff is the <code>SIMILAR_TO</code> edge. Once I compute player similarity scores and store them as graph edges — <code>(Kylian Mbappé Lottin)-[:SIMILAR_TO {score: 0.82}]->(Omar Khaled Mohamed Marmoush)</code> — finding replacements becomes a single hop:</p>
+          <pre><code>MATCH (p:Player {name: "Kylian Mbappé Lottin"})-[r:SIMILAR_TO]->(s:Player)
+RETURN s.name, r.score ORDER BY r.score DESC LIMIT 15</code></pre>
+          <p>Zero recomputing or scanning. Just traversal. At around 18,000 players the performance difference is modest, but the architecture scales, and, more importantly, it forced me to think about my data as a network of relationships rather than a table of rows. I believe that shift in thinking is the real value.</p>
+
+          <div class="schema-diagram">
+            <div class="toc-label">Graph Schema</div>
+            <div class="schema-row">
+              <span class="schema-node">Player</span><span class="schema-edge">──</span><span class="schema-rel">[:PLAYS_FOR]</span><span class="schema-edge">──▶</span>
+              <span class="schema-node">Club</span><span class="schema-edge">──</span><span class="schema-rel">[:IN_LEAGUE]</span><span class="schema-edge">──▶</span>
+              <span class="schema-node">League</span>
+            </div>
+            <div class="schema-row">
+              <span class="schema-node">Player</span><span class="schema-edge">──</span><span class="schema-rel">[:PLAYS_AT]</span><span class="schema-edge">──▶</span>
+              <span class="schema-node">Position</span>
+            </div>
+            <div class="schema-row">
+              <span class="schema-node">Player</span><span class="schema-edge">──</span><span class="schema-rel">[:SIMILAR_TO {score, pos_match}]</span><span class="schema-edge">──▶</span>
+              <span class="schema-node">Player</span>
+            </div>
+            <div class="schema-foot">4 node types · 4 relationship types · each edge carries its own properties</div>
+          </div>
+        </section>
+
+        <section id="dataset" class="reveal">
+          <h2>The Dataset Problem</h2>
+          <p>I initially started with a <a href="https://www.kaggle.com/datasets/aniss7/fifa-player-data-from-sofifa-2025-06-03/data" target="_blank" rel="noopener"><em>SoFIFA</em> dataset from <em>Kaggle</em></a>. On the surface, it looked comprehensive. It wasn't. Every individual skill attribute (crossing, finishing, dribbling, stamina, etc.) was null for every single player. The scraper had captured biographical and overall rating data, but not the granular attributes I needed to build a meaningful similarity engine.</p>
+
+          <div class="aside-card">
+            <div class="eyebrow">Lesson</div>
+            <p>Always audit your data before designing around it. Column names do not imply populated data.</p>
+          </div>
+
+          <p>So that was on me for not checking first. I switched to an <a href="https://www.kaggle.com/datasets/rovnez/fc-26-fifa-26-player-data" target="_blank" rel="noopener"><em>FC 26</em> dataset</a> that included the full attribute breakdown across prefixed column groups: <code>attacking_</code>, <code>skill_</code>, <code>movement_</code>, <code>power_</code>, <code>mentality_</code>, <code>defending_</code>, and <code>goalkeeping_</code>. Zero nulls across all 29 outfield attributes and 7 goalkeeper attributes. 18,405 players. This was the foundation.</p>
+        </section>
+
+        <section id="similarity-model" class="reveal">
+          <h2>Building the Similarity Model</h2>
+          <p>Before any similarity computation, I made one structural decision that shaped everything downstream: goalkeepers and outfield players are modelled entirely separately. A goalkeeper's reflexes score means something completely different to a striker's finishing score, even if the numbers look similar in magnitude. Mixing them in a single vector space would produce statistically coherent but footballingly meaningless results. The two groups live in separate vector spaces. Similarity is only ever computed within each group.</p>
+
+          <h3>Weighted Attribute Vectors</h3>
+          <p>The naive approach treats all 29 attributes equally. But a defensive midfielder's interceptions matter far more than their finishing. A striker's positioning is more important than their sliding tackle. Equal weighting ignores what positions actually demand. I assigned weights across four groups:</p>
+
+          <table class="data-table weight-table">
+            <thead><tr><th>Group</th><th>Weight</th><th>Key Attributes</th></tr></thead>
+            <tbody>
+              <tr><td>Technical</td><td>35%</td><td>Ball control, dribbling, passing, vision</td></tr>
+              <tr><td>Tactical</td><td>30%</td><td>Positioning, interceptions, marking, reactions</td></tr>
+              <tr><td>Physical</td><td>25%</td><td>Acceleration, sprint speed, stamina, strength</td></tr>
+              <tr><td>League / Region</td><td>10%</td><td>Contextual adaptation bonus</td></tr>
+            </tbody>
+          </table>
+
+          <p>These group weights are informed judgements, not empirically optimised values. Each individual attribute's contribution is its raw score multiplied by its group weight divided by the number of attributes in that group. A 90-rated crossing doesn't dominate the vector just because it's high; it's weighted relative to its group.</p>
+
+          <h3>Cosine Similarity Over Euclidean Distance</h3>
+          <p>Cosine similarity measures the angle between two vectors, not the absolute distance between them. This means a 70-rated player with a balanced profile is more "similar" to an 85-rated balanced player than to a 90-rated specialist, because their skill shape is the same, even if the magnitude differs. For player replacement, shape matters more than magnitude. You're looking for someone who plays the same way, not someone of identical quality.</p>
+          <p>Consider Mohamed Salah and Francisco Trincão, a 91-rated <em>Premier League</em> superstar and an 82-rated winger at <em>Sporting CP</em>. Their Euclidean distance is significant: Salah's raw attribute numbers are simply higher across the board. But the model scores them at 76% similarity, because the shape of their profiles points in the same direction. The ratios between attributes are nearly identical, the same pattern, expressed at different levels. Euclidean distance would tell you they're far apart. Cosine similarity correctly identifies them as the same type of player, separated by level and context rather than style. That distinction is exactly what a replacement finder should care about. A club that can't afford Salah but needs his profile: a left-footed, right-sided attacker who dribbles, finishes, and doesn't defend too much, gets a credible starting point. That's what the engine is built to surface.</p>
+
+          <h3>The Overall Rating Penalty</h3>
+          <p>My first results exposed a flaw. A 73-rated player appeared as the top replacement for a 90-rated Bellingham because their attribute ratios were nearly identical. Mathematically correct. Practically not useful. I added a penalty term:</p>
+          <pre><code>overall_diff = abs(player_a_overall - player_b_overall)
+overall_penalty = min(overall_diff * 0.015, 0.30)
+final_score = base_similarity * 0.90 + league_bonus - overall_penalty</code></pre>
+          <p>A 17-point gap now reduces the score by up to 25.5%. The ceiling of 30% ensures a large gap is penalised, but never completely eliminates a stylistically similar player from appearing.</p>
+
+          <h3>The League / Region Bonus</h3>
+          <p>Real scouting isn't purely statistical. Clubs prefer players already adapted to similar footballing cultures. Why? Because there's a meaningful contextual advantage to finding someone already adapted to a similar environment: tactical styles, physical demands, officiating standards, etc. I encoded this as a 10% contextual bonus: same league gets +10%, same regional group (e.g. both in Iberian leagues) gets +5%, different region gets nothing. A perfect statistical twin in a different league still scores very high. The nudge here is small and deliberate.</p>
+
+          <h3>Position Matching</h3>
+          <p>A central midfielder is not a valid replacement for a striker, even if the underlying stats look similar. I only create <code>SIMILAR_TO</code> edges between players who share at least one position. Primary position match earns an additional 3% boost. Because <em>FC 26</em> players carry multiple positions, a player listed as <code>CAM, CM</code> can surface as a replacement for either role. This reflects real-world flexibility without forcing false matches.</p>
+        </section>
+
+        <section id="loading-edges" class="reveal">
+          <h2>Loading 276,075 Edges Into <em>AuraDB</em></h2>
+          <p>The production database is <em>Neo4j AuraDB Free</em>: cloud-hosted, zero cost, with a 200k node / 400k relationship limit. The dataset sits comfortably within those limits.</p>
+          <p>The first loading attempt failed. I was sending 18,000 individual write queries over the internet, one per player. The connection timed out mid-load. The fix was switching to <code>UNWIND</code> batch writes, sending 250 players per round trip instead of one at a time:</p>
+          <pre><code>UNWIND $batch AS props
+MERGE (p:Player {id: props.id})
+SET p += props</code></pre>
+
+          <div class="aside-card">
+            <div class="eyebrow">Lesson</div>
+            <p>Always batch writes to remote databases. This reduced round trips from 18,000 to 74, and the connection held for the full load.</p>
+          </div>
+
+          <p>The similarity computation runs as two separate matrices: cosine similarity across 16,343 outfield players produces a 16,343 × 16,343 matrix (roughly 267 million comparisons), and a separate 2,062 × 2,062 matrix handles goalkeepers in their own attribute space. Both are computed in seconds by <em>NumPy</em>'s vectorised operations. The top 15 position-compatible candidates per player were then written as <code>SIMILAR_TO</code> edges to <em>AuraDB</em> in batches of 1,000. Total edges thus written were 276,075.</p>
+        </section>
+
+        <section id="product-decisions" class="reveal">
+          <h2>Four Choices That Shaped the App</h2>
+          <p>The technical layer was only half the design surface. Several product decisions had as much impact on the final experience as any model choice.</p>
+
+          <div class="accordion">
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">01</span>Dark and Minimal Visual Language</span>
+                  <span class="trigger-meta">Design · Branding</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>The design language I chose is dark and minimal: black background, <em>Bebas Neue</em> for display type, <em>DM Sans</em> for body, <em>JetBrains Mono</em> for data values. The colour accent is a sharp yellow-green that reads as "data" rather than "football kit." It's legible, distinctive, and avoids every visual cliché in the football analytics space.</p>
+                <p>This was also built to align with my personal brand. If you look at my website and this project, you would understand what I mean.</p>
+                <p class="decision-outcome"><span>Outcome</span>Visually differentiated from every spreadsheet-style football tool I found in the space.</p>
+              </div></div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">02</span>No Club, League, or Value Data in the UI</span>
+                  <span class="trigger-meta">Data · Longevity</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>I made a deliberate choice to not show club, league, market value, or wage data. All of those change. A player's club next season is unknown; their value fluctuates weekly. Displaying them would anchor the app to a moment in time and make it feel stale.</p>
+                <p>What I do show: overall rating, position, nationality, age, and similarity score, is stable within the <em>FC 26</em> snapshot, which is clearly labelled in the interface. A decision was made to include age since it's genuinely useful context when evaluating a replacement. The league/region bonus was used in the model, but it isn't surfaced as a visible field, because the logic is internal and the data would drift.</p>
+                <p class="decision-outcome"><span>Outcome</span>The app remains accurate and honest about what it knows and when.</p>
+              </div></div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">03</span>Why <em>Transferium?</em></span>
+                  <span class="trigger-meta">Naming</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>It took a few iterations. Earlier candidates included <em>ScoutIQ</em> and <em>Squadrant</em>. <em>ScoutIQ</em> was too AI-tool-adjacent and generic. It could describe a hundred different products. <em>Squadrant</em> was too hard to say and the wordplay didn't land on first read.</p>
+                <p><em>Transferium</em> stuck because it sounds vaguely scientific, and maps immediately to the transfer market without being literal about it. Naming was one of the first UX decisions. And to be honest, it feels inevitable in retrospect.</p>
+                <p class="decision-outcome"><span>Outcome</span>Instantly identifiable, memorable, and domain-appropriate.</p>
+              </div></div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">04</span>Free End to End</span>
+                  <span class="trigger-meta">Infrastructure · Cost</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Every component in the stack was deliberately chosen to be free without compromising on technical quality. <em>Neo4j Desktop</em> for local development, <em>AuraDB Free</em> for cloud hosting. <em>Streamlit</em> for the frontend and <em>Streamlit Community Cloud</em> for hosting. <em>Python</em>, <em>pandas</em>, <em>NumPy</em>, and <em>scikit-learn</em> for processing. <em>GitHub</em> for version control. <em>FC 26</em> dataset from <em>Kaggle</em>.</p>
+                <p>The constraint was generative. Being forced to work within the <em>AuraDB</em> free tier meant thinking carefully about schema design and edge counts from the start. I believe this made the architecture tighter overall.</p>
+                <p class="decision-outcome"><span>Outcome</span>Production-grade stack with £0 ongoing cost.</p>
+              </div></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="retrospective" class="reveal">
+          <h2>What I Would Do Differently</h2>
+          <p><strong>Better base data.</strong> <em>FC 26</em> ratings are community-maintained perceptions, not tracking data. Real clubs use <em>Opta</em>, <em>StatsBomb</em>, GPS telemetry, etc. The limitation is real. This makes the project a game-data approximation of a scouting tool. I believe this could be useful on its own.</p>
+          <p><strong>Player embeddings instead of raw attributes.</strong> Rather than vectors built from raw attribute scores, I'd experiment with training embeddings on match performance data: representing players by how they actually play, not how a video game rates them. That's a harder problem to solve.</p>
+          <p><strong>Age cohort filtering.</strong> Replacing a 32-year-old with a 19-year-old and a 35-year-old are different scouting problems. A future version would let users filter by age range explicitly.</p>
+          <p><strong>Explainability.</strong> The score ring tells you how similar a player is. It doesn't tell you why. A radar chart overlay comparing the queried player's attribute profile against the replacement would make results far more actionable. Once again, that is for a future version.</p>
+        </section>
+
+        <section id="stack" class="reveal">
+          <h2>Everything Used, Free End to End</h2>
+
+          <table class="data-table stack-table">
+            <tbody>
+              <tr><td>Graph database (local)</td><td><em>Neo4j Desktop</em></td><td>Free</td></tr>
+              <tr><td>Graph database (cloud)</td><td><em>Neo4j AuraDB Free</em></td><td>Free</td></tr>
+              <tr><td>Data processing</td><td><em>Python</em> · <em>pandas</em> · <em>NumPy</em> · <em>scikit-learn</em></td><td>Free</td></tr>
+              <tr><td>App framework</td><td><em>Streamlit</em></td><td>Free</td></tr>
+              <tr><td>Hosting</td><td><em>Streamlit Community Cloud</em></td><td>Free</td></tr>
+              <tr><td>Version control</td><td><em>GitHub</em></td><td>Free</td></tr>
+              <tr><td>Data</td><td><em>FC 26</em> · <em>Kaggle</em></td><td>Free</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="reveal" style="border-top: 1px solid var(--line); padding-top: 40px; margin-top: 16px;">
+          <p><em>Transferium Player Intelligence</em> is live. Search any player, find their replacements.</p>
+          <p>The code is on GitHub. If you're thinking about graph databases for a similar problem, or if you have questions about any of the decisions above, I'd genuinely like to hear from you.</p>
+          <a class="btn btn-primary" href="https://transferium.streamlit.app" target="_blank" rel="noopener">Open Transferium Player Intelligence <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Read next</div>
+          <h2 class="section-title">More essays.</h2>
+        </div>
+        <a class="section-link" href="essays.html">All essays <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid two-col" data-related-source="data/essays.json" data-related-exclude="My Football Player Replacement Finder" data-related-limit="2"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

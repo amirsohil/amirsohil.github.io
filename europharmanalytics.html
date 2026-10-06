@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EuroPharm Analytics — Amir Sohil</title>
+<meta name="description" content="A five-view Power BI system turning pharmacy sales data into ranked, actionable decisions — margin grew 4.93% year-over-year against 4.43% revenue growth.">
+<meta property="og:title" content="EuroPharm Analytics — Amir Sohil">
+<meta property="og:description" content="Five views that move from what happened to what to do about it.">
+<meta property="og:image" content="images/project-images/europharma1.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="portfolio.html">Portfolio</a> <span>/</span> <span>EuroPharm Analytics</span>
+    </div>
+
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Dashboard</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+      </div>
+      <h1 class="article-title">EuroPharm Analytics</h1>
+      <p class="article-dek">Five views that move from what happened to what to do about it.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <span class="tag tool">Power BI</span>
+          <span class="tag tool">Vega</span>
+          <span class="tag tool">Figma</span>
+          <span class="tag">Dashboard Design</span>
+          <span class="tag">Simulation & Modeling</span>
+          <span class="tag">Data Storytelling</span>
+        </div>
+        <div class="article-actions">
+          <a class="btn-cv" href="https://app.powerbi.com/view?r=eyJrIjoiOWZhOTcxNGEtN2JhZi00MmExLTkyNWUtYmE0MTA1MDBlZTg2IiwidCI6IjQ2NTRiNmYxLTBlNDctNDU3OS1hOGExLTAyZmU5ZDk0M2M3YiIsImMiOjl9" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>
+            View Live
+          </a>
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/project-images/europharma1.png" alt="The first page of the EuroPharm Analytics dashboard.">
+    </div>
+    <div class="cover-caption">Fig. 1 — Image of the first page of the dashboard. Scroll below for more images. Click the link above for the live version.</div>
+
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#overview">The Problem</a></li>
+          <li><a href="#fiveviews">The Five Views</a></li>
+          <li><a href="#levers">The Levers, Ranked</a></li>
+          <li><a href="#outcome">The Outcome</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section id="overview" class="reveal">
+          <h2>The Problem</h2>
+          <p>Built for the DataDNA Pharmacy Sales & Profitability Analytics Challenge (Jan–Feb 2026), the brief was to turn raw pharmacy sales data into decisions a business could actually act on, explaining why, and what to do next.</p>
+          <p>The starting numbers don't make that case on their own: €8.63M in total revenue, a 28.04% margin, 445,793 units sold across the period. What makes the brief genuinely hard is what has to sit underneath those headline figures: a system that explains why margin lands where it does by country, by pharmacy type, and by product category, and then says something useful about what to actually do about it.</p>
+        </section>
+
+        <section id="fiveviews" class="reveal">
+          <h2>The Five Views</h2>
+          <p>Each view answers a different version of "why," building toward the point where the dashboard stops describing performance and starts prescribing action.</p>
+          
+          <div class="accordion">
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">01</span>Executive Overview</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Headline KPIs for the whole business, serving as the starting point before drilling into any one region, pharmacy, or product.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">02</span>Geographic Intelligence</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Margin drills from country down through region to individual pharmacy, so underperformance can be traced to an actual address.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">03</span>Pharmacy Benchmarking</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Every pharmacy is ranked against its peers using margin-percentile/Z-Score normalisation within country and pharmacy-type cohorts, isolating genuine operational performance from geography or business-model effects.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">04</span>Product Portfolio Intelligence</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Every SKU is classified into a quadrant — Volume Trap, Profit Engine, Premium/Niche, Low Impact — turning a units-vs-margin scatter into a direct stocking and promotion decision.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">05</span>Strategy Simulator</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Three interactive levers let a stakeholder test trade-offs directly against the model instead of waiting on a rebuild.</p>
+              </div></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="levers" class="reveal">
+          <h2>The Levers, Ranked</h2>
+          
+          <div class="accordion">
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">01</span>Structural margin expansion (pricing, supplier terms)</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>The most efficient lever: roughly 172,000 in incremental margin per 100bps of uplift, about 7% profit growth without touching revenue.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">02</span>Portfolio simplification</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Barely moves the needle by comparison: +4bps from cutting the lowest-margin 30% of SKUs.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">03</span>Promotion pullback</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Full removal buys +96bps of margin at a 10.6% revenue cost; a moderate 20–30% pullback captures most of that margin gain while keeping ~97% of revenue.</p>
+              </div></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="outcome" class="reveal">
+          <h2>The Outcome</h2>
+          <p>Margin grew 4.93% year-over-year against 4.43% revenue growth — profitability improving faster than volume. Geographic concentration is similarly clear: Germany, France, and Italy together account for roughly half of total margin contribution, reframing a vague "grow revenue" goal into a sharper "protect these three markets first" priority.</p>
+          <p>The category breakdown adds a second layer to that same idea. Prescription is a volume category more than a profitability one; Wellness is disproportionately profitable relative to its size. That distinction is exactly what the Strategy Simulator's structural-margin lever is built to act on, rather than treating every product category as equally worth pushing.</p>       
+          <p>The Geographic Intelligence drill-down carries the same logic all the way down to individual locations, and the pharmacy-type breakdown makes the same point at a different resolution: an underperforming region isn't a dead end in this dashboard, it's a pointer toward an actual address. Rural underperformance specifically shows up here as a margin-conversion problem.</p>
+          <blockquote>Not stopping at just reporting performance, the model also tells you which lever to pull first.</blockquote>
+        </section>
+
+        <section id="gallery" class="reveal">
+          <h2>Gallery</h2>
+          <p>A closer look at the system — click to expand, arrow keys move between them, Escape closes.</p>
+
+          <div class="gallery-grid">
+            <button type="button">
+              <img src="images/project-images/europharma1.png" alt="Executive Overview view, showing headline KPIs for the whole business">
+            </button>
+            <button type="button">
+              <img src="images/project-images/europharma2.png" alt="Geographic Intelligence view, drilling margin from country down to an individual pharmacy">
+            </button>
+            <button type="button">
+              <img src="images/project-images/europharma3.png" alt="Pharmacy benchmarking view, ranking every pharmacy against its peers using margin-percentile/Z-Score normalisation">
+            </button>
+            <button type="button">
+              <img src="images/project-images/europharma4.png" alt="Product Portfolio Intelligence view, classifying every SKU into a quadrant — Volume Trap, Profit Engine, Premium/Niche, Low Impact">
+            </button>
+            <button type="button">
+              <img src="images/project-images/europharma5.png" alt="Strategy Simulator view, with three interactive levers letting a stakeholder test trade-offs directly against the model">
+            </button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">More work</div>
+          <h2 class="section-title">Keep exploring.</h2>
+        </div>
+        <a class="section-link" href="portfolio.html">All projects <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid" data-related-source="data/projects.json" data-related-exclude="EuroPharm Analytics" data-related-limit="3"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

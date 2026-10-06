@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>All Goals in the Men's World Cup — Amir Sohil</title>
+<meta name="description" content="A data-art visualisation of all 2,720 goals scored across 22 Men's World Cup tournaments, mapped inside the silhouette of the trophy itself.">
+<meta property="og:title" content="All Goals in the Men's World Cup — Amir Sohil">
+<meta property="og:description" content="Every World Cup goal since 1930, plotted inside the shape of the trophy.">
+<meta property="og:image" content="images/project-images/worldcupfull.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="portfolio.html">Portfolio</a> <span>/</span> <span>All Goals in the Men's World Cup</span>
+    </div>
+
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Visualisation</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+      </div>
+      <h1 class="article-title">All Goals in the Men's World Cup</h1>
+      <p class="article-dek">Every goal in World Cup history, plotted inside the shape of the trophy itself.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <span class="tag tool">Tableau Public</span>
+          <span class="tag tool">Figma</span>
+          <span class="tag">Data Visualisation</span>
+          <span class="tag">Data Storytelling</span>
+        </div>
+        <div class="article-actions">
+          <a class="btn-cv" href="https://public.tableau.com/app/profile/amir.sohil/viz/WorldCupGoals_17061911571980/Dashboard1" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>
+            View Live
+          </a>
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/project-images/worldcupfull.png" alt="The full World Cup Goals dashboard, every recorded goal mapped inside the silhouette of the trophy">
+    </div>
+    <div class="cover-caption">Fig. 1 — Image of the visualisation. Click the link above for the live version.</div>
+
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#overview">The Problem</a></li>
+          <li><a href="#approach">The Approach</a></li>
+          <li><a href="#decisions">Design Decisions</a></li>
+          <li><a href="#outcome">The Outcome</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section id="overview" class="reveal">
+          <h2>The Problem</h2>
+          <p>Nearly a century of World Cup history (from 1930 to 2022 across 22 tournaments) is usually explored through record books and stat tables. The goal was to make that entire scoring history explorable and visually legible in a single view, built around the tournament's own most recognisable symbol.</p>
+
+          <div class="stat-strip">
+            <div class="stat">
+              <div class="stat-num" data-target="2720">0</div>
+              <div class="stat-label">GOALS SCORED</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="22">0</div>
+              <div class="stat-label">TOURNAMENTS</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="92">0</div>
+              <div class="stat-label">YEARS OF HISTORY</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="approach" class="reveal">
+          <h2>The Approach</h2>
+          <p>Every one of the 2,720 recorded goals is rendered as an individual point inside a silhouette of the FIFA World Cup trophy itself, with own goals (54 of them) visually distinguished from regular goals. A minute-by-minute breakdown runs beneath the trophy as a supporting layer, showing when in a match goals actually happen.</p>
+          <p>Four highlight filters let a viewer isolate any single goalscoring thread within the full dataset:</p>
+          <ul>
+            <li><strong>Tournament</strong> — isolate a single World Cup year</li>
+            <li><strong>Stage</strong> — group stage, knockout rounds, final</li>
+            <li><strong>Team</strong> — every goal scored by one nation</li>
+            <li><strong>Player</strong> — one player's full World Cup scoring record</li>
+          </ul>
+          <p>By design, only one filter can be active at a time, so the selected view stays clear and easy to read.</p>
+        </section>
+
+        <section id="decisions" class="reveal">
+          <h2>Design Decisions</h2>
+
+          <div class="accordion">
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">01</span>The trophy</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>The aim was to merge historical depth with a bold visual identity. What better way of doing this than transforming nine decades of football data into an intuitive, engaging, and emotionally resonant experience, built around one of sport's most recognisable symbols.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">02</span>Own goals, distinguished</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Own goals are a real and recorded part of World Cup scoring history, making up 54 of the 2,720 goals. I have visually marked them as distinct from regular goals, avoiding oversimplification.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">03</span>One filter at a time</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Tournament, stage, team, and player filters could easily stack into a tangle of competing highlights. Deliberately limiting the view to one active filter keeps any single goalscoring thread readable against the full 2,720-goal field.</p>
+              </div></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="outcome" class="reveal">
+          <h2>The Outcome</h2>
+          <p>The top-scoring-nations ribbon puts Brazil and Germany well clear of the rest of the field, with Argentina a distant third.</p>
+
+          <div class="stat-strip">
+            <div class="stat">
+              <div class="stat-num" data-target="236">0</div>
+              <div class="stat-label">BRAZIL</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="228">0</div>
+              <div class="stat-label">GERMANY</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="150">0</div>
+              <div class="stat-label">ARGENTINA</div>
+            </div>
+          </div>
+
+          <p>The minute-by-minute chart shows the same late-game clustering seen in club-level data elsewhere in the portfolio (the <a href="diegegenpress.html">Klopp-era Liverpool goals project</a> shows an identical pattern).</p>
+
+          <blockquote>Goals piling up in stoppage time is a structural feature of the sport across nine decades of World Cup history.</blockquote>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">More work</div>
+          <h2 class="section-title">Keep exploring.</h2>
+        </div>
+        <a class="section-link" href="portfolio.html">All projects <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid" data-related-source="data/projects.json" data-related-exclude="All Goals in the Men's World Cup" data-related-limit="3"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

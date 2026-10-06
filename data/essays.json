@@ -1,0 +1,29 @@
+[
+  {
+    "title": "My Football Player Replacement Finder",
+    "description": "A full account of building Transferium Player Intelligence: every architectural decision, from choosing Neo4j over a relational database to designing a weighted cosine similarity engine that separates profile shape from absolute quality.",
+    "image": "images/project-cards/transferiumwriteup.jpg",
+    "href": "transferiumwriteup.html",
+    "tools": ["Neo4j", "Python", "Streamlit"],
+    "skills": ["Network Analysis", "Technical Writing"],
+    "featured": true
+  },
+  {
+    "title": "Pola \u2014 A Virtual Market of AI Shopkeepers",
+    "description": "A full account of building Pola: the case for building a place instead of a chat widget, a hand-built Ghibli-style Three.js world, and a FastAPI backend that falls back across three LLM providers to run at zero hosting cost.",
+    "image": "images/project-cards/polawriteup.jpg",
+    "href": "polawriteup.html",
+    "tools": ["Three.js", "FastAPI"],
+    "skills": ["Agentic AI", "Product Design", "Technical Writing"],
+    "featured": true
+  },
+  {
+    "title": "When Your Dashboards Deceive",
+    "description": "An interactive essay on Goodhart's Law, the economic principle that silently corrupts KPI dashboards across every industry. Includes real case studies, a live metric simulator, and a practical framework for designing better measurements.",
+    "image": "images/project-cards/goodhartslaw.jpg",
+    "href": "goodhartslaw.html",
+    "tools": [],
+    "skills": ["Data Storytelling", "Simulation & Modeling", "Technical Writing"],
+    "featured": true
+  }
+]

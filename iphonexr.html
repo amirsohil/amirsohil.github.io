@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>"Brilliant. In every way." Are they really?</title>
+<meta name="description" content="A sentiment and helpfulness analysis of 5,010 Amazon India iPhone XR reviews, testing whether Apple's marketing claim actually holds up.">
+<meta property="og:title" content="&ldquo;Brilliant. In every way.&rdquo; Are they really? — Amir Sohil">
+<meta property="og:description" content="5,010 iPhone XR reviews — and the 6% that shaped trust the most.">
+<meta property="og:image" content="images/project-images/iphonexrfull.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="portfolio.html">Portfolio</a> <span>/</span> <span>"Brilliant. In every way." Are they really?</span>
+    </div>
+
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Dashboard</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+      </div>
+      <h1 class="article-title">"Brilliant. In every way." Are they really?</h1>
+      <p class="article-dek">5,010 iPhone XR reviews, and the 6.4% that shaped trust the most.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <span class="tag tool">R</span>
+          <span class="tag tool">Power BI</span>
+          <span class="tag">NLP & Sentiment Analysis</span>
+          <span class="tag">Statistical Analysis</span>
+        </div>
+        <div class="article-actions">
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/project-images/iphonexrfull.png" alt="The full iPhone XR reviews dashboard">
+    </div>
+    <div class="cover-caption">Fig. 1 — Image of the dashboard.</div>
+
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#overview">The Problem</a></li>
+          <li><a href="#approach">The Approach</a></li>
+          <li><a href="#outcome">The Outcome</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section id="overview" class="reveal">
+          <h2>The Problem</h2>
+          <p>For the DataDNA Dataset Challenge (March 2023), the brief was to test whether the iPhone XR actually lived up to Apple's marketing promise, using 5,010 real Amazon India reviews of the black 64GB edition. This project was not just about averaging star ratings, but examining what was actually driving sentiment and which reviews people trusted enough to act on.</p>
+          <p>Every one of the 5,010 reviews in the dataset originated from India specifically, not a global sample. This is a picture of how one national market responded to the phone, not a universal verdict, and the analysis treats that as a defined scope.</p>
+        </section>
+
+        <section id="approach" class="reveal">
+          <h2>The Approach</h2>
+          <p>Sentiment mapped from the 1–5 star scale into negative/neutral/positive buckets, then cross-analysed against three signals: how many people marked a review "helpful," when reviews were posted relative to the product's India launch, and how review length varied by sentiment.</p>
+        </section>
+
+        <section id="outcome" class="reveal">
+          <h2>The Outcome</h2>
+          <div class="stat-strip">
+            <div class="stat">
+              <div class="stat-num" data-target="4.49" data-decimals="2" data-suffix="/5">0</div>
+              <div class="stat-label">AVERAGE RATING</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="88.84" data-decimals="2" data-suffix="%">0</div>
+              <div class="stat-label">POSITIVE REVIEWS</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="8.1" data-decimals="1" data-suffix="%">0</div>
+              <div class="stat-label">NEGATIVE REVIEWS</div>
+            </div>
+          </div>
+
+          <p>On the surface, the marketing claim holds up, with an average rating 4.49/5, 88.84% positive, 8.1% negative. But helpfulness complicates that: 1-star reviews, only 6.4% of the total (319 of 5,010), pulled in 10,105 helpful votes, nearly matching the 10,330 votes earned by the far more common 3-star reviews.</p> 
+          <p>The full rating breakdown makes the "extremes over middle" pattern sharper: 3,731 five-star reviews and 720 four-star reviews dwarf everything else, but among negative ratings, 1-star (319) comfortably outnumbers 2-star (87) — when people were unhappy, they tended toward the most extreme rating available rather than a moderate one. That same polarisation shows up in the helpfulness data: 2-star reviews drew only 109 helpful votes total, while the far rarer but more extreme 1-star reviews pulled in over 10,000.</p> 
+          <p>The adoption timeline adds another wrinkle: reviews stayed thin for three quarters after the November 2018 India launch, then spiked in October–November 2019. And sentiment intensity drives length more than positivity does, with neutral reviews being the shortest by far, while both positive and negative reviews ran long.</p>
+
+          <blockquote>Readers weight rare, extreme negative reviews disproportionately heavily when deciding whether to trust a product.</blockquote>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">More work</div>
+          <h2 class="section-title">Keep exploring.</h2>
+        </div>
+        <a class="section-link" href="portfolio.html">All projects <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid" data-related-source="data/projects.json" data-related-exclude="&ldquo;Brilliant. In every way.&rdquo; Are they really?" data-related-limit="3"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

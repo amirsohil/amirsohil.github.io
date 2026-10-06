@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact — Amir Sohil</title>
+<meta name="description" content="Get in touch with Amir Sohil — email, LinkedIn, or book a session directly.">
+<meta property="og:title" content="Contact — Amir Sohil">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <section class="section" style="padding-bottom:0;">
+    <div class="wrap">
+      <div class="eyebrow">Contact</div>
+      <h1 class="section-title">Let's talk.</h1>
+      <p class="hero-sub" style="margin-top:20px;">Freelance work, full-time roles, or just a good data problem — pick whichever's easiest.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap contact-grid">
+      <div>
+        <div class="contact-list">
+          <div class="contact-row">
+            <span class="k">Email</span>
+            <span class="v">
+              <a href="mailto:bhmasohail@gmail.com">bhmasohail@gmail.com</a>
+              <button class="copy-btn" data-copy="bhmasohail@gmail.com" type="button">Copy</button>
+            </span>
+          </div>
+          <div class="contact-row">
+            <span class="k">LinkedIn</span>
+            <span class="v"><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">in/amir-sohil ↗</a></span>
+          </div>
+          <div class="contact-row">
+            <span class="k">Calendly</span>
+            <span class="v"><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session ↗</a></span>
+          </div>
+          <div class="contact-row">
+            <span class="k">Based in</span>
+            <span class="v">Colombo, Sri Lanka</span>
+          </div>
+        </div>
+
+        <div class="aside-card" style="margin-top:36px;">
+          <div class="eyebrow">Portfolio chatbot</div>
+          <p>Prefer to ask questions instead of scrolling? <a href="portfoliochatbot.html" style="color:var(--accent); text-decoration:underline; text-underline-offset:3px;">Chat with my portfolio</a> and it'll answer for me.</p>
+        </div>
+      </div>
+
+      <div>
+        <form id="contact-form">
+          <div class="form-field">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+          <div class="form-field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+          <div class="form-field">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="6" required></textarea>
+          </div>
+          <button class="btn btn-primary" type="submit" style="width:100%; justify-content:center;">
+            Send Message <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>
+          </button>
+          <p class="form-note">This opens your email client with the message pre-filled — this site has no backend, so nothing is sent from here directly.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="about.html">About</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="essays.html">Essays</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+</body>
+</html>

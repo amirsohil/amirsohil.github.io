@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nova Credit Risk Lab — Amir Sohil</title>
+<meta name="description" content="A credit risk system built on a validated XGBoost model (AUC 0.92) across 32,581 loans, with an ethics-by-design profit simulator that excludes protected characteristics.">
+<meta property="og:title" content="Nova Credit Risk Lab — Amir Sohil">
+<meta property="og:description" content="A credit model that grades its own confidence instead of presenting every finding as equally certain.">
+<meta property="og:image" content="images/project-images/nova1.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="portfolio.html">Portfolio</a> <span>/</span> <span>Nova Credit Risk Lab</span>
+    </div>
+
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Dashboard</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+      </div>
+      <h1 class="article-title">Nova Credit Risk Lab</h1>
+      <p class="article-dek">A credit model that grades its own confidence instead of presenting every finding as equally certain.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <span class="tag tool">Python</span>
+          <span class="tag tool">Tableau Public</span>
+          <span class="tag tool">Figma</span>
+          <span class="tag">Machine Learning</span>
+          <span class="tag">Simulation & Modeling</span>
+        </div>
+        <div class="article-actions">
+          <a class="btn-cv" href="https://public.tableau.com/app/profile/amir.sohil/viz/NovaCreditRiskLab/Overview" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>
+            View Live
+          </a>
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/project-images/nova1.png" alt="The first page of the Nova Credit Risk Lab dashboard.">
+    </div>
+    <div class="cover-caption">Fig. 1 — Image of the first page of the dashboard. Scroll below for more images. Click the link above for the live version.</div>
+
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#overview">The Problem</a></li>
+          <li><a href="#approach">The Approach</a></li>
+          <li><a href="#guardrails">Built-In Guardrails</a></li>
+          <li><a href="#outcome">The Outcome</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section id="overview" class="reveal">
+          <h2>The Problem</h2>
+          <p>For the September 2025 DataDNA Credit Risk Analytics Challenge, the goal was to turn a raw loan dataset into a system a lender could actually use to decide who to approve, essentially quantifying risk per borrower and translating that into a defensible approval policy.</p>
+          <p>The starting numbers set the stakes: 32,581 loans, a 21.82% overall default rate, and — if every defaulted loan amount were treated as a total loss — an expected loss north of $77M. A default rate that high, spread across that many loans, is the kind of dataset where a single blanket approval policy leaves real money on the table in both directions: rejecting good borrowers and approving bad ones.</p>
+        </section>
+
+        <section id="approach" class="reveal">
+          <h2>The Approach</h2>
+          <p>A five-page analytical system built around a validated XGBoost default-probability model (AUC 0.92 on a held-out test set, SHAP values used to explain every prediction). Loan-to-income ratio and applicant income came out as the strongest predictors, ahead of loan grade or loan purpose. A Policy Simulator then turns the model's output into an actual business decision: it tests approval thresholds against a real profit function rather than optimising for accuracy alone.</p>
+        </section>
+
+        <section id="guardrails" class="reveal">
+          <h2>Built-In Guardrails</h2>
+          
+          <div class="accordion">
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">01</span>Protected characteristics excluded on purpose</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Home ownership, gender, marital status, education, and location were kept out on ethical grounds rather than performance grounds, to stop the model learning proxies for protected characteristics.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">02</span>The profit function excludes interest income</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>This was a deliberate, methodological choice grounded in ethical-finance principles and personal beliefs. The Policy Simulator tests approval thresholds against principal recovery alone.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">03</span>Findings are self-graded</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>The project closes by rating its own conclusions Robust, Moderate, or Needs Further Work, rather than presenting everything with equal confidence.</p>
+              </div></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="outcome" class="reveal">
+          <h2>The Outcome</h2>
+          <div class="stat-strip">
+            <div class="stat">
+              <div class="stat-num" data-target="0.92" data-decimals="2">0</div>
+              <div class="stat-label">MODEL AUC</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="55.00" data-decimals="2" data-suffix="%">0</div>
+              <div class="stat-label">OPTIMAL APPROVAL THRESHOLD</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="8.67" data-decimals="2" data-suffix="%">0</div>
+              <div class="stat-label">DEFAULT RATE AT OPTIMAL THRESHOLD</div>
+            </div>
+             <div class="stat">
+            </div>
+          </div>
+
+          <p>The simulator identifies 55% as the profit-maximising approval threshold (a materially better trade-off than looser or stricter cutoffs). The project won the DataDNA Credit Risk Analytics Challenge, September 2025.</p>
+          <p>The segment-level analysis is where the model's real value shows up, ahead of any single threshold decision. Credit grade turns out to be a sharp cliff rather than a smooth gradient. Grade D loans already default more often than they repay (2,141 defaults against 1,485 successful), and by Grade E through G, default rates run 64–98%, effectively unsustainable regardless of price. Loan purpose tells a more counterintuitive story: education loans carry the largest volume in the dataset (6,453 loans) but one of the lower default rates (17.22%), while medical (26.7%) and debt consolidation (28.59%) loans run riskier.</p>
+          <p>The age-and-income breakdown adds a further wrinkle worth flagging on its own: the single highest-risk segment isn't the youngest, lowest-income borrowers, as a simple "young and broke" assumption would predict. It's actually borrowers aged 45–54 earning under $25,000, who default at 60.98%. That's a specific, non-obvious segment a coarser age- or income-bracket model would blend into the surrounding averages and lose entirely.</p>
+        </section>
+
+        <section id="gallery" class="reveal">
+          <h2>Gallery</h2>
+          <p>A closer look at the system — click to expand, arrow keys move between them, Escape closes.</p>
+
+          <div class="gallery-grid">
+            <button type="button">
+              <img src="images/project-images/nova1.png" alt="Overview page, showing summary metrics and aggregate visualisations">
+            </button>
+            <button type="button">
+              <img src="images/project-images/nova2.png" alt="Risk Segments view, focusing on the model's segment-level analysis of risk">
+            </button>
+            <button type="button">
+              <img src="images/project-images/nova3.png" alt="Drivers of Risk view, focusing on the XGBoost default-probability model">
+            </button>
+            <button type="button">
+              <img src="images/project-images/nova4.png" alt="Policy Simulator view, with a profit function and interactive approval threshold slicer">
+            </button>
+            <button type="button">
+              <img src="images/project-images/nova5.png" alt="Recommendations view, showing the project's conclusions and self-graded confidence levels">
+            </button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">More work</div>
+          <h2 class="section-title">Keep exploring.</h2>
+        </div>
+        <a class="section-link" href="portfolio.html">All projects <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid" data-related-source="data/projects.json" data-related-exclude="Nova Credit Risk Lab" data-related-limit="3"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!--
+  PROJECT PAGE TEMPLATE
+  ======================
+  How to use: duplicate this file, rename it to match the `href` you
+  already set for this project in data/projects.json (e.g. pola.html),
+  then search for ALL-CAPS placeholder text and swap it for the real
+  thing. Anywhere you see an HTML comment like this one, it's telling
+  you what to edit or delete.
+
+  Everything here reads from css/style.css and js/main.js + js/detail.js
+  — both already in your repo root, nothing new to wire up.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PROJECT NAME — Amir Sohil</title>
+<meta name="description" content="ONE-SENTENCE DESCRIPTION FOR SEARCH ENGINES AND LINK PREVIEWS.">
+<meta property="og:title" content="PROJECT NAME — Amir Sohil">
+<meta property="og:description" content="ONE-SENTENCE DESCRIPTION.">
+<meta property="og:image" content="images/YOUR-COVER-IMAGE.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="portfolio.html">Portfolio</a> <span>/</span> <span>PROJECT NAME</span>
+    </div>
+
+    <!-- ============ HEADER ============ -->
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Case Study</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+        <span class="sep">·</span>
+        <span class="plain">2026</span>
+      </div>
+      <h1 class="article-title">PROJECT NAME</h1>
+      <p class="article-dek">ONE-LINE SUBTITLE — what it is and who it's for, in plain language.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <!-- Mirror the tools/skills you gave this project in data/projects.json -->
+          <span class="tag tool">TOOL ONE</span>
+          <span class="tag tool">TOOL TWO</span>
+          <span class="tag">SKILL ONE</span>
+          <span class="tag">SKILL TWO</span>
+        </div>
+        <div class="article-actions">
+          <a class="btn-cv" href="#" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>
+            View Live
+          </a>
+          <a class="icon-btn" href="#" target="_blank" rel="noopener" aria-label="View source on GitHub">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+          </a>
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============ COVER IMAGE ============ -->
+    <div class="cover-media">
+      <img src="images/YOUR-COVER-IMAGE.png" alt="Screenshot of PROJECT NAME">
+    </div>
+    <div class="cover-caption">Fig. 1 — CAPTION DESCRIBING WHAT THIS SCREENSHOT SHOWS</div>
+
+    <!-- ============ BODY: TOC + PROSE ============ -->
+    <div class="article-layout">
+
+      <!-- In-page nav — keep the href targets matched to the h2 ids below -->
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#approach">Approach</a></li>
+          <li><a href="#process">How it was built</a></li>
+          <li><a href="#demo">Try it</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#lessons">Challenges &amp; lessons</a></li>
+          <li><a href="#results">Results</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section id="overview" class="reveal">
+          <h2>Overview</h2>
+          <p>WHAT THIS PROJECT IS, in two or three sentences. Say what problem it solves and for whom — this is the paragraph people actually read, so make the value obvious before anything else.</p>
+          <p>A second paragraph on <strong>why it exists</strong> — the gap you spotted, the constraint you were working under, or the question you wanted answered.</p>
+
+          <!-- Animated stat strip — set data-target to your real numbers -->
+          <div class="stat-strip">
+            <div class="stat">
+              <div class="stat-num" data-target="18405">0</div>
+              <div class="stat-label">RECORDS PROCESSED</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="94" data-suffix="%">0%</div>
+              <div class="stat-label">MODEL ACCURACY</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="3" data-decimals="1" data-suffix="s">0s</div>
+              <div class="stat-label">AVG RESPONSE TIME</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="approach" class="reveal">
+          <h2>Approach</h2>
+          <p>How you tackled it — architecture, key decisions, why you chose the stack you chose. This is a good place for a tabbed breakdown if the project has distinct layers.</p>
+
+          <!-- Tabs — add/remove tab-btn + tab-panel pairs in matching order -->
+          <div class="tabs">
+            <div class="tab-list">
+              <button class="tab-btn is-active">Frontend</button>
+              <button class="tab-btn">Backend</button>
+              <button class="tab-btn">Data</button>
+            </div>
+            <div class="tab-panel is-active">
+              <p>DESCRIBE THE FRONTEND LAYER — framework, key libraries, any notable UI decisions.</p>
+            </div>
+            <div class="tab-panel">
+              <p>DESCRIBE THE BACKEND LAYER — API design, hosting, how it talks to the frontend.</p>
+            </div>
+            <div class="tab-panel">
+              <p>DESCRIBE THE DATA LAYER — source, cleaning, modeling, storage.</p>
+            </div>
+          </div>
+
+          <figure>
+            <img src="images/YOUR-ARCHITECTURE-DIAGRAM.png" alt="Architecture diagram">
+            <figcaption>Fig. 2 — CAPTION FOR YOUR ARCHITECTURE DIAGRAM</figcaption>
+          </figure>
+        </section>
+
+        <section id="process" class="reveal">
+          <h2>How it was built</h2>
+          <p>A short intro to the build sequence, if useful.</p>
+
+          <!-- Numbered on purpose — this is an actual sequence, so the ordinals earn their place -->
+          <div class="process-list">
+            <div class="process-item">
+              <div class="process-num"></div>
+              <div class="process-body">
+                <h3>Research</h3>
+                <p>WHAT YOU EXPLORED BEFORE BUILDING — prior art, constraints, early sketches.</p>
+              </div>
+            </div>
+            <div class="process-item">
+              <div class="process-num"></div>
+              <div class="process-body">
+                <h3>Prototype</h3>
+                <p>WHAT THE FIRST ROUGH VERSION LOOKED LIKE AND WHAT IT PROVED OR DISPROVED.</p>
+              </div>
+            </div>
+            <div class="process-item">
+              <div class="process-num"></div>
+              <div class="process-body">
+                <h3>Build</h3>
+                <p>WHAT CHANGED GOING FROM PROTOTYPE TO REAL BUILD.</p>
+              </div>
+            </div>
+            <div class="process-item">
+              <div class="process-num"></div>
+              <div class="process-body">
+                <h3>Ship</h3>
+                <p>HOW YOU DEPLOYED IT AND WHAT, IF ANYTHING, YOU'D DO DIFFERENTLY NEXT TIME.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="demo" class="reveal">
+          <h2>Try it</h2>
+          <p>A tiny embedded demo goes a long way on a project page. This one is a bare scaffold — wire the slider to whatever your project actually does.</p>
+
+          <!-- Generic interactive scaffold — rewire the math in js/detail.js's
+               initDemoSlider() `compute()` function to match your project -->
+          <div class="demo-panel" data-demo data-unit="">
+            <div class="eyebrow">Interactive demo</div>
+            <div class="demo-row">
+              <input type="range" min="0" max="100" value="40">
+              <span class="demo-readout">40</span>
+            </div>
+            <div class="demo-bar-track"><div class="demo-bar-fill"></div></div>
+            <p class="demo-note">REPLACE THIS: describe what dragging the slider actually changes in your real demo.</p>
+          </div>
+        </section>
+
+        <section id="gallery" class="reveal">
+          <h2>Gallery</h2>
+          <p>A few more screens. Click to expand — arrow keys move between them, Escape closes.</p>
+
+          <!-- Add/remove buttons freely; the lightbox picks up whatever's here -->
+          <div class="gallery-grid">
+            <button type="button"><img src="images/YOUR-SHOT-1.png" alt="Screen one"></button>
+            <button type="button"><img src="images/YOUR-SHOT-2.png" alt="Screen two"></button>
+            <button type="button"><img src="images/YOUR-SHOT-3.png" alt="Screen three"></button>
+          </div>
+        </section>
+
+        <section id="lessons" class="reveal">
+          <h2>Challenges &amp; lessons</h2>
+
+          <!-- Accordion — same "expandable case card" pattern as your essays -->
+          <div class="accordion">
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">01</span>CHALLENGE ONE, IN A FEW WORDS</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>WHAT WENT WRONG, WHY, AND HOW YOU FIXED IT.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">02</span>CHALLENGE TWO, IN A FEW WORDS</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>WHAT WENT WRONG, WHY, AND HOW YOU FIXED IT.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">03</span>WHAT YOU'D DO DIFFERENTLY</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>WITH HINDSIGHT, WHAT WOULD CHANGE ABOUT THE APPROACH.</p>
+              </div></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="results" class="reveal">
+          <h2>Results</h2>
+          <blockquote>A PULL-QUOTE STATING THE OUTCOME IN ONE STRONG SENTENCE.</blockquote>
+          <p>Close with the actual outcome — what shipped, what it enabled, what you'd point to as proof this worked.<sup><a class="fn-ref" href="#fn-1">1</a></sup></p>
+        </section>
+
+        <!-- Delete this block entirely if you don't need footnotes -->
+        <div class="footnotes">
+          <ol>
+            <li id="fn-1">A SAMPLE FOOTNOTE — SOURCE, CAVEAT, OR ASIDE THAT DIDN'T BELONG IN THE MAIN TEXT.</li>
+          </ol>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============ RELATED WORK ============ -->
+    <!-- Pulls straight from data/projects.json; set data-related-exclude
+         to this project's exact "title" so it doesn't recommend itself -->
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">More work</div>
+          <h2 class="section-title">Keep exploring.</h2>
+        </div>
+        <a class="section-link" href="portfolio.html">All projects <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid" data-related-source="data/projects.json" data-related-exclude="PROJECT NAME" data-related-limit="3"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>When Your Dashboards Deceive — Amir Sohil</title>
+<meta name="description" content="Goodhart's Law warns that tied targets corrupt measures. A deep-dive into how KPI dashboards mislead, four real case studies, and a practical playbook for metrics that actually work.">
+<meta property="og:title" content="When Your Dashboards Deceive — Amir Sohil">
+<meta property="og:description" content="Goodhart's Law states that any measure, once it becomes a target, stops being a reliable one. Here's how that plays out on an actual KPI dashboard.">
+<meta property="og:image" content="images/project-images/goodhartslawfull.jpg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  /* Page-specific: the Goodhart simulator and the metric worksheet table.
+     Everything else (nav, footer, .prose, .accordion, .toc, .stat-strip)
+     comes from css/style.css. */
+
+  .sim-box{
+    border: 1px solid var(--line-bright);
+    background: var(--bg-raised);
+    padding: 28px;
+    margin: 32px 0;
+  }
+  .sim-phase{ margin-bottom: 20px; }
+  .sim-phase-label{
+    font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); display: block; margin-bottom: 6px;
+  }
+  .sim-phase-desc{ color: var(--text-dim); font-size: 14.5px; }
+
+  .sim-grid{ display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px; }
+  .sim-metric{ background: var(--bg); border: 1px solid var(--line); padding: 16px 18px; }
+  .sim-metric-name{
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--text-dimmer); margin-bottom: 10px;
+  }
+  .sim-metric-value{
+    font-family: var(--font-display); font-size: 32px; font-weight: 800; line-height: 1;
+    color: var(--accent); transition: color .5s;
+  }
+  .sim-metric-value.bad{ color: #ff6b4a; }
+  .sim-metric-sub{ font-family: var(--font-mono); font-size: 11px; color: var(--text-dimmer); margin-top: 6px; }
+  .sim-bar-track{ margin-top: 10px; height: 3px; background: var(--line); overflow: hidden; }
+  .sim-bar-fill{ height: 100%; background: var(--accent); transition: width 1.4s cubic-bezier(.4,0,.2,1), background-color .5s; }
+
+  .sim-message{
+    padding: 14px 18px; border-left: 2px solid var(--accent); background: var(--accent-wash);
+    font-size: 14px; color: var(--text-dim); line-height: 1.65; margin-bottom: 20px; min-height: 52px;
+  }
+  .sim-message strong{ color: var(--accent); }
+
+  .sim-actions{ display: flex; gap: 12px; flex-wrap: wrap; }
+
+  /* Accordion trigger metadata — stacked under the title rather than run
+     inline, so it never has to compete with the title for horizontal
+     space at any viewport width. */
+  .trigger-title-block{ display: flex; flex-direction: column; gap: 4px; text-align: left; min-width: 0; }
+  .trigger-meta{
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--text-dimmer); font-weight: 400; padding-left: 26px;
+  }
+
+  /* --- Mobile overflow fix ---
+     .prose is a CSS Grid item (from .article-layout in the shared
+     stylesheet). Grid items default to min-width:auto, meaning they won't
+     shrink below their widest descendant's intrinsic content size. This
+     page has two flex-based components whose children share that same
+     min-width:auto default (.trigger-title-block above, .sim-metric
+     below) — if either resists shrinking, that resistance bubbles up
+     through .prose and widens the ENTIRE column past the viewport, which
+     is why even earlier, unrelated text (like the opening blockquote)
+     was rendering clipped rather than wrapped. Setting min-width:0 at
+     each level breaks that chain. This override belongs in the shared
+     css/style.css, not just here — see the note below the code block. */
+  .prose{ min-width: 0; }
+  .toc{ min-width: 0; }
+  .sim-metric{ min-width: 0; }
+
+  /* Metric worksheet table */
+  .worksheet-wrap{
+    position: relative;
+    margin: 28px 0;
+    border: 1px solid var(--line);
+  }
+  .worksheet-scroll{ overflow-x: auto; }
+  .worksheet{ width: 100%; border-collapse: collapse; min-width: 760px; }
+  .worksheet thead th{
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--text-dimmer); text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line-bright);
+    background: var(--bg-raised);
+  }
+  .worksheet tbody td{
+    font-size: 13.5px; color: var(--text-dim); padding: 12px 14px; border-bottom: 1px solid var(--line);
+    vertical-align: top; line-height: 1.5;
+  }
+  .worksheet tbody tr:first-child td{ color: var(--text); }
+  .worksheet-editable td{ background: var(--accent-wash); }
+  .worksheet input[type="text"], .worksheet select{
+    width: 100%; min-width: 110px; background: var(--bg); border: 1px solid var(--line-bright); color: var(--text);
+    font-family: var(--font-display); font-size: 13px; padding: 8px 10px; outline: none;
+  }
+  .worksheet input[type="text"]:focus, .worksheet select:focus{ border-color: var(--accent); }
+  .worksheet select option{ background: var(--bg-raised); color: var(--text); }
+
+  /* Scroll affordance for the worksheet — only shown when the table is
+     actually wider than its container, which on desktop it usually isn't. */
+  .worksheet-hint{
+    display: none;
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--text-dimmer); text-align: center; padding: 8px; border-top: 1px solid var(--line);
+    background: var(--bg-raised);
+  }
+  .worksheet-wrap::after{
+    content: '';
+    position: absolute; top: 0; right: 0; bottom: 0; width: 28px;
+    background: linear-gradient(to right, transparent, var(--bg-raised-2));
+    pointer-events: none; opacity: 0; transition: opacity .2s;
+  }
+  .worksheet-wrap.is-scrollable::after{ opacity: 1; }
+
+  @media (max-width: 620px){
+    .sim-box{ padding: 20px; }
+    .sim-grid{ grid-template-columns: 1fr; }
+    .sim-actions{ flex-direction: column; align-items: stretch; }
+    .sim-actions .btn{ justify-content: center; }
+    .worksheet-hint{ display: block; }
+  }
+</style>
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="essays.html">Essays</a> <span>/</span> <span>When Your Dashboards Deceive</span>
+    </div>
+
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Essay</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+      </div>
+      <h1 class="article-title">When Your Dashboards Deceive</h1>
+      <p class="article-dek">Goodhart's Law states that any measure, once it becomes a target, stops being a reliable one.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <span class="tag">Data Storytelling</span>
+          <span class="tag">Simulation &amp; Modeling</span>
+          <span class="tag">Technical Writing</span>
+        </div>
+        <div class="article-actions">
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this essay">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/project-images/goodhartslawfull.jpg" alt="When Your Dashboards Deceive — an essay on Goodhart's Law">
+    </div>
+    <div class="cover-caption">Fig. 1 — When a measure becomes a target, it ceases to be a good measure.</div>
+
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#the-law">The Law</a></li>
+          <li><a href="#cousins">Cousins of the Law</a></li>
+          <li><a href="#case-studies">Case Studies</a></li>
+          <li><a href="#connection">Your Dashboards</a></li>
+          <li><a href="#simulator">The Simulator</a></li>
+          <li><a href="#playbook">The Playbook</a></li>
+          <li><a href="#template">Ship Checklist</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section id="the-law" class="reveal">
+          <blockquote>"When a measure becomes a target, it ceases to be a good measure."</blockquote>
+
+          <h2>The Law</h2>
+          <p>In 1975, British economist Charles Goodhart made an observation that has haunted boardrooms ever since. Working on monetary policy at the <em>Bank of England</em>, he noticed that whenever the government targeted a specific economic indicator, the indicator stopped working as a reliable signal. People changed their behaviour to hit the number, and the number stopped meaning what it used to.</p>
+
+          <blockquote>"Any observed statistical regularity will tend to collapse once pressure is placed upon it for control purposes."</blockquote>
+          <p style="margin-top:-14px; font-family: var(--font-mono); font-size: 12px; color: var(--text-dimmer);">— Charles Goodhart, 1975</p>
+
+          <p>Although this may look like a piece of economic trivia, it is actually a fundamental law of human incentive systems that plays out every day inside companies that live and die by their KPI dashboards.</p>
+          <p>It sounds almost paradoxical. You want to improve customer satisfaction, so you start tracking NPS scores. You incentivise teams around NPS. Scores go up. But satisfaction? That might be going anywhere. Why? Because your front-line staff learned to ask customers for high scores, rather than earn them. In this case, the metric has become a goal in itself, rather than a measure of progress towards a larger objective.</p>
+          <p>This is <em>Goodhart's Law</em> in its purest form. And it plays out with stunning regularity across almost every industry, department, and well-intentioned KPI dashboard ever built.</p>
+        </section>
+
+        <section id="cousins" class="reveal">
+          <h2>Cousins of the Law</h2>
+          <p><em>Goodhart's Law</em> has several structural cousins.</p>
+          <p>Donald Campbell, a psychologist, reached a similar conclusion to <em>Goodhart's Law</em>. His adage is known today as <em>Campbell's Law</em>: "The more any quantitative social indicator is used for social decision-making, the more subject it will be to corruption pressures and the more apt it will be to distort and corrupt the social processes it is intended to monitor."</p>
+          <p>Robert Lucas Jr., a Nobel-winning economist, framed the same problem in macroeconomics. The <em>Lucas Critique</em> states that relationships observed in historical data will not necessarily hold once policies change.</p>
+          <p>Then there's the <em>Cobra Effect</em>: British colonial India, where a bounty on dead cobras led enterprising locals to breed cobras to collect the reward. When the government caught on and scrapped the bounty, the breeders released their now-worthless cobras, making the problem worse than before.</p>
+          <p>All these concepts share the same underlying truth: metrics reshape behavior. Or, in other words, you can't treat observed relationships as fixed if people are aware of them and have incentives to respond.</p>
+        </section>
+
+        <section id="case-studies" class="reveal">
+          <h2>Times When the Metrics Ate the Mission</h2>
+          <p>History is not short of examples for the law. Each has the following in common: a sensible-sounding metric, a powerful incentive, and a system that learned to game both.</p>
+
+          <div class="accordion">
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">01</span>The Wells Fargo Cross-Selling Scandal</span>
+                  <span class="trigger-meta">Banking · 2016</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>In the early 2010s, Wells Fargo's retail banking division set aggressive sales/KPI targets for bank staff. Tied to bonuses and job security, these metrics, focused on the number of products per customer, became everything. Employees opened approximately 3.5 million fake accounts using forged signatures and unauthorised transfers. The SEC's investigation described systematic gaming practices across thousands of branches.</p>
+                <p>The bank hit its cross-sell KPI. It looked like growth. But it destroyed trust, triggered billions in fines, and cost the CEO his job. The metric was hit. The actual mission, which is genuine customer loyalty, was obliterated.</p>
+              </div></div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">02</span>The 2008 Subprime Mortgage Crisis</span>
+                  <span class="trigger-meta">Finance · 2008</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>In the run-up to the financial crisis, many mortgage originators were compensated based on loan volume, often through commissions tied to originations. Research shows that such incentives increased loan approvals, loan sizes, and default rates, as officers exercised greater discretion and approved marginal borrowers.</p>
+                <p>While these systems boosted volume, they often failed to align incentives with long-term loan performance, contributing to a deterioration in lending standards.</p>
+              </div></div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">03</span>G4S and the Fake 999 Calls</span>
+                  <span class="trigger-meta">Public Sector · UK</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>The incident involving G4S and Lincolnshire Police is a clear example of how performance metrics can distort behaviour when they become targets. Call handlers were measured against a specific KPI: answering a high percentage of emergency calls within 10 seconds. Because financial penalties were tied to missing this threshold, the focus shifted from the real goal, which was responding effectively to genuine emergencies, to simply achieving the numerical target. To meet the metric, staff made hundreds of fake 999 calls during quiet periods, which were answered instantly and artificially boosted performance figures.</p>
+                <p>On paper, targets were met; in reality, operational effectiveness was not.</p>
+              </div></div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span class="trigger-title-block">
+                  <span><span class="idx">04</span>College Rankings Gaming</span>
+                  <span class="trigger-meta">Education · Rankings</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>US News &amp; World Report college rankings use selectivity, typically measured by acceptance rates, as a quality signal. The logic here is that competitive schools attract stronger students. Once schools recognised that lower acceptance rates can improve their perceived standing, they had an incentive to manipulate the metric.</p>
+                <p>Some colleges increased applications through widespread outreach aimed at students unlikely to be admitted, purely to generate more rejections. As a result, the metric becomes less informative about what it was intended to measure: academic quality.</p>
+              </div></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="connection" class="reveal">
+          <h2>From Economic Law to Your Daily Dashboards</h2>
+          <p>You might be thinking: "This is all interesting, but I'm not running a bank or a police department. I'm just trying to build a dashboard for my team." And that's exactly the point. Dashboards are essentially compression machines. They take the messy, sprawling reality of a business and squeeze it into a handful of numbers on a screen. While this compression is genuinely useful, it's also where the trouble starts.</p>
+          <p>When you put a metric on a dashboard, you are effectively saying: "This is what we care about. This is how we will measure success." And that creates an incentive for people to hit those numbers, even if it means gaming the system. In other words, optimising for the visible metrics. Not necessarily dishonest optimisation, just the entirely rational human instinct to look good on the thing you're being judged by.</p>
+          <p>At this point, the dashboard stops merely reflecting reality and starts shaping it. Teams reorganise their work around what gets tracked. Managers move the number rather than the underlying thing it is used to measure. The dashboard becomes a target, and the metrics become less and less meaningful as a result.</p>
+          <p>Dashboards are especially vulnerable to this because numbers feel objective. A sales target showing 98% attainment looks like success. What it doesn't show is whether those deals were discounted into unprofitability, or closed with customers who will churn in 90 days. The green indicator triggers a feeling of safety before any critical thinking kicks in.</p>
+        </section>
+
+        <section id="simulator" class="reveal">
+          <h2>The Goodhart Simulator</h2>
+          <p>Watch the law in action. You're a call centre manager. Press "Apply Volume Bonus" to attach an incentive to the call-volume metric, and watch what happens to everything else.</p>
+
+          <div class="sim-box">
+            <div class="sim-phase">
+              <span class="sim-phase-label" id="sim-phase-label">Phase 1 — Baseline (No Incentive)</span>
+              <span class="sim-phase-desc" id="sim-phase-desc">Agents balance speed and quality naturally. No bonus tied to volume.</span>
+            </div>
+
+            <div class="sim-grid">
+              <div class="sim-metric">
+                <div class="sim-metric-name">Calls Handled / Day</div>
+                <div class="sim-metric-value" id="val-calls">48</div>
+                <div class="sim-metric-sub">per agent avg.</div>
+                <div class="sim-bar-track"><div class="sim-bar-fill" id="bar-calls" style="width:48%;"></div></div>
+              </div>
+              <div class="sim-metric">
+                <div class="sim-metric-name">First-Contact Resolution</div>
+                <div class="sim-metric-value" id="val-resolution">74%</div>
+                <div class="sim-metric-sub">issues resolved on first call</div>
+                <div class="sim-bar-track"><div class="sim-bar-fill" id="bar-resolution" style="width:74%;"></div></div>
+              </div>
+              <div class="sim-metric">
+                <div class="sim-metric-name">Customer Satisfaction</div>
+                <div class="sim-metric-value" id="val-csat">82%</div>
+                <div class="sim-metric-sub">post-call survey score</div>
+                <div class="sim-bar-track"><div class="sim-bar-fill" id="bar-csat" style="width:82%;"></div></div>
+              </div>
+              <div class="sim-metric">
+                <div class="sim-metric-name">Repeat Call Rate</div>
+                <div class="sim-metric-value" id="val-repeat">18%</div>
+                <div class="sim-metric-sub">customers who call back</div>
+                <div class="sim-bar-track"><div class="sim-bar-fill" id="bar-repeat" style="width:18%;"></div></div>
+              </div>
+            </div>
+
+            <div class="sim-message" id="sim-message">
+              <strong>Status:</strong> Balanced baseline state. Agents are productive, customers reasonably satisfied, repeat contacts manageable.
+            </div>
+
+            <div class="sim-actions">
+              <button class="btn btn-primary" id="sim-btn" onclick="applyIncentive()">Apply Volume Bonus</button>
+              <button class="btn btn-ghost" onclick="resetSim()">Reset</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="playbook" class="reveal">
+          <h2>Rules to Keep Metrics Honest</h2>
+          <p>So, what do we do? Abandon metrics altogether? Just hope people won't game the system? Of course not. What we can do is design measurements that are harder to game and that capture actual outcomes rather than proxies. Six principles make the difference. Obviously, these principles won't make what you have perfect. But they would at least prevent what you have from actively misleading you.</p>
+
+          <h3>1. Name the Underlying Construct First</h3>
+          <p>As your very first task, even before picking a metric, you should decide what you actually want to achieve. Not "NPS score". Not "completion rate". The actual underlying objective. Think customer loyalty, deep product knowledge, genuine satisfaction. That's it. If you can't articulate what you really want, any metric you pick will drift. And you won't even notice until it's too late. The real target should always be explicit and separate from the proxy.</p>
+
+          <h3>2. Never Govern by a Single Number</h3>
+          <p>One metric is one attack surface. For every target metric, pair it with at least one counter-metric (something that should hold steady or improve alongside it). Call volume rises? First-contact resolution had better hold. NPS goes up? Check the detractor rate. A single number is easy to game. Two that pull in opposite directions are much harder.</p>
+
+          <h3>3. Separate Learning Metrics from Reward Metrics</h3>
+          <p>Tie a metric to a bonus and people will optimise it. That's human nature. It's just how incentives work. The problem is when the same metric does both rewarding and learning, at the same time. It can't. Once it's attached to a performance review, people stop using it to understand reality and start using it to manage perception. Keep some KPIs safe. No consequences.</p>
+
+          <h3>4. Goodhart-Test Every Metric Before Launch</h3>
+          <p>Before any new KPI goes live with an incentive attached, get your team in a room and ask one question: how would a rational person game this? I don't mean a dishonest person. A rational one. Because that's who you're dealing with. If your team can break the metric in ten minutes, best believe the people being measured will break it too. Find the flaw before they do.</p>
+
+          <h3>5. Combine Quantitative with Qualitative</h3>
+          <p>Numbers tell you what changed. Yes, important. But qualitative methods (say, interviews, audits, observations, etc.) tell you why and whether it matters. Beware McNamara's Fallacy, treating only the measurable as meaningful. Some of the most important things happening in your organisation right now cannot be counted. Build qualitative checkpoints into your process. And if the numbers look fine but the stories from the floor are alarming, trust the stories. Every time.</p>
+
+          <h3>6. Set Expiry Dates on Every KPI</h3>
+          <p>Yes. Remember that measure you have been tracking since 2018. Yeah, that one that everyone knows by heart. That one that shows up in every board report like clockwork. It is time. User behaviour shifts, competitive landscapes change, technology alters what's possible. A metric that was a perfect proxy five years ago might be actively lying to you now. Schedule mandatory reviews. Make each KPI prove it still correlates with what you actually care about. Retire the ones that can't. Set an expiry date, or the measure will.</p>
+        </section>
+
+        <section id="template" class="reveal">
+          <h2>Before You Ship Your Metric…</h2>
+          <p>Run every new KPI through this template before it goes live. I have thrown in a few example metrics. The last row is yours to edit.</p>
+
+          <div class="worksheet-wrap" id="worksheet-wrap">
+            <div class="worksheet-scroll" id="worksheet-scroll">
+              <table class="worksheet">
+                <thead>
+                  <tr>
+                    <th>Metric / KPI</th>
+                    <th>Underlying Goal</th>
+                    <th>Gaming Risk</th>
+                    <th>Counter-Metric</th>
+                    <th>Incentive?</th>
+                    <th>Review Cadence</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>NPS Score</td>
+                    <td>Customer satisfaction</td>
+                    <td>Staff coaching customers to rate high</td>
+                    <td>% Detractors; follow-up survey; unstructured feedback</td>
+                    <td>No (informational only)</td>
+                    <td>Quarterly</td>
+                  </tr>
+                  <tr>
+                    <td>Average Handle Time</td>
+                    <td>Call centre efficiency</td>
+                    <td>Rushing or dropping customers to cut call short</td>
+                    <td>First-Contact Resolution; CSAT; Repeat Call Rate</td>
+                    <td>No (paired target)</td>
+                    <td>Monthly</td>
+                  </tr>
+                  <tr>
+                    <td>Training Completion %</td>
+                    <td>Employee knowledge &amp; compliance</td>
+                    <td>Speed-clicking through modules to tick box</td>
+                    <td>Post-training knowledge quiz; audit score</td>
+                    <td>No (dashboard only)</td>
+                    <td>Per cohort</td>
+                  </tr>
+                  <tr class="worksheet-editable">
+                    <td><input type="text" placeholder="Your metric..."></td>
+                    <td><input type="text" placeholder="What outcome?"></td>
+                    <td><input type="text" placeholder="How could it be gamed?"></td>
+                    <td><input type="text" placeholder="What balances it?"></td>
+                    <td>
+                      <select>
+                        <option value="">Select...</option>
+                        <option>Yes — bonus</option>
+                        <option>Yes — review</option>
+                        <option>No — informational</option>
+                        <option>No — learning</option>
+                      </select>
+                    </td>
+                    <td>
+                      <select>
+                        <option value="">Select...</option>
+                        <option>Weekly</option>
+                        <option>Monthly</option>
+                        <option>Quarterly</option>
+                        <option>Bi-annually</option>
+                        <option>Annually</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="worksheet-hint">Swipe to see every column →</div>
+          </div>
+        </section>
+
+        <section class="reveal" style="border-top: 1px solid var(--line); padding-top: 40px; margin-top: 16px;">
+          <p style="font-size: 19px; font-style: italic; color: var(--text);">Your dashboards are telling a story. The question is whether it's true.</p>
+          <p>I work with data-driven teams to design metrics that reflect reality, and build the visualisations to communicate them clearly. If anything in this essay felt familiar, there's a good chance your KPIs have a blind spot or two.</p>
+          <p>Start with a free audit. I'll look at your current metrics, pressure-test them against Goodhart's Law, and identify where the gaps are.</p>
+          <a class="btn btn-primary" href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a Free Audit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+        </section>
+
+        <div class="footnotes">
+          <div class="toc-label" style="margin-bottom:14px;">References</div>
+          <ol>
+            <li>Goodhart, C.A.E. (1975). <em>Problems of Monetary Management: The UK Experience.</em> In Courakis, A.S. (ed.), Inflation, Depression, and Economic Policy in the West. Barnes and Noble Books.</li>
+            <li>Campbell, D.T. (1979). Assessing the Impact of Planned Social Change. <em>Evaluation and Program Planning</em>, 2(1), 67–90. <a href="https://scispace.com/pdf/assessing-the-impact-of-planned-social-change-pu1rmdj88o.pdf" target="_blank" rel="noopener">PDF</a></li>
+            <li>Nisslmüller, C.R.A. (2026). Goodhart's Law and the Death of Honest Metrics. <em>Medium.</em> <a href="https://medium.com/@claus.nisslmueller/goodharts-law-and-the-death-of-honest-metrics-e08cc756f93a" target="_blank" rel="noopener">Read</a></li>
+            <li>Consumer Financial Protection Bureau (2016). CFPB Fines Wells Fargo $100 Million for Widespread Illegal Practice of Secretly Opening Unauthorized Accounts. <a href="https://www.consumerfinance.gov/about-us/newsroom/consumer-financial-protection-bureau-fines-wells-fargo-100-million-widespread-illegal-practice-secretly-opening-unauthorized-accounts/" target="_blank" rel="noopener">Read</a></li>
+            <li>Turnbull, S. (2008). The Subprime Credit Crisis of 2007. <em>University of Houston.</em> <a href="https://www.bauer.uh.edu/sturnbull/documents/subprimecreditcrisis.pdf" target="_blank" rel="noopener">PDF</a></li>
+            <li>The Guardian (2016). G4S Police Control Room Staff Suspended Over Claims of Bogus 999 Calls. <a href="https://www.theguardian.com/uk-news/2016/may/23/g4s-police-control-room-staff-suspended-claims-bogus-999-calls-lincolnshire-force" target="_blank" rel="noopener">Read</a></li>
+            <li>Byrne, J. (2014). How Northeastern University Gamed the College Rankings. <em>Boston Magazine.</em> <a href="https://www.bostonmagazine.com/news/2014/08/26/how-northeastern-gamed-the-college-rankings/" target="_blank" rel="noopener">Read</a></li>
+          </ol>
+        </div>
+
+      </div>
+    </div>
+
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Read next</div>
+          <h2 class="section-title">More essays.</h2>
+        </div>
+        <a class="section-link" href="essays.html">All essays <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid two-col" data-related-source="data/essays.json" data-related-exclude="When Your Dashboards Deceive" data-related-limit="2"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+
+<!-- Goodhart Simulator — page-specific, same state logic and numbers as the
+     original: baseline → gaming, triggered by a button rather than a slider,
+     so it doesn't use the generic .demo-panel scaffold in detail.js. -->
+<script>
+  let simState = 'baseline';
+
+  function animateStat(valId, from, to, suffix, barId, barPct, barColor){
+    const el = document.getElementById(valId);
+    const bar = document.getElementById(barId);
+    const duration = 1400;
+    const start = performance.now();
+    const tick = (now) => {
+      const t = Math.min((now - start) / duration, 1);
+      const eased = t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+      el.textContent = Math.round(from + (to - from) * eased) + suffix;
+      if (t < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    setTimeout(() => { bar.style.width = barPct + '%'; bar.style.backgroundColor = barColor; }, 100);
+  }
+
+  function applyIncentive(){
+    if (simState === 'gaming') return;
+    simState = 'gaming';
+    document.getElementById('sim-phase-label').textContent = 'Phase 2 — Bonus Applied (After 6 Weeks)';
+    document.getElementById('sim-phase-desc').textContent = 'A $50/week volume bonus for top-quartile call count has been introduced.';
+    const btn = document.getElementById('sim-btn');
+    btn.textContent = 'Bonus Active';
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+
+    animateStat('val-calls', 48, 94, '', 'bar-calls', 94, 'var(--accent)');
+    animateStat('val-resolution', 74, 41, '%', 'bar-resolution', 41, '#ff6b4a');
+    animateStat('val-csat', 82, 54, '%', 'bar-csat', 54, '#ff6b4a');
+    animateStat('val-repeat', 18, 38, '%', 'bar-repeat', 38, '#ff6b4a');
+
+    document.getElementById('val-calls').classList.add('good');
+    setTimeout(() => {
+      document.getElementById('val-resolution').classList.add('bad');
+      document.getElementById('val-csat').classList.add('bad');
+      document.getElementById('val-repeat').classList.add('bad');
+    }, 800);
+
+    setTimeout(() => {
+      document.getElementById('sim-message').innerHTML =
+        '<strong>Goodhart in Action:</strong> Call volume surged 96%. Everyone celebrated. But First-Contact Resolution collapsed from 74% to 41%. CSAT fell to 54%. Repeat calls nearly doubled. The metric looked spectacular. The actual goal, which is helping customers, deteriorated rapidly.';
+    }, 1600);
+  }
+
+  function resetSim(){
+    simState = 'baseline';
+    document.getElementById('sim-phase-label').textContent = 'Phase 1 — Baseline (No Incentive)';
+    document.getElementById('sim-phase-desc').textContent = 'Agents balance speed and quality naturally. No bonus tied to volume.';
+    const btn = document.getElementById('sim-btn');
+    btn.textContent = 'Apply Volume Bonus';
+    btn.disabled = false;
+    btn.style.opacity = '';
+
+    const resets = [
+      ['val-calls', '48', 'bar-calls', '48%'],
+      ['val-resolution', '74%', 'bar-resolution', '74%'],
+      ['val-csat', '82%', 'bar-csat', '82%'],
+      ['val-repeat', '18%', 'bar-repeat', '18%']
+    ];
+    resets.forEach(([vid, vval, bid, bw]) => {
+      const el = document.getElementById(vid);
+      el.textContent = vval;
+      el.className = 'sim-metric-value';
+      const bar = document.getElementById(bid);
+      bar.style.width = bw;
+      bar.style.backgroundColor = 'var(--accent)';
+    });
+    document.getElementById('sim-message').innerHTML =
+      '<strong>Status:</strong> Balanced baseline state. Agents are productive, customers reasonably satisfied, repeat contacts manageable.';
+  }
+
+  // Only show the scroll-fade/hint on the worksheet when it's actually
+  // wider than its container — on most desktop widths it isn't.
+  (function checkWorksheetScroll(){
+    const wrap = document.getElementById('worksheet-wrap');
+    const scrollEl = document.getElementById('worksheet-scroll');
+    if (!wrap || !scrollEl) return;
+    const check = () => wrap.classList.toggle('is-scrollable', scrollEl.scrollWidth > scrollEl.clientWidth + 2);
+    check();
+    window.addEventListener('resize', check);
+    scrollEl.addEventListener('scroll', () => {
+      const atEnd = scrollEl.scrollLeft + scrollEl.clientWidth >= scrollEl.scrollWidth - 2;
+      wrap.classList.toggle('is-scrollable', !atEnd && scrollEl.scrollWidth > scrollEl.clientWidth + 2);
+    });
+  })();
+</script>
+</body>
+</html>

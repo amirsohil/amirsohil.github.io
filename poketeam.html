@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Wonderful World of Pokémon</title>
+<meta name="description" content="A statistical analysis of 801 Pokémon testing what actually drives competitive strength, used to optimise a 6-Pokémon team.">
+<meta property="og:title" content="The Wonderful World of Pokémon — Amir Sohil">
+<meta property="og:description" content="What actually makes a Pokémon strong, and a 6-Pokémon team built on the answer.">
+<meta property="og:image" content="images/project-images/poketeamfull.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="progress-bar"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="breadcrumb">
+      <a href="portfolio.html">Portfolio</a> <span>/</span> <span>The Wonderful World of Pokémon</span>
+    </div>
+
+    <header class="article-head">
+      <div class="article-meta-top">
+        <div class="eyebrow">Dashboard</div>
+        <span class="sep">·</span>
+        <span class="plain" data-reading-time>— min read</span>
+      </div>
+      <h1 class="article-title">The Wonderful World of Pokémon</h1>
+      <p class="article-dek">What actually makes a Pokémon strong, and a 6-Pokémon team built on the answer.</p>
+
+      <div class="article-meta-row">
+        <div class="article-tags">
+          <span class="tag tool">R</span>
+          <span class="tag tool">Power BI</span>
+          <span class="tag">Data Visualisation</span>
+          <span class="tag">Statistical Analysis</span>
+        </div>
+        <div class="article-actions">
+          <button class="icon-btn" data-copy-link aria-label="Copy link to this project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="cover-media">
+      <img src="images/project-images/poketeamfull.png" alt="The full Pokémon dashboard">
+    </div>
+    <div class="cover-caption">Fig. 1 — Image of the dashboard.</div>
+
+    <div class="article-layout">
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-label">On this page</div>
+        <ul>
+          <li><a href="#overview">The Problem</a></li>
+          <li><a href="#approach">The Approach</a></li>
+          <li><a href="#twoteams">Two Teams</a></li>
+          <li><a href="#outcome">The Outcome</a></li>
+        </ul>
+      </nav>
+
+      <div class="prose">
+
+        <section id="overview" class="reveal">
+          <h2>The Problem</h2>
+          <p>For the Onyx Data DataDNA Dataset Challenge (July 2022), the brief was to analyse 801 Pokémon to understand what actually shapes competitive strength, and use that to build an optimised team.</p>
+          <div class="stat-strip">
+            <div class="stat">
+              <div class="stat-num" data-target="801">0</div>
+              <div class="stat-label">POKÉMON ANALYSED</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" data-target="70">0</div>
+              <div class="stat-label">LEGENDARY POKÉMON</div>
+            </div>
+             <div class="stat">
+              <div class="stat-num" data-target="6">0</div>
+              <div class="stat-label">TEAM SIZE</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="approach" class="reveal">
+          <h2>The Approach</h2>
+          <p>Type composition split into single-type versus dual-type, then broken down further with a chord diagram separating each type's role as primary versus secondary. Stats were compared across all 801 Pokémon, segmented by Legendary status, to test whether "Legendary" actually means statistically stronger or is just a lore label. these feed directly into an optimisation exercise selecting a 6-Pokémon team that maximises combined stats while minimising type-based vulnerability.</p>
+        </section>
+
+        <section id="twoteams" class="reveal">
+          <h2>Two Teams</h2>
+          <p>Two different 6-Pokémon teams were constructed based on the analysis: one being the optimised team and the other comprising of personal favourites only.</p>
+          <div class="accordion">
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">01</span>The Optimised Team</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Arceus, Dialga, Kyogre, Rayquaza (Legendary) mixed with Metagross and Lucario (non-Legendary). This serves as proof that the model rewarded genuine stat and type-coverage fit, not rarity.</p>
+              </div></div>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-trigger">
+                <span><span class="idx">02</span>The Personal-Favourites Team</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <div class="accordion-panel"><div class="accordion-panel-inner">
+                <p>Built purely on preference, included deliberately to make the contrast between "objectively strongest" and "personally preferred" explicit. Garchomp, Genesect, Infernape, Gengar, Empoleon, and Tropius.</p>
+              </div></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="outcome" class="reveal">
+          <h2>The Outcome</h2>
+          <p>Flying is the rarest primary type in the dataset (3 of 801 Pokémon lead with it) but the most common secondary type (95).</p>
+          <p>Water sits at the opposite end of that same analysis, being the most abundant type overall once primary and secondary roles are combined (131 total appearances across the dataset), against Ice's 38, the least abundant. Reading primary and secondary counts together, rather than as one blended total, is what makes both of those findings visible in the first place.</p>
+          <p>Legendary status held up statistically: the 70 Legendary Pokémon cluster in a distinctly higher Base Stat Total range than the rest of the field.</p>
+          
+          <blockquote>Flying is the rarest primary type but the most common secondary type, making it a supporting role, but not a rare one.</blockquote>
+        </section>
+
+      </div>
+    </div>
+
+    <section class="section" style="padding:0 0 96px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">More work</div>
+          <h2 class="section-title">Keep exploring.</h2>
+        </div>
+        <a class="section-link" href="portfolio.html">All projects <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      </div>
+      <div class="card-grid" data-related-source="data/projects.json" data-related-exclude="The Wonderful World of Pokémon" data-related-limit="3"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script src="js/main.js"></script>
+<script src="js/detail.js"></script>
+</body>
+</html>

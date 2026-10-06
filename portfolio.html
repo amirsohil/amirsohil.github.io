@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio — Amir Sohil</title>
+<meta name="description" content="Analytics, machine learning, and data-storytelling projects — searchable by tool and skill.">
+<meta property="og:title" content="Portfolio — Amir Sohil">
+<meta property="og:image" content="images/pola.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a href="index.html" class="nav-mark"><span class="dot"></span>AMIR SOHIL</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" data-nav>Home</a>
+      <a href="about.html" data-nav>About</a>
+      <a href="portfolio.html" data-nav>Portfolio</a>
+      <a href="essays.html" data-nav>Essays</a>
+      <a href="contact.html" data-nav>Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn-cv" href="assets/cv/amir-sohil-cv.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        <span class="btn-cv-label">Download CV</span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav">
+  <button class="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html" data-nav>Home</a>
+  <a href="about.html" data-nav>About</a>
+  <a href="portfolio.html" data-nav>Portfolio</a>
+  <a href="essays.html" data-nav>Essays</a>
+  <a href="contact.html" data-nav>Contact</a>
+</div>
+
+<main id="main">
+  <section class="section" style="padding-bottom:0;">
+    <div class="wrap">
+      <div class="eyebrow">Portfolio</div>
+      <h1 class="section-title">The topics change.<br>What I'm actually looking for doesn't.</h1>
+      <p class="hero-sub" style="margin-top:20px;">Search by name, or filter by the tools I used and the skills each project leaned on. Or <a href="portfoliochatbot.html" style="color:var(--accent); text-decoration:underline; text-underline-offset:3px;">chat with my portfolio</a> instead.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="filter-panel" id="filter-panel">
+        <div class="search-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="filter-search" placeholder="search_projects( )" autocomplete="off">
+          <span class="search-count" id="filter-count"></span>
+        </div>
+        <div class="filter-groups">
+          <div>
+            <span class="filter-group-label">Filter · Tools</span>
+            <div class="chip-row" id="filter-tools"></div>
+          </div>
+          <div>
+            <span class="filter-group-label">Filter · Skills</span>
+            <div class="chip-row" id="filter-skills"></div>
+          </div>
+          <button class="filter-clear" type="button">Clear all filters</button>
+        </div>
+      </div>
+
+      <div class="card-grid" id="results"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-title">Let's build something worth remembering.</div>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/amir-sohil/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://calendly.com/amirspatterns" target="_blank" rel="noopener">Book a session</a></li>
+        <li><a href="portfoliochatbot.html">Chat with my portfolio</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Mohamed Amir Sohil Bishrul Hafi</span>
+      <span>Colombo, Sri Lanka</span>
+    </div>
+  </div>
+</footer>
+<button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></button>
+
+<script>
+  window.FILTER_CONFIG = { source: 'data/projects.json', mount: '#results', itemNoun: 'projects', linkLabel: 'View project' };
+</script>
+<script src="js/main.js"></script>
+<script src="js/filter.js"></script>
+</body>
+</html>
