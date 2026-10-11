@@ -122,20 +122,33 @@ function initBackToTop(){
   btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 }
 
-/* ---------------- Contact form → mailto ----------------
-   No backend on GitHub Pages, so this composes a mailto: link
-   from the fields and opens the visitor's mail client directly. */
+/* ---------------- Contact form → Google Sheet ---------------- */
+const CONTACT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyblTuWvLSz97MuyIo4KBVdjfKWaGm5ulzvB7QpRQi8c-1kCPpurQWt_iLx3-FZSImJ/exec';
+
 function initContactForm(){
   const form = document.querySelector('#contact-form');
   if (!form) return;
-  form.addEventListener('submit', (e) => {
+  const status = form.querySelector('.form-status');
+  const button = form.querySelector('button[type="submit"]');
+  const label = button.innerHTML;
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = form.name.value.trim();
-    const email = form.email.value.trim();
-    const message = form.message.value.trim();
-    const subject = encodeURIComponent(`Portfolio enquiry from ${name || 'website visitor'}`);
-    const body = encodeURIComponent(`${message}\n\n—\n${name}\n${email}`);
-    window.location.href = `mailto:bhmasohail@gmail.com?subject=${subject}&body=${body}`;
+    button.disabled = true;
+    button.textContent = 'Sending…';
+    status.textContent = '';
+    try {
+      const res = await fetch(CONTACT_ENDPOINT, { method: 'POST', body: new FormData(form) });
+      const data = await res.json();
+      if (data.result !== 'success') throw new Error(data.error || 'Request failed');
+      form.reset();
+      status.textContent = "Thanks, your message is in. I'll reply by email soon.";
+    } catch (err) {
+      status.innerHTML = 'That didn\'t send. Please email me directly at <a href="mailto:bhmasohail@gmail.com">bhmasohail@gmail.com</a>.';
+    } finally {
+      button.disabled = false;
+      button.innerHTML = label;
+    }
   });
 }
 

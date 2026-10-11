@@ -6,8 +6,16 @@
 <title>Contact — Amir Sohil</title>
 <meta name="description" content="Get in touch with Amir Sohil — email, LinkedIn, or book a session directly.">
 <meta property="og:title" content="Contact — Amir Sohil">
+<meta property="og:description" content="Freelance work, full-time roles, or just a good data problem. Send a message, email directly, or book a session.">
+<meta property="og:image" content="images/myself.png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/style.css">
+<style>
+  /* Form feedback line. If you've already added these two rules to
+     css/style.css, you can delete this block. */
+  .form-status{ min-height: 1.4em; }
+  .form-status a{ color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+</style>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -85,20 +93,29 @@
         <form id="contact-form">
           <div class="form-field">
             <label for="name">Name</label>
-            <input type="text" id="name" name="name" required>
+            <input type="text" id="name" name="name" autocomplete="name" maxlength="200" required>
           </div>
           <div class="form-field">
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" name="email" autocomplete="email" maxlength="200" required>
           </div>
           <div class="form-field">
             <label for="message">Message</label>
-            <textarea id="message" name="message" rows="6" required></textarea>
+            <textarea id="message" name="message" rows="6" maxlength="5000" required></textarea>
           </div>
+
+          <!-- Honeypot: invisible to people, tempting to bots. The Apps Script
+               silently discards any submission where this is filled in. -->
+          <div style="position:absolute; left:-9999px;" aria-hidden="true">
+            <label for="website">Leave this field empty</label>
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+          </div>
+
           <button class="btn btn-primary" type="submit" style="width:100%; justify-content:center;">
             Send Message <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>
           </button>
-          <p class="form-note">This opens your email client with the message pre-filled — this site has no backend, so nothing is sent from here directly.</p>
+          <p class="form-note form-status" role="status" aria-live="polite"></p>
+          <p class="form-note">I'll only use your details to reply to your message.</p>
         </form>
       </div>
     </div>
