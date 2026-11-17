@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0A1210">
+<title>The Great Reordering — Qur'an Mushaf vs. Revelation Order</title>
+<meta name="description" content="An interactive bump chart tracing all 114 surahs of the Qur'an from their position in the mushaf to their position in two scholarly chronologies of revelation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  :root{
+    /* Black ground, stepped surfaces */
+    --ink-950:#000000;
+    --ink-900:#0A0A0A;
+    --ink-850:#121212;
+    --ink-800:#1C1C1C;
+    --hairline: rgba(255,255,255,0.16);
+    --hairline-soft: rgba(255,255,255,0.08);
+    /* Neutrals: Cloud Dancer-like off-white */
+    --parchment:#FFFFFF;
+    --parchment-dim:#A3A3A0;
+    --parchment-faint:#6F6F6C;
+    /* Pantone-like chips */
+    --gold:#D9A441;            /* Ochre impasto: Meccan */
+    --gold-bright:#F0C46A;
+    --lapis:#5FA394;           /* Moonlit sage-teal: Medinan */
+    --lapis-bright:#8CC9B8;
+    --rubric:#D9824A;          /* Sunset clay from the clouds: callouts */
+    --rubric-bright:#EE9F6B;
+    --font-display:'Instrument Sans', -apple-system, sans-serif;
+    --font-body:'Instrument Sans', -apple-system, sans-serif;
+    --r-sm:4px; --r-md:0; --r-lg:0;
+    --shadow-soft:none;
+    --shadow-lift:none;
+    --ease-out:cubic-bezier(.16,1,.3,1);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html{ background:var(--ink-950); scroll-behavior:smooth; }
+
+  body{
+    background:var(--ink-950);
+    color:var(--parchment);
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+
+  a{ color:var(--gold-bright); }
+
+  :focus-visible{ outline:2px solid var(--rubric-bright); outline-offset:3px; border-radius:2px; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition-duration:.001ms !important; animation-duration:.001ms !important; scroll-behavior:auto !important; }
+    .reveal{ opacity:1; transform:none; }
+  }
+  @media (prefers-reduced-transparency: reduce){
+    .tooltip{ background:var(--ink-850); backdrop-filter:none; -webkit-backdrop-filter:none; }
+    .controls-sticky.stuck{ background:var(--ink-950); backdrop-filter:none; -webkit-backdrop-filter:none; }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{ max-width:900px; margin:0 auto; padding:88px 24px 44px; }
+  .eyebrow{
+    display:flex; align-items:center; gap:12px;
+    font:500 .85rem/1 var(--font-body); letter-spacing:.01em;
+    color:var(--parchment-dim); margin-bottom:22px;
+  }
+  .eyebrow::before{ content:""; width:28px; height:8px; background:linear-gradient(90deg,var(--gold) 50%,var(--lapis) 50%); display:block; border-radius:1px; }
+  h1{
+    font-family:var(--font-display); font-weight:500; font-optical-sizing:auto;
+    font-size:clamp(2.3rem, 5.2vw, 4.1rem); line-height:1.04;
+    letter-spacing:clamp(-.03em, -.012em - .3vw, -.015em);
+    margin-bottom:24px; max-width:11ch;
+  }
+  h1 em{ font-style:inherit; font-weight:inherit; color:inherit; }
+  .lede{ font-size:1.08rem; line-height:1.7; letter-spacing:.001em; color:var(--parchment-dim); max-width:58ch; }
+  .lede strong{ color:var(--parchment); font-weight:600; }
+
+  /* ---------- Scroll reveal ---------- */
+  .reveal{ opacity:0; transform:translateY(16px); transition:opacity .6s var(--ease-out), transform .6s var(--ease-out); }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+
+  /* ---------- Stat cards ---------- */
+  .stats{
+    max-width:900px; margin:0 auto 46px; padding:0 24px;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+  }
+  .stat{
+    background:var(--ink-900); border:1px solid var(--hairline);
+    padding:20px 18px; position:relative; z-index:1; border-radius:0;
+    transition:transform .15s var(--ease-out), box-shadow .15s var(--ease-out), background .15s ease, border-color .15s ease;
+  }
+  .stat + .stat{ border-left:none; }
+  .stat:nth-child(1){ border-top-left-radius:var(--r-md); border-bottom-left-radius:var(--r-md); }
+  .stat:nth-child(4){ border-top-right-radius:var(--r-md); border-bottom-right-radius:var(--r-md); }
+  .stat .num{
+    font-family:var(--font-display); font-size:1.8rem; font-weight:500;
+    color:var(--parchment); font-variant-numeric:tabular-nums; line-height:1.1;
+  }
+  .stat .num .sep{ color:var(--parchment-faint); margin:0 2px; font-weight:400; }
+  .stat .label{
+    font-size:.78rem; letter-spacing:.005em;
+    color:var(--parchment-faint); margin-top:8px; line-height:1.4;
+  }
+  .split-bar{ display:flex; height:10px; border-radius:2px; overflow:hidden; margin-top:10px; background:var(--ink-800); }
+  .split-bar .seg.meccan{ background:var(--gold); }
+  .split-bar .seg.medinan{ background:var(--lapis); }
+  .stat.clickable{ cursor:pointer; }
+  .stat.clickable:hover, .stat.clickable:focus-visible{ background:var(--rubric-bright); border-color:var(--rubric-bright); transform:translateY(-2px); box-shadow:var(--shadow-soft); }
+  .stat.clickable:active{ transform:translateY(0) scale(.98); transition-duration:.08s; }
+  .stat.clickable{ background:var(--rubric); border-color:var(--rubric); }
+  .stat.clickable .num{ color:#000; }
+  .stat.clickable .label{ color:rgba(0,0,0,.82); }
+
+  @media (max-width:640px){
+    .stats{ grid-template-columns:repeat(2,1fr); }
+    .stat:nth-child(3){ border-left:1px solid var(--hairline); }
+    .stat:nth-child(1){ border-radius:0; border-top-left-radius:var(--r-md); }
+    .stat:nth-child(2){ border-radius:0; border-top-right-radius:var(--r-md); }
+    .stat:nth-child(3){ border-radius:0; border-bottom-left-radius:var(--r-md); }
+    .stat:nth-child(4){ border-radius:0; border-bottom-right-radius:var(--r-md); }
+  }
+
+  /* ---------- Controls ---------- */
+  .controls-sticky{
+    position:sticky; top:0; z-index:40; padding:14px 0 16px;
+    background:rgba(0,0,0,0);
+    transition:background .3s ease;
+  }
+  .controls-sticky::after{
+    content:""; position:absolute; left:0; right:0; top:100%; height:22px;
+    background:linear-gradient(to bottom, rgba(0,0,0,.7), transparent);
+    opacity:0; transition:opacity .3s ease; pointer-events:none;
+  }
+  .controls-sticky.stuck{
+    background:rgba(0,0,0,.82); backdrop-filter:blur(18px) saturate(160%); -webkit-backdrop-filter:blur(18px) saturate(160%);
+    box-shadow:0 1px 0 var(--hairline);
+  }
+  .controls-sticky.stuck::after{ opacity:1; }
+  .controls{
+    max-width:1148px; margin:0 auto; padding:0 24px;
+    display:flex; gap:14px; align-items:center; flex-wrap:wrap;
+  }
+  .search-box{ position:relative; flex:1 1 260px; min-width:220px; }
+  .search-box input{
+    width:100%; background:var(--ink-900); border:1px solid var(--hairline);
+    color:var(--parchment); padding:12px 40px 12px 16px; border-radius:var(--r-sm);
+    font-family:var(--font-body); font-size:.9rem;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .search-box input::placeholder{ color:var(--parchment-faint); }
+  .search-box input:focus{ outline:none; border-color:var(--rubric); background:var(--ink-850); }
+  .clear-btn{
+    position:absolute; right:8px; top:50%; transform:translateY(-50%);
+    width:26px; height:26px; border-radius:50%; border:none; background:transparent;
+    color:var(--parchment-faint); font-size:16px; cursor:pointer; display:none;
+    align-items:center; justify-content:center; line-height:1;
+    transition:transform .12s var(--ease-out), color .12s ease, background .12s ease;
+  }
+  .clear-btn.show{ display:flex; }
+  .clear-btn:hover{ color:var(--rubric-bright); background:var(--ink-850); }
+  .clear-btn:active{ transform:translateY(-50%) scale(.85); }
+
+  .suggestions{
+    position:absolute; top:calc(100% + 6px); left:0; right:0;
+    background:var(--ink-850); border:1px solid var(--hairline); border-radius:8px;
+    max-height:300px; overflow-y:auto; z-index:30; display:none;
+    box-shadow:0 16px 32px rgba(0,0,0,.45);
+  }
+  .suggestions.open{ display:block; }
+  .suggestion-item{
+    padding:10px 14px; cursor:pointer; display:flex; justify-content:space-between;
+    align-items:baseline; gap:10px; font-size:.85rem; border-bottom:1px solid var(--hairline-soft);
+  }
+  .suggestion-item:last-child{ border-bottom:none; }
+  .suggestion-item:hover{ background:var(--ink-800); }
+  .s-meaning{ color:var(--parchment-faint); font-size:.85em; font-style:italic; margin-left:6px; }
+  .s-num{ color:var(--parchment-faint); font-variant-numeric:tabular-nums; font-size:.8rem; white-space:nowrap; }
+
+  .legend{ position:relative; display:flex; gap:8px; flex-wrap:wrap; padding:3px; border-radius:999px; background:var(--ink-900); border:1px solid var(--hairline); }
+  .legend-pill{
+    position:absolute; top:3px; left:3px; height:calc(100% - 6px); width:0;
+    background:var(--ink-800); border:1px solid var(--parchment-faint); border-radius:999px;
+    pointer-events:none; will-change:transform, width; z-index:0;
+  }
+  .chip{
+    position:relative; z-index:1;
+    display:flex; align-items:center; gap:7px; padding:9px 15px;
+    border:1px solid transparent; border-radius:999px; background:transparent;
+    font:500 .78rem var(--font-body); color:var(--parchment-dim); cursor:pointer;
+    user-select:none; white-space:nowrap; transition:color .15s ease;
+  }
+  .chip:active{ transform:scale(.96); transition:transform .08s var(--ease-out); }
+  .chip .dot{ width:9px; height:9px; border-radius:50%; background:var(--parchment-faint); }
+  .chip.meccan .dot{ background:var(--gold); }
+  .chip.medinan .dot{ background:var(--lapis); }
+  .chip.active{ color:var(--parchment); }
+
+  @media (max-width:640px){
+    .controls{ flex-direction:column; align-items:stretch; }
+    .legend{ justify-content:center; }
+  }
+
+  /* ---------- Chart ---------- */
+  .chart-section{ max-width:1148px; margin:0 auto; padding:26px 24px 0; }
+  .scroll-hint{ display:none; text-align:center; font-size:.72rem; color:var(--parchment-faint); margin-bottom:10px; letter-spacing:.04em; }
+  @media (max-width:1160px){ .scroll-hint{ display:block; } }
+
+  .scroll-area{
+    overflow-x:auto; overflow-y:hidden; border-top:1px solid var(--hairline);
+    -webkit-overflow-scrolling:touch; cursor:grab; user-select:none;
+  }
+  .scroll-area.dragging{ cursor:grabbing; }
+  .scroll-area svg{ display:block; }
+
+  .surah{ cursor:pointer; }
+  .surah .line{ fill:none; stroke-width:1.3; opacity:.5; transition:stroke-width .2s var(--ease-out); }
+  .surah.meccan .line{ stroke:var(--gold); }
+  .surah.medinan .line{ stroke:var(--lapis); }
+  .surah .hit{ fill:none; stroke:transparent; stroke-width:9; pointer-events:stroke; }
+  .surah circle{
+    stroke:var(--ink-950); stroke-width:1; opacity:.92;
+    transform-box:fill-box; transform-origin:center;
+    transition:transform .15s var(--ease-out), stroke-width .15s ease;
+  }
+  .surah.meccan circle{ fill:var(--gold); }
+  .surah.medinan circle{ fill:var(--lapis); }
+  .surah.active .line{ stroke-width:2.75; opacity:1; }
+  .surah.active circle{ stroke:var(--parchment); stroke-width:1.4; transform:scale(1.35); }
+  .surah:active circle{ transform:scale(1.6); transition-duration:.08s; }
+
+  .lane-label{ font:600 12px/1 var(--font-body); letter-spacing:.01em; fill:var(--parchment-dim); }
+  .lane-range{ font:400 10px/1 var(--font-body); fill:var(--parchment-faint); }
+  .grid line{ stroke:var(--hairline-soft); stroke-width:1; }
+  .grid text{ font:400 10px/1 var(--font-body); fill:var(--parchment-faint); font-variant-numeric:tabular-nums; }
+
+  .callout line{ stroke:var(--rubric); stroke-width:1; stroke-dasharray:2,3; }
+  .callout .callout-dot{ fill:var(--rubric-bright); }
+  .callout text{ font:500 10.5px/1.55 var(--font-body); fill:var(--parchment-dim); }
+  .callout text tspan:first-of-type{ fill:var(--rubric-bright); font-weight:600; }
+
+  /* ---------- Tooltip ---------- */
+  .tooltip{
+    position:fixed; width:308px; max-width:calc(100vw - 32px); z-index:60;
+    background:rgba(20,20,22,.92); backdrop-filter:blur(22px) saturate(160%); -webkit-backdrop-filter:blur(22px) saturate(160%);
+    border:1px solid var(--gold); border-top-color:rgba(240,196,106,.55); border-radius:var(--r-md);
+    padding:16px 18px; box-shadow:var(--shadow-lift);
+    opacity:0; pointer-events:none; transform:translateY(6px) scale(.94);
+    transform-origin:var(--tt-origin-x,0) var(--tt-origin-y,0);
+    transition:opacity .16s var(--ease-out), transform .2s var(--ease-out);
+  }
+  .tooltip.visible{ opacity:1; transform:translateY(0) scale(1); }
+
+
+  /* ---- Per-surah image slot in the hover card ---- */
+  .tooltip{ overflow:hidden; background:rgba(14,25,22,.94); }
+  .tt-image{
+    position:relative; aspect-ratio:16/9; margin:-16px -18px 14px; overflow:hidden;
+    border-bottom:1px solid var(--hairline);
+  }
+  .tt-image img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+  .tt-image[data-ok] span{ display:none; }
+  .tt-image.placeholder{
+    background:
+      radial-gradient(circle at var(--mx) var(--my), rgba(237,230,207,.95) 0 4px, rgba(237,230,207,.22) 5px 13px, transparent 30px),
+      radial-gradient(ellipse 70% 38% at var(--hx) 118%, hsl(var(--h) 26% 7%) 96%, transparent 100%),
+      radial-gradient(ellipse 80% 30% at calc(var(--hx) + 45%) 124%, hsl(var(--h) 24% 10%) 96%, transparent 100%),
+      linear-gradient(180deg, hsl(var(--h) 34% 14%) 0%, hsl(var(--h2) 24% 30%) 82%);
+  }
+  .tt-image.placeholder span{
+    position:absolute; left:12px; bottom:8px; font-size:.7rem; letter-spacing:.01em;
+    color:rgba(237,230,207,.6); font-variant-numeric:tabular-nums;
+  }
+  .tt-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .tt-badge{ font-size:.72rem; letter-spacing:.01em; padding:3px 9px; border-radius:999px; font-weight:600; }
+  .tt-badge.meccan{ background:rgba(217,164,65,.2); color:var(--gold-bright); }
+  .tt-badge.medinan{ background:rgba(95,163,148,.22); color:var(--lapis-bright); }
+  .tt-verses{ font-size:.72rem; color:var(--parchment-faint); font-variant-numeric:tabular-nums; }
+  .tt-name{ font-family:var(--font-display); font-size:1.3rem; font-weight:500; margin-bottom:2px; }
+  .tt-meaning{ font-style:italic; color:var(--parchment-dim); font-size:.82rem; margin-bottom:12px; }
+  .tt-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:9px 14px; margin-bottom:11px;
+    padding:11px 0; border-top:1px solid var(--hairline); border-bottom:1px solid var(--hairline);
+  }
+  .tt-grid label{ display:block; font-size:.72rem; color:var(--parchment-faint); letter-spacing:.005em; margin-bottom:2px; }
+  .tt-grid strong{ font-size:.92rem; color:var(--parchment); font-variant-numeric:tabular-nums; }
+  .tt-shift{ font-size:.78rem; color:var(--gold-bright); margin-bottom:8px; line-height:1.45; }
+  .tt-scholarly{ font-size:.72rem; color:var(--lapis-bright); margin-bottom:10px; font-style:italic; line-height:1.5; }
+  .tt-fact{ font-size:.79rem; line-height:1.55; color:var(--parchment-dim); }
+
+  /* ---------- Colophon ---------- */
+  .colophon{
+    max-width:900px; margin:64px auto 0; padding:26px 24px 70px;
+    border-top:1px solid var(--hairline); font-size:.78rem; line-height:1.75;
+    color:var(--parchment-faint);
+  }
+  .colophon p + p{ margin-top:10px; }
+  .colophon strong{ color:var(--parchment-dim); font-weight:600; }
+
+  /* ---------- Flat, monochrome look (black, white, tight grotesque, sharp rectangles) ---------- */
+  body{ letter-spacing:-.015em; }
+  ::selection{ background:#fff; color:#000; }
+  a{ color:var(--parchment); }
+  :focus-visible{ outline-color:var(--parchment); border-radius:0; }
+
+  .hero, .stats, .colophon{ max-width:1148px; }
+  .hero{ padding:72px 24px 36px; }
+  .eyebrow{ font:500 .9rem/1 var(--font-body); letter-spacing:-.01em; color:var(--parchment); gap:10px; margin-bottom:28px; }
+  .eyebrow::before{ width:18px; height:10px; border-radius:0; }
+  h1{ font-weight:500; font-size:clamp(2.2rem, 4.6vw, 3.6rem); line-height:1; letter-spacing:-.04em; max-width:12ch; margin-bottom:22px; }
+  .lede{ font-size:1rem; line-height:1.4; letter-spacing:-.01em; color:var(--parchment-dim); max-width:46ch; }
+  .lede strong{ color:var(--parchment); font-weight:500; }
+
+  .stats{ gap:24px; margin-bottom:40px; }
+  .stat{ background:transparent; border:none; border-top:1px solid var(--hairline); padding:12px 0 0; }
+  .stat:nth-child(n){ border-radius:0; border-left:none; }
+  .stat .num{ font-size:1.5rem; font-weight:500; letter-spacing:-.03em; }
+  .stat .label{ font-size:.85rem; letter-spacing:-.01em; color:var(--parchment-dim); margin-top:6px; }
+  .split-bar{ height:6px; border-radius:0; background:var(--ink-800); }
+  .stat.clickable{ background:var(--rubric); border-top-color:var(--rubric); padding:12px 14px 14px; }
+  .stat.clickable:hover, .stat.clickable:focus-visible{ background:var(--rubric-bright); border-top-color:var(--rubric-bright); transform:none; box-shadow:none; }
+  .stat.clickable:active{ transform:none; }
+
+  .search-box input{ background:transparent; border:1px solid var(--hairline); border-radius:0; padding:11px 40px 11px 14px; font-size:.95rem; letter-spacing:-.01em; }
+  .search-box input:focus{ background:transparent; border-color:var(--parchment); }
+  .clear-btn{ border-radius:0; }
+  .clear-btn:hover{ color:var(--parchment); background:var(--ink-800); }
+  .suggestions{ background:var(--ink-900); border-radius:0; box-shadow:none; }
+  .s-meaning{ font-style:normal; }
+  .legend{ background:var(--ink-800); border:none; border-radius:4px; }
+  .legend-pill{ background:#333; border:none; border-radius:4px; }
+  .chip{ border-radius:4px; font:500 .95rem var(--font-body); letter-spacing:-.015em; padding:8px 12px; color:var(--parchment-faint); }
+  .chip.active{ color:var(--parchment); }
+
+  .lane-label{ font-size:12.5px; font-weight:500; letter-spacing:-.01em; fill:var(--parchment); }
+  .callout text{ letter-spacing:-.01em; }
+
+  .colophon{ margin-top:56px; font-size:.82rem; letter-spacing:-.01em; }
+
+  /* ---------- Rectangular hover card: light sheet on black, like the thumbnails ---------- */
+  .tooltip{
+    --parchment:#0A0A0A; --parchment-dim:#4B4B48; --parchment-faint:#7A7975;
+    --hairline:rgba(0,0,0,.14);
+    --gold-bright:#7A4F00; --lapis-bright:#17594D;
+    background:#F4F3EF; color:#0A0A0A; border:none; border-radius:0; box-shadow:none;
+    backdrop-filter:none; -webkit-backdrop-filter:none; letter-spacing:-.01em;
+  }
+  .tt-image{ border-bottom:none; }
+  .tt-badge{ border-radius:0; font-weight:500; padding:3px 8px; }
+  .tt-name{ font-weight:500; font-size:1.4rem; letter-spacing:-.035em; line-height:1.1; margin-bottom:4px; }
+  .tt-meaning, .tt-scholarly{ font-style:normal; }
+</style>
+</head>
+<body>
+
+<header class="hero reveal">
+  <h1>The Great <em>Reordering</em></h1>
+  <p class="lede">
+    The Qur'an is read today in an order that has little to do with the sequence it was revealed in.
+    This traces <strong>all 114 surahs</strong> from their place in the mushaf to their place in history —
+    as reconstructed by two separate chronological traditions.
+  </p>
+</header>
+
+<main>
+  <section class="stats reveal" aria-label="Summary statistics">
+    <div class="stat">
+      <div class="num" id="stat-surahs-num">—</div>
+      <div class="label">Surahs</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="stat-verses-num">—</div>
+      <div class="label">Verses</div>
+    </div>
+    <div class="stat">
+      <div class="num"><span id="stat-meccan-num">—</span><span class="sep">:</span><span id="stat-medinan-num">—</span></div>
+      <div class="label">Meccan : Medinan Surahs</div>
+      <div class="split-bar"><span class="seg meccan" id="seg-meccan"></span><span class="seg medinan" id="seg-medinan"></span></div>
+    </div>
+    <div class="stat clickable" id="stat-biggest" tabindex="0" role="button" aria-label="Jump to the surah with the largest reordering">
+      <div class="num" id="stat-biggest-num">—</div>
+      <div class="label" id="stat-biggest-label">Largest single reordering</div>
+    </div>
+  </section>
+
+  <div id="sticky-sentinel"></div>
+  <div class="controls-sticky" id="controls-sticky">
+    <section class="controls" aria-label="Filter and search">
+      <div class="search-box">
+        <input type="text" id="search" placeholder="Find a Surah…" autocomplete="off" spellcheck="false" aria-label="Search surahs">
+        <button type="button" class="clear-btn" id="clear-search" aria-label="Clear search">×</button>
+        <div class="suggestions" id="suggestions"></div>
+      </div>
+      <div class="legend" id="legend">
+        <div class="legend-pill" id="legend-pill" aria-hidden="true"></div>
+        <button type="button" class="chip active" data-place="">All</button>
+        <button type="button" class="chip meccan" data-place="Meccan"><span class="dot"></span>Meccan</button>
+        <button type="button" class="chip medinan" data-place="Medinan"><span class="dot"></span>Medinan</button>
+      </div>
+    </section>
+  </div>
+
+  <section class="chart-section" aria-label="Bump chart of surah ranking changes">
+    <div class="scroll-hint">← scroll to explore the full chart →</div>
+    <div class="scroll-area">
+      <svg id="chart" viewBox="0 0 1100 1600" width="1100" height="1600" role="img" aria-label="Bump chart connecting each surah's position in the mushaf to its position in traditional and Nöldeke revelation chronologies"></svg>
+    </div>
+  </section>
+
+  <footer class="colophon">
+    <p><strong>On this chart</strong> — Mushaf position is a surah's place in the standard printed Qur'an used today.
+    Traditional chronology follows the sequence commonly cited across modern Qur'an editions and Islamic scholarship;
+    Nöldeke chronology follows the 19th-century academic reconstruction proposed by German orientalist Theodor Nöldeke.
+    Both orderings are scholarly reconstructions rather than settled fact, and other traditions exist.</p>
+    <p>Circle size is proportional to verse count (√-scaled). Set in Instrument Sans. Built with D3.js.
+    Visualization by <strong>Amir Sohil</strong>.</p>
+  </footer>
+</main>
+
+<div class="tooltip" id="tooltip" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- motion utilities ---------------- */
+  const REDUCE_MOTION = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // A minimal critically-damped-by-default spring, driven by rAF.
+  // Interruptible: retargeting reads the live value+velocity instead of restarting.
+  function makeSpring({ value = 0, dampingRatio = 1, response = 0.35, onUpdate, epsilon = 0.01 } = {}){
+    let current = value, velocity = 0, target = value, raf = null;
+    const angularFreq = (2 * Math.PI) / response;
+    const stiffness = angularFreq * angularFreq;
+    const damping = 2 * dampingRatio * angularFreq;
+
+    function tick(){
+      const dt = 1 / 60;
+      const force = -stiffness * (current - target) - damping * velocity;
+      velocity += force * dt;
+      current += velocity * dt;
+      onUpdate(current);
+      if(Math.abs(target - current) < epsilon && Math.abs(velocity) < epsilon){
+        current = target; velocity = 0; onUpdate(current); raf = null; return;
+      }
+      raf = requestAnimationFrame(tick);
+    }
+    return {
+      set(v, andTarget){ current = v; velocity = 0; if(andTarget !== false) target = v; onUpdate(current); },
+      to(v){
+        target = v;
+        if(REDUCE_MOTION){ current = v; velocity = 0; onUpdate(current); return; }
+        if(!raf) raf = requestAnimationFrame(tick);
+      }
+    };
+  }
+
+  // Momentum decay for a free-scrolling value (drag release, flick).
+  // Same exponential-decay projection Apple uses for scroll deceleration.
+  function decayTo(getVal, setVal, initialVelocity, { decel = 0.994, min, max, onDone } = {}){
+    let v = initialVelocity, raf = null;
+    function tick(){
+      v *= decel;
+      let next = getVal() + v * (1/60);
+      if(next < min){ next = min; v = 0; }
+      if(next > max){ next = max; v = 0; }
+      setVal(next);
+      if(Math.abs(v) < 4){ raf = null; onDone && onDone(); return; }
+      raf = requestAnimationFrame(tick);
+    }
+    if(REDUCE_MOTION || Math.abs(initialVelocity) < 4){ onDone && onDone(); return; }
+    raf = requestAnimationFrame(tick);
+    return () => raf && cancelAnimationFrame(raf);
+  }
+
+  const DATA = [{"mushaf":1,"name":"Al-Fatihah","meaning":"The Opening","verses":7,"place":"Meccan","trad":5,"noldeke":48,"shift":-4,"fact":"Known as \"Fatihat-al-Kitab\" (The Opener of the Book), Al-Sab' al-Mathani (The Seven Oft-Repeated Ayahs) \u2014 since it consists of seven ayahs and is recited in every single unit of prayer, and \"Umm al-Qur'an\" (The Source of the Quran). Serves as a preface to the Qur'an, gathering its core purposes into a single prayer."},{"mushaf":2,"name":"Al-Baqarah","meaning":"The Cow","verses":286,"place":"Medinan","trad":87,"noldeke":91,"shift":-85,"fact":"The longest surah in the Quran, containing 286 verses. It was the first surah revealed in Medina. Takes its name from the unique story of the cow that Allah commanded the Children of Israel to sacrifice. It is reported that the Prophet (ﷺ) described it as \"Sanam al-Qur'an\" (The Summit of the Qur'an)."},{"mushaf":3,"name":"Ali 'Imran","meaning":"The Family of Imran","verses":200,"place":"Medinan","trad":89,"noldeke":97,"shift":-86,"fact":"Named after the family of Imran, father of Maryam (Mary), peace be upon her. Contains the story of Maryam, her mother, her caretaker Zakariyya (Zechariah) and the miraculous birth of Isa (Jesus), peace be upon them. Together with Al-Baqarah, it forms the pair known as \"Az-Zahrawayn\" (The Two Illuminating Ones)."},{"mushaf":4,"name":"An-Nisa","meaning":"The Women","verses":176,"place":"Medinan","trad":92,"noldeke":100,"shift":-88,"fact":"One of the longest Medinan surahs, it is named for the extensive and detailed laws concerning women that feature throughout it. Elaborates in detail many of the legal directives especially those concerning orphans, women, and inheritance that were outlined more concisely in al-Baqarah."},{"mushaf":5,"name":"Al-Ma'idah","meaning":"The Table Spread","verses":120,"place":"Medinan","trad":112,"noldeke":114,"shift":-107,"fact":"Contains the story of the disciples of Isa (Jesus), peace be upon him, requesting a table spread with food from heaven. Contains verse 5:3, widely held by scholars to be the last verse revealed, proclaimed at Arafat during the Farewell Pilgrimage (this verse contains the declaration that Allah has perfected the religion for the believers and completed His favour upon them)."},{"mushaf":6,"name":"Al-An'am","meaning":"The Cattle","verses":165,"place":"Meccan","trad":55,"noldeke":89,"shift":-49,"fact":"According to the stronger opinion, it was revealed \"all at once, at night, in Makkah\". This would make it the only long surah to be revealed all at once. Famously revealed accompanied by 70,000 angels chanting Allah's praises."},{"mushaf":7,"name":"Al-A'raf","meaning":"The Heights","verses":206,"place":"Meccan","trad":39,"noldeke":87,"shift":-32,"fact":"The longest Meccan surah. Contains the story of Adam, peace be upon him, and Iblis, including Iblis's refusal to prostrate when commanded by Allah. It describes the people of Al-A'raf, who are positioned on the heights between Paradise and Hell."},{"mushaf":8,"name":"Al-Anfal","meaning":"The Spoils of War","verses":75,"place":"Medinan","trad":88,"noldeke":95,"shift":-80,"fact":"Serves as a comprehensive review of the Battle of Badr, the first major military confrontation between the Muslims and the Quraysh. Revelation began at Badr itself, before the Muslims had departed or divided the spoils, specifically to address the dispute that arose among the companions regarding the distribution of the spoils."},{"mushaf":9,"name":"At-Tawba","meaning":"The Repentance","verses":129,"place":"Medinan","trad":113,"noldeke":113,"shift":-104,"fact":"The name is in reference to the verses about the repentance of the three companions who stayed behind from the Expedition of Tabuk. The only one of the 114 surahs not preceded by \"Bismillah-ir-Rahman-ir-Rahim\"."},{"mushaf":10,"name":"Yunus","meaning":"Jonah","verses":109,"place":"Meccan","trad":51,"noldeke":84,"shift":-41,"fact":"Named after Yunus (Jonah), it is the only surah that mentions the unique story of the people of Yunus, who believed after their messenger warned them of punishment and were consequently saved."},{"mushaf":11,"name":"Hud","meaning":"Hud","verses":123,"place":"Meccan","trad":52,"noldeke":75,"shift":-41,"fact":"It is named for Hud (loosely equated with Eber from Genesis), peace be upon him, whose name is repeated five times and whose story is detailed more extensively here than elsewhere. Chains together the stories of several Prophets in a repeating pattern of warning and destruction."},{"mushaf":12,"name":"Yusuf","meaning":"Joseph","verses":111,"place":"Meccan","trad":53,"noldeke":77,"shift":-41,"fact":"Narrates the complete story of Yusuf (Joseph). Allah describes it as \"Ahsan al-Qasas\" (the best of stories). No other Prophet's story is related in the Qur'an in such a long, single, detailed narrative."},{"mushaf":13,"name":"Ar-Ra'd","meaning":"The Thunder","verses":43,"place":"Medinan","trad":96,"noldeke":90,"shift":-83,"fact":"Named for the unique and dramatic mention of \"the thunder\" in verse 13, which is depicted as glorifying Allah. Repeatedly draws attention to natural phenomena as signs of Allah's power."},{"mushaf":14,"name":"Ibrahim","meaning":"Abraham","verses":52,"place":"Meccan","trad":72,"noldeke":76,"shift":-58,"fact":"Named for Ibrahim (Abraham), peace be upon him, whose prayer for Mecca is contained within it."},{"mushaf":15,"name":"Al-Hijr","meaning":"The Rocky Tract","verses":99,"place":"Meccan","trad":54,"noldeke":57,"shift":-39,"fact":"Named after Al-Hijr, the rock-cut homeland of the Thamud people (identified with Mada'in Salih in modern Saudi Arabia)."},{"mushaf":16,"name":"An-Nahl","meaning":"The Bees","verses":128,"place":"Meccan","trad":70,"noldeke":73,"shift":-54,"fact":"Named so for its well-known passage describing Allah inspiring the bee to build its homes and produce honey, which contains healing for people. Also known as \"Surah al-Niam\" (The Surah of Bounties) because it enumerates so many of Allah's blessings upon humanity."},{"mushaf":17,"name":"Al-Isra","meaning":"The Night Journey","verses":111,"place":"Meccan","trad":50,"noldeke":67,"shift":-33,"fact":"Recounts Muhammad's (peace be upon him) Night Journey from Mecca to Jerusalem. Also known as \" Surah Bani Isra'il\", its more common name among the Companions, as it uniquely details the Children of Israel's two periods of corruption and destruction."},{"mushaf":18,"name":"Al-Kahf","meaning":"The Cave","verses":110,"place":"Meccan","trad":69,"noldeke":69,"shift":-51,"fact":"Traditionally recommended for weekly Friday recitation. Contains four remarkable narratives commonly associated with four major tests of life: the story of \"The People of the Cave\" being a test of faith, that of \"The Owner of Two Gardens\" being a test of wealth, that of Musa (Moses) and Khidr, peace be upon them, being a test of knowledge, and that of Dhul-Qarnayn, peace be upon him, being a test of power."},{"mushaf":19,"name":"Maryam","meaning":"Mary","verses":98,"place":"Meccan","trad":44,"noldeke":58,"shift":-25,"fact":"The only surah named directly after a specific woman: Maryam (Mary), mother of Isa (Jesus), peace be upon them. It is named for the extensive detail given to the story of Maryam, her son, and her family, peace be upon them, making it the first to do so, before Surah Ali 'Imran which was revealed in Medina."},{"mushaf":20,"name":"Taha","meaning":"Ta-Ha","verses":135,"place":"Meccan","trad":45,"noldeke":55,"shift":-25,"fact":"Named after its two opening letters. Contains an extensive account of Musa (Moses), peace be upon him, including his encounter with Allah at Mount Tur. According to a well-known account, Umar ibn Al-Khattab, may Allah be pleased with him, was moved by verses from this surah when he encountered his sister reading it, contributing to his conversion to Islam."},{"mushaf":21,"name":"Al-Anbiya","meaning":"The Prophets","verses":112,"place":"Meccan","trad":73,"noldeke":65,"shift":-52,"fact":"Named this because it mentions the names of sixteen prophets, a number exceeded only by Surah al-Anʿam (which mentions 18). This surah recounts their histories, paralleling their circumstances and the stance of their peoples to the Prophet's (may Allah honour him and grant him peace) own situation with his people."},{"mushaf":22,"name":"Al-Hajj","meaning":"The Pilgrimage","verses":78,"place":"Medinan","trad":103,"noldeke":107,"shift":-81,"fact":"Named for its description of Allah's command to Ibrahim, peace be upon him, to proclaim the Hajj, detailing the rites and their benefits. It is the only surah in the Qur'an that contains two ayahs where a listener should prostrate [18, 77]."},{"mushaf":23,"name":"Al-Mu'minun","meaning":"The Believers","verses":118,"place":"Meccan","trad":74,"noldeke":64,"shift":-51,"fact":"Opens by reporting Allah's proclamation of the success of the believers and then details the virtues by which they achieved that success."},{"mushaf":24,"name":"An-Nur","meaning":"The Light","verses":64,"place":"Medinan","trad":102,"noldeke":105,"shift":-78,"fact":"Named as such due to the profound \"Ayah of Light\" [35], which is a unique description of Allah. A significant fact about this surah is that the Companion Umar ibn al-Khattab, may Allah be pleased with him, instructed the community to learn it."},{"mushaf":25,"name":"Al-Furqan","meaning":"The Criterion","verses":77,"place":"Meccan","trad":42,"noldeke":66,"shift":-17,"fact":"Establishes the Qur'an as al-Furqan (The Criterion). The surah's name has been established from the time of Muhammad (may Allah honour him and grant him peace) and has been named such because the word is mentioned three times in the surah (at the beginning, middle, and end)."},{"mushaf":26,"name":"Ash-Shu'ara","meaning":"The Poets","verses":227,"place":"Meccan","trad":47,"noldeke":56,"shift":-21,"fact":"The only surah that mentions the word \"ash-Shu'ara\" [224], where it refutes the polytheists' claim that Muhammad (may Allah honour him and grant him peace) was like the poets. A key feature is the repetition of the final refrain [9, 68, 104, 122, 140, 159, 175, 19] after every prophetic story, serving to repeatedly emphasise the lesson and as a warning to the heedless listener."},{"mushaf":27,"name":"An-Naml","meaning":"The Ants","verses":93,"place":"Meccan","trad":48,"noldeke":68,"shift":-21,"fact":"Named as such and sometimes as \"Surah al-Hudhud\" (The Hoopoe), because it is the only surah that mentions each of these animals. Also called \"Surah Sulayman\"  because the magnificent kingdom of Sulayman (Solomon), may peace be upon him, is detailed here more extensively than elsewhere. The only surah with a second \"Bismillah\", embedded inside Sulayman's letter to the Queen of Saba (Sheba) (27:30)."},{"mushaf":28,"name":"Al-Qasas","meaning":"The Stories","verses":88,"place":"Meccan","trad":49,"noldeke":79,"shift":-21,"fact":"Takes its name from ayah 25, where Musa (Moses), peace be upon him, \"recounts his story\" to his new father-in-law after fleeing Egypt. The surah itself narrates what Musa, peace be upon him, narrated, thereby becoming a narrative that recounts a narrative. Therefore, the motif of \"qasas\" is deeply embedded throughout."},{"mushaf":29,"name":"Al-'Ankabut","meaning":"The Spider","verses":69,"place":"Meccan","trad":85,"noldeke":81,"shift":-56,"fact":"Takes its name from the parable of the spider [41], which illustrates the weakness and fragility of those who seek protection from others besides Allah."},{"mushaf":30,"name":"Ar-Rum","meaning":"The Romans","verses":60,"place":"Meccan","trad":84,"noldeke":74,"shift":-54,"fact":"The only surah in the Qur'an to mention these people (the Byzantines, made up of intermixed Greeks and Romans) by name, and it contains the prophecy concerning their conflict with the Persians. Revealed after the Persian polytheists defeated the Byzantine forces, who were Christians. The Meccan polytheists celebrated this victory, seeing it as validation of their own ways. Allah revealed the surah to counter their joy, prophesying the Byzantine victory \"within a few years\" [3], which was subsequently fulfilled."},{"mushaf":31,"name":"Luqman","meaning":"Luqman","verses":34,"place":"Meccan","trad":57,"noldeke":82,"shift":-26,"fact":"Named for a sage whose name circulated among the Arabs. Contains a detailed record of his wisdom and his moral instructions to his son, a subject unique to this surah."},{"mushaf":32,"name":"As-Sajdah","meaning":"The Prostration","verses":30,"place":"Meccan","trad":75,"noldeke":70,"shift":-43,"fact":"Often called \"Alif-Lam-Mim al-Sajdah\", \"Alif-Lam-Mim Tanzil al-Sajdah\", or \"Tanzīl al-Sajdah\". It has also been called \"Surah al-Madaji\" (The Beds), referring to verse 16, which describes believers who rise for night prayer."},{"mushaf":33,"name":"Al-Ahzab","meaning":"The Combined Forces","verses":73,"place":"Medinan","trad":90,"noldeke":103,"shift":-57,"fact":"Named for the main event it describes: the gathering of the confederate armies of the Quraysh, Ghatafan and others, who besieged Medina in 4 or 5 AH."},{"mushaf":34,"name":"Saba","meaning":"Sheba","verses":54,"place":"Meccan","trad":58,"noldeke":85,"shift":-24,"fact":"Named for the unique and detailed mention of the famous ancient Arabian kingdom of Saba (Sheba), whose people were punished and scattered for their ingratitude, reminding that material prosperity is not necessarily a sign of Allah's approval."},{"mushaf":35,"name":"Fatir","meaning":"Originator","verses":45,"place":"Meccan","trad":43,"noldeke":86,"shift":-8,"fact":"Known by two names: \"Surah Fatir\" (Originator) because this descriptive name (al-Fatir) occurs in the opening verse; and \"Surah al-Mala'ikah\" (The Angels) because the verse describing the angels also occurs at the very beginning."},{"mushaf":36,"name":"Ya-Sin","meaning":"Ya-Sin","verses":83,"place":"Meccan","trad":41,"noldeke":60,"shift":-5,"fact":"Named after the two letters that open the surah. Also known as \"Surah al-Qalb\" (The Heart of the Quran), based on a hadith (though this hadith is graded weak by many scholars). Another name that has been used is \"Surah Habib al-Najjar\", in reference to the man who came running from the farthest part of the city [20]."},{"mushaf":37,"name":"As-Saffat","meaning":"Those in Ranks","verses":182,"place":"Meccan","trad":56,"noldeke":50,"shift":-19,"fact":"Named for the unique mention of this word in its opening oath, in reference to the angels. Also sometimes called \"Surah al-Dhabih\" (The Sacrificed Son), referring to Isma'il (Ishmael), peace be upon him, who submitted to his father's divine dream before they were rescued from the test."},{"mushaf":38,"name":"Saad","meaning":"Saad","verses":88,"place":"Meccan","trad":38,"noldeke":59,"shift":0,"fact":"Named after the opening letter. Also sometimes called \"Surah Dawud\", due to the emphasis on his story and righteous rule."},{"mushaf":39,"name":"Az-Zumar","meaning":"The Troops","verses":75,"place":"Meccan","trad":59,"noldeke":80,"shift":-20,"fact":"\"The Troops\" refers to the crowds of the saved and the condemned being led in groups on Judgment Day."},{"mushaf":40,"name":"Ghafir","meaning":"The Forgiver","verses":85,"place":"Meccan","trad":60,"noldeke":78,"shift":-20,"fact":"Also called \"Al-Mu'min\" (The Believer); tells of a believer who kept his faith secret among Pharaoh's people."},{"mushaf":41,"name":"Fussilat","meaning":"Explained in Detail","verses":54,"place":"Meccan","trad":61,"noldeke":71,"shift":-20,"fact":"Part of a run of seven consecutive surahs (40-46) that all open with the letters \"Ha Mim.\""},{"mushaf":42,"name":"Ash-Shura","meaning":"The Consultation","verses":53,"place":"Meccan","trad":62,"noldeke":83,"shift":-20,"fact":"Contains a verse (42:38) often cited as a Quranic basis for consultative decision-making (shura)."},{"mushaf":43,"name":"Az-Zukhruf","meaning":"The Gold Adornments","verses":89,"place":"Meccan","trad":63,"noldeke":61,"shift":-20,"fact":"Warns against equating worldly wealth (\"gold ornaments\") with true value or divine favor."},{"mushaf":44,"name":"Ad-Dukhan","meaning":"The Smoke","verses":59,"place":"Meccan","trad":64,"noldeke":53,"shift":-20,"fact":"Named after \"the Smoke,\" described in the text as a sign heralding the coming Judgment."},{"mushaf":45,"name":"Al-Jathiya","meaning":"The Kneeling Down","verses":37,"place":"Meccan","trad":65,"noldeke":72,"shift":-20,"fact":"\"The Kneeling Down\" pictures every nation kneeling before God on Judgment Day."},{"mushaf":46,"name":"Al-Ahqaf","meaning":"The Wind-Curved Sandhills","verses":35,"place":"Meccan","trad":66,"noldeke":88,"shift":-20,"fact":"Named after the sand dunes that were home to the people of 'Ad, mentioned in the text."},{"mushaf":47,"name":"Muhammad","meaning":"Muhammad","verses":38,"place":"Medinan","trad":95,"noldeke":96,"shift":-48,"fact":"Also called \"Al-Qital\" (The Fighting); one of only two surahs explicitly named after the Prophet."},{"mushaf":48,"name":"Al-Fath","meaning":"The Victory","verses":29,"place":"Medinan","trad":111,"noldeke":108,"shift":-63,"fact":"Revealed following the Treaty of Hudaybiyyah, which it frames as a \"clear victory\" despite its initially unfavorable terms."},{"mushaf":49,"name":"Al-Hujurat","meaning":"The Private Apartments","verses":18,"place":"Medinan","trad":106,"noldeke":112,"shift":-57,"fact":"Contains foundational verses on social ethics, privacy, and etiquette toward the Prophet."},{"mushaf":50,"name":"Qaf","meaning":"Qaf","verses":45,"place":"Meccan","trad":34,"noldeke":54,"shift":16,"fact":"Named after a single Arabic letter; deals extensively with resurrection and the afterlife."},{"mushaf":51,"name":"Adh-Dhariyat","meaning":"The Winnowing Winds","verses":60,"place":"Meccan","trad":67,"noldeke":39,"shift":-16,"fact":"Opens with an oath sworn by scattering winds."},{"mushaf":52,"name":"At-Tur","meaning":"The Mount","verses":49,"place":"Meccan","trad":76,"noldeke":40,"shift":-24,"fact":"Named after Mount Sinai (\"The Mount\"), the site of Moses's revelation."},{"mushaf":53,"name":"An-Najm","meaning":"The Star","verses":62,"place":"Meccan","trad":23,"noldeke":28,"shift":30,"fact":"Describes Muhammad's night ascension (Mi'raj) and contains a verse (53:62) traditionally marking a prostration."},{"mushaf":54,"name":"Al-Qamar","meaning":"The Moon","verses":55,"place":"Meccan","trad":37,"noldeke":49,"shift":17,"fact":"Opens by referencing the splitting of the moon, an event some traditions describe as witnessed by the Meccans."},{"mushaf":55,"name":"Ar-Rahman","meaning":"The Most Merciful","verses":78,"place":"Medinan","trad":97,"noldeke":43,"shift":-42,"fact":"Its refrain \"Which of your Lord's favors will you deny?\" repeats 31 times; classified Medinan in the traditional chronology used here, though most Muslim scholars actually place it in the Meccan period."},{"mushaf":56,"name":"Al-Waqi'a","meaning":"The Inevitable","verses":96,"place":"Meccan","trad":46,"noldeke":41,"shift":10,"fact":"Describes three groups on Judgment Day: the foremost, the companions of the right, and the companions of the left."},{"mushaf":57,"name":"Al-Hadid","meaning":"The Iron","verses":29,"place":"Medinan","trad":94,"noldeke":99,"shift":-37,"fact":"\"The Iron\" references the created metal as a source of both practical benefit and \"great might\" for humanity."},{"mushaf":58,"name":"Al-Mujadila","meaning":"The Pleading Woman","verses":22,"place":"Medinan","trad":105,"noldeke":106,"shift":-47,"fact":"Named after a woman who came pleading (mujadila) to the Prophet over a personal grievance, opening the surah."},{"mushaf":59,"name":"Al-Hashr","meaning":"The Exile","verses":24,"place":"Medinan","trad":101,"noldeke":102,"shift":-42,"fact":"\"The Exile\" narrates the expulsion of the Banu Nadir Jewish tribe from Medina."},{"mushaf":60,"name":"Al-Mumtahana","meaning":"The Woman to be Examined","verses":13,"place":"Medinan","trad":91,"noldeke":110,"shift":-31,"fact":"Sets out criteria for testing the sincerity of women migrating to Medina."},{"mushaf":61,"name":"As-Saff","meaning":"The Ranks","verses":14,"place":"Medinan","trad":109,"noldeke":98,"shift":-48,"fact":"\"The Ranks\" describes believers who fight for God's cause as a \"solid structure.\""},{"mushaf":62,"name":"Al-Jumu'a","meaning":"Friday","verses":11,"place":"Medinan","trad":110,"noldeke":94,"shift":-48,"fact":"Establishes the obligation of the Friday congregational prayer."},{"mushaf":63,"name":"Al-Munafiqun","meaning":"The Hypocrites","verses":11,"place":"Medinan","trad":104,"noldeke":104,"shift":-41,"fact":"Describes the outward behavior versus inward disbelief of certain figures in Medina."},{"mushaf":64,"name":"At-Taghabun","meaning":"The Mutual Disillusion","verses":18,"place":"Medinan","trad":108,"noldeke":93,"shift":-44,"fact":"Named after \"the Day of Mutual Loss and Gain,\" a description of Judgment Day."},{"mushaf":65,"name":"At-Talaq","meaning":"Divorce","verses":12,"place":"Medinan","trad":99,"noldeke":101,"shift":-34,"fact":"Sets out legal rulings on divorce procedure and waiting periods."},{"mushaf":66,"name":"At-Tahrim","meaning":"The Prohibition","verses":12,"place":"Medinan","trad":107,"noldeke":109,"shift":-41,"fact":"Addresses an episode within the Prophet's household regarding a personal matter."},{"mushaf":67,"name":"Al-Mulk","meaning":"The Sovereignty","verses":30,"place":"Meccan","trad":77,"noldeke":63,"shift":-10,"fact":"Traditionally recited before sleep; several hadiths describe it as interceding for its reciter."},{"mushaf":68,"name":"Al-Qalam","meaning":"The Pen","verses":52,"place":"Meccan","trad":2,"noldeke":18,"shift":66,"fact":"Also called \"Nun\" after its opening letter; traditionally the second surah ever revealed, opening with an oath \"by the pen.\""},{"mushaf":69,"name":"Al-Haqqa","meaning":"The Reality","verses":52,"place":"Meccan","trad":78,"noldeke":38,"shift":-9,"fact":"\"The Sure Reality\" is one of several distinct Quranic names for the Day of Judgment."},{"mushaf":70,"name":"Al-Ma'arij","meaning":"The Ascending Stairways","verses":44,"place":"Meccan","trad":79,"noldeke":42,"shift":-9,"fact":"Named after \"the Ascending Stairways,\" a means by which angels and the spirit are described as ascending to God."},{"mushaf":71,"name":"Nuh","meaning":"Noah","verses":28,"place":"Meccan","trad":71,"noldeke":51,"shift":0,"fact":"Devoted entirely to the story of Noah and his long call to his people."},{"mushaf":72,"name":"Al-Jinn","meaning":"The Jinn","verses":28,"place":"Meccan","trad":40,"noldeke":62,"shift":32,"fact":"Describes a group of jinn overhearing a Quran recitation and coming to believe in it."},{"mushaf":73,"name":"Al-Muzzammil","meaning":"The Enshrouded One","verses":20,"place":"Meccan","trad":3,"noldeke":23,"shift":70,"fact":"\"The Enshrouded One\" (Muhammad, wrapped in a cloak) originally commanded lengthy night prayer, a duty later eased within the same surah."},{"mushaf":74,"name":"Al-Muddaththir","meaning":"The Cloaked One","verses":56,"place":"Meccan","trad":4,"noldeke":2,"shift":70,"fact":"Traditionally considered among the very earliest revelations, marking the start of Muhammad's public mission."},{"mushaf":75,"name":"Al-Qiyama","meaning":"The Resurrection","verses":40,"place":"Meccan","trad":31,"noldeke":36,"shift":44,"fact":"Focuses entirely on the Resurrection and the state of the human soul on Judgment Day."},{"mushaf":76,"name":"Al-Insan","meaning":"Man","verses":31,"place":"Medinan","trad":98,"noldeke":52,"shift":-22,"fact":"Also called \"Ad-Dahr\" (Time); describes the rewards prepared for the righteous."},{"mushaf":77,"name":"Al-Mursalat","meaning":"Those Sent Forth","verses":50,"place":"Meccan","trad":33,"noldeke":32,"shift":44,"fact":"Opens with an oath sworn by winds described as being sent forth in succession."},{"mushaf":78,"name":"An-Naba","meaning":"The Great News","verses":40,"place":"Meccan","trad":80,"noldeke":33,"shift":-2,"fact":"\"The Great News\" (the Resurrection) gives its name colloquially to the Quran's final 30th part, \"Juz' Amma.\""},{"mushaf":79,"name":"An-Nazi'at","meaning":"Those Who Tear Out","verses":46,"place":"Meccan","trad":81,"noldeke":31,"shift":-2,"fact":"Describes angels who \"tear out\" souls harshly at death, contrasted with those who draw them out gently."},{"mushaf":80,"name":"Abasa","meaning":"He Frowned","verses":42,"place":"Meccan","trad":24,"noldeke":17,"shift":56,"fact":"Named after an episode in which the Prophet is described as having frowned at a blind man's interruption -- a moment of Quranic self-correction."},{"mushaf":81,"name":"At-Takwir","meaning":"The Overthrowing","verses":29,"place":"Meccan","trad":7,"noldeke":27,"shift":74,"fact":"Opens with a vivid sequence of cosmic events marking the end of the world."},{"mushaf":82,"name":"Al-Infitar","meaning":"The Cleaving Asunder","verses":19,"place":"Meccan","trad":82,"noldeke":26,"shift":0,"fact":"Continues the same apocalyptic imagery, describing the sky splitting open."},{"mushaf":83,"name":"Al-Mutaffifin","meaning":"The Defrauding","verses":36,"place":"Meccan","trad":86,"noldeke":37,"shift":-3,"fact":"Condemns merchants who give short measure or weight in trade."},{"mushaf":84,"name":"Al-Inshiqaq","meaning":"The Sundering","verses":25,"place":"Meccan","trad":83,"noldeke":29,"shift":1,"fact":"Describes the sky splitting and the earth being leveled flat at the Last Hour."},{"mushaf":85,"name":"Al-Buruj","meaning":"The Mansions of the Stars","verses":22,"place":"Meccan","trad":27,"noldeke":22,"shift":58,"fact":"Refers to the \"constellations\"; recounts believers persecuted in a fire-pit (\"Ashab al-Ukhdud\")."},{"mushaf":86,"name":"At-Tariq","meaning":"The Morning Star","verses":17,"place":"Meccan","trad":36,"noldeke":15,"shift":50,"fact":"Named after \"the Night-Comer,\" identified in the text as a piercing star."},{"mushaf":87,"name":"Al-A'la","meaning":"The Most High","verses":19,"place":"Meccan","trad":8,"noldeke":19,"shift":79,"fact":"Opens \"Glorify the name of your Lord, the Most High,\" a phrase recommended for recitation in specific prayers."},{"mushaf":88,"name":"Al-Ghashiya","meaning":"The Overwhelming","verses":26,"place":"Meccan","trad":68,"noldeke":34,"shift":20,"fact":"\"The Overwhelming\" describes the Day of Judgment enveloping all creation."},{"mushaf":89,"name":"Al-Fajr","meaning":"The Dawn","verses":30,"place":"Meccan","trad":10,"noldeke":35,"shift":79,"fact":"Opens with an oath \"by the dawn\" and closes with one of the Quran's most quoted descriptions of the peaceful soul entering Paradise."},{"mushaf":90,"name":"Al-Balad","meaning":"The City","verses":20,"place":"Meccan","trad":35,"noldeke":11,"shift":55,"fact":"\"The City\" sworn by in its opening oath is understood to be Mecca."},{"mushaf":91,"name":"Ash-Shams","meaning":"The Sun","verses":15,"place":"Meccan","trad":26,"noldeke":16,"shift":65,"fact":"A chain of celestial oaths (sun, moon, day, night) builds to a meditation on the purification of the soul."},{"mushaf":92,"name":"Al-Layl","meaning":"The Night","verses":21,"place":"Meccan","trad":9,"noldeke":10,"shift":83,"fact":"Contrasts the paths of generosity and miserliness."},{"mushaf":93,"name":"Ad-Dhuha","meaning":"The Morning Hours","verses":11,"place":"Meccan","trad":11,"noldeke":13,"shift":82,"fact":"Traditionally said to have been revealed to reassure Muhammad after a pause in revelation had left him distressed."},{"mushaf":94,"name":"Ash-Sharh","meaning":"The Relief","verses":8,"place":"Meccan","trad":12,"noldeke":12,"shift":82,"fact":"Closely linked in theme and occasion to the surah before it (Ad-Dhuha); contains the well-known line \"with hardship comes ease.\""},{"mushaf":95,"name":"At-Tin","meaning":"The Fig","verses":8,"place":"Meccan","trad":28,"noldeke":20,"shift":67,"fact":"Swears an oath by the fig and the olive, understood by many commentators as references to lands associated with earlier prophets."},{"mushaf":96,"name":"Al-Alaq","meaning":"The Clot","verses":19,"place":"Meccan","trad":1,"noldeke":1,"shift":95,"fact":"Contains the first five verses ever revealed to Muhammad, traditionally dated to 610 CE in the cave of Hira."},{"mushaf":97,"name":"Al-Qadr","meaning":"The Power","verses":5,"place":"Meccan","trad":25,"noldeke":14,"shift":72,"fact":"Describes \"the Night of Decree\" (Laylat al-Qadr), said in the text to be \"better than a thousand months.\""},{"mushaf":98,"name":"Al-Bayyina","meaning":"The Clear Proof","verses":8,"place":"Medinan","trad":100,"noldeke":92,"shift":-2,"fact":"Despite sitting near the start of the mushaf's final section, it is one of the later-revealed surahs by traditional chronology; addresses the \"People of the Book.\""},{"mushaf":99,"name":"Az-Zalzala","meaning":"The Earthquake","verses":8,"place":"Medinan","trad":93,"noldeke":25,"shift":6,"fact":"Vividly depicts the earth shaking and \"reporting its news\" on the Last Day."},{"mushaf":100,"name":"Al-Adiyat","meaning":"The Chargers","verses":11,"place":"Meccan","trad":14,"noldeke":30,"shift":86,"fact":"Opens with an oath sworn by the sound and imagery of galloping war-horses."},{"mushaf":101,"name":"Al-Qari'a","meaning":"The Calamity","verses":11,"place":"Meccan","trad":30,"noldeke":24,"shift":71,"fact":"\"The Striking Hour,\" another apocalyptic name for Judgment Day, likened to weighed scales of deeds."},{"mushaf":102,"name":"At-Takathur","meaning":"Rivalry in World Increase","verses":8,"place":"Meccan","trad":16,"noldeke":8,"shift":86,"fact":"Warns against being consumed by rivalry in the accumulation of wealth and status."},{"mushaf":103,"name":"Al-Asr","meaning":"The Declining Day","verses":3,"place":"Meccan","trad":13,"noldeke":21,"shift":90,"fact":"Just three verses long, yet the scholar Ash-Shafi'i is reported to have said it alone would suffice as guidance for all of humanity."},{"mushaf":104,"name":"Al-Humaza","meaning":"The Traducer","verses":9,"place":"Meccan","trad":32,"noldeke":6,"shift":72,"fact":"Condemns slander and backbiting, describing the resulting punishment as a \"Crushing Fire.\""},{"mushaf":105,"name":"Al-Fil","meaning":"The Elephant","verses":5,"place":"Meccan","trad":19,"noldeke":9,"shift":86,"fact":"References the \"Year of the Elephant\" (c. 570 CE), when an army with war elephants was repelled from attacking the Kaaba."},{"mushaf":106,"name":"Quraysh","meaning":"Quraysh","verses":4,"place":"Meccan","trad":29,"noldeke":4,"shift":77,"fact":"Addresses the Quraysh tribe directly, referencing their trading caravans and urging gratitude to the protector of the Kaaba."},{"mushaf":107,"name":"Al-Ma'un","meaning":"Small Kindnesses","verses":7,"place":"Meccan","trad":17,"noldeke":7,"shift":90,"fact":"Links true worship to caring for orphans and the needy, condemning empty ritual without compassion."},{"mushaf":108,"name":"Al-Kawthar","meaning":"Abundance","verses":3,"place":"Meccan","trad":15,"noldeke":5,"shift":93,"fact":"At just three verses, it's the shortest surah in the Quran by word count (though tied with two others for fewest verses); named after a river/pool granted to the Prophet, per tradition."},{"mushaf":109,"name":"Al-Kafirun","meaning":"The Disbelievers","verses":6,"place":"Meccan","trad":18,"noldeke":45,"shift":91,"fact":"Its closing line, \"to you your religion, and to me mine\" (109:6), is often cited as a Quranic statement on religious distinctness."},{"mushaf":110,"name":"An-Nasr","meaning":"The Divine Support","verses":3,"place":"Medinan","trad":114,"noldeke":111,"shift":-4,"fact":"Traditionally regarded as the last complete surah revealed, understood by some Companions as a subtle sign of the Prophet's approaching death."},{"mushaf":111,"name":"Al-Masad","meaning":"The Palm Fiber","verses":5,"place":"Meccan","trad":6,"noldeke":3,"shift":105,"fact":"The only surah naming and condemning a specific contemporary opponent by name -- Abu Lahab, an uncle of Muhammad, and his wife."},{"mushaf":112,"name":"Al-Ikhlas","meaning":"The Sincerity","verses":4,"place":"Meccan","trad":22,"noldeke":44,"shift":90,"fact":"Described in a hadith as equivalent in reward to reciting one-third of the Quran, despite being just four verses long."},{"mushaf":113,"name":"Al-Falaq","meaning":"The Daybreak","verses":5,"place":"Meccan","trad":20,"noldeke":46,"shift":93,"fact":"One of the \"Two Refuges\" (Al-Mu'awwidhatayn), traditionally recited together with An-Nas for protection."},{"mushaf":114,"name":"An-Nas","meaning":"Mankind","verses":6,"place":"Meccan","trad":21,"noldeke":47,"shift":93,"fact":"The final surah in the mushaf, closing the Quran with a prayer for refuge from \"the whisperer\" (Satan)."}];
+
+  /* ---------------- helpers ---------------- */
+  function ordinal(n){
+    const j = n % 10, k = n % 100;
+    if(j===1 && k!==11) return n+"st";
+    if(j===2 && k!==12) return n+"nd";
+    if(j===3 && k!==13) return n+"rd";
+    return n+"th";
+  }
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, function(ch){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];
+    });
+  }
+
+  /* ---------------- derived stats ---------------- */
+  const total = DATA.length;
+  const totalVerses = d3.sum(DATA, d=>d.verses);
+  const meccan = DATA.filter(d=>d.place==="Meccan");
+  const medinan = DATA.filter(d=>d.place==="Medinan");
+
+  let biggest = DATA[0];
+  DATA.forEach(d=>{ if(Math.abs(d.shift) > Math.abs(biggest.shift)) biggest = d; });
+
+  const forward = DATA.reduce((a,b)=> b.shift > a.shift ? b : a);
+  const backward = DATA.reduce((a,b)=> b.shift < a.shift ? b : a);
+
+  document.getElementById("stat-surahs-num").textContent = total;
+  document.getElementById("stat-verses-num").textContent = totalVerses.toLocaleString("en-US");
+  document.getElementById("stat-meccan-num").textContent = meccan.length;
+  document.getElementById("stat-medinan-num").textContent = medinan.length;
+  document.getElementById("seg-meccan").style.width = (meccan.length/total*100)+"%";
+  document.getElementById("seg-medinan").style.width = (medinan.length/total*100)+"%";
+  document.getElementById("stat-biggest-num").textContent = Math.abs(biggest.shift);
+  document.getElementById("stat-biggest-label").textContent = biggest.name + "\u2019s shift \u2014 the largest of any surah";
+
+  /* ---------------- chart setup ---------------- */
+  const WIDTH = 1100, HEIGHT = 1600;
+  const MARGIN = {top:70, bottom:26, left:190, right:190};
+  const LANE_X = [MARGIN.left, WIDTH/2, WIDTH-MARGIN.right];
+  const LANE_LABELS = ["Mushaf Order","Traditional Chronology","N\u00f6ldeke Chronology"];
+
+  const yScale = d3.scaleLinear().domain([1,114]).range([MARGIN.top, HEIGHT-MARGIN.bottom]);
+  const rScale = d3.scaleSqrt().domain([3,286]).range([2.5,11]);
+  const lineGen = d3.line().x(d=>d.x).y(d=>d.y).curve(d3.curveBumpX);
+
+  const svg = d3.select("#chart");
+
+  // lane headers
+  svg.selectAll(".lane-label").data(LANE_LABELS).join("text")
+    .attr("class","lane-label")
+    .attr("x",(d,i)=> LANE_X[i])
+    .attr("y", MARGIN.top - 40)
+    .attr("text-anchor",(d,i)=> i===0 ? "start" : i===2 ? "end" : "middle")
+    .text(d=>d);
+
+  svg.selectAll(".lane-range").data(LANE_LABELS).join("text")
+    .attr("class","lane-range")
+    .attr("x",(d,i)=> LANE_X[i])
+    .attr("y", MARGIN.top - 24)
+    .attr("text-anchor",(d,i)=> i===0 ? "start" : i===2 ? "end" : "middle")
+    .text("1 \u2192 114");
+
+  // rank grid
+  const gridG = svg.append("g").attr("class","grid");
+  const rankTicks = d3.range(10,111,10);
+  gridG.selectAll("line").data(rankTicks).join("line")
+    .attr("x1", MARGIN.left-16).attr("x2", WIDTH-MARGIN.right+16)
+    .attr("y1", d=>yScale(d)).attr("y2", d=>yScale(d));
+  gridG.selectAll(".tick-left").data(rankTicks).join("text")
+    .attr("class","tick-left")
+    .attr("x", MARGIN.left-24).attr("y", d=>yScale(d)+3.5)
+    .attr("text-anchor","end").text(d=>d);
+  gridG.selectAll(".tick-right").data(rankTicks).join("text")
+    .attr("class","tick-right")
+    .attr("x", WIDTH-MARGIN.right+24).attr("y", d=>yScale(d)+3.5)
+    .attr("text-anchor","start").text(d=>d);
+
+  // surah groups
+  const surahsG = svg.append("g").attr("class","surahs");
+  const surahs = surahsG.selectAll("g.surah").data(DATA, d=>d.mushaf).join("g")
+    .attr("class", d=> "surah " + d.place.toLowerCase());
+
+  surahs.each(function(d){
+    const g = d3.select(this);
+    const pts = [
+      {x:LANE_X[0], y:yScale(d.mushaf)},
+      {x:LANE_X[1], y:yScale(d.trad)},
+      {x:LANE_X[2], y:yScale(d.noldeke)}
+    ];
+    const path = lineGen(pts);
+    g.append("path").attr("class","hit").attr("d", path);
+    g.append("path").attr("class","line").attr("d", path);
+    g.selectAll("circle").data(pts).join("circle")
+      .attr("cx", p=>p.x).attr("cy", p=>p.y).attr("r", rScale(d.verses));
+  });
+
+  // callouts
+  function wrapTspans(sel, str, maxChars){
+    const words = str.split(" ");
+    const lines = [];
+    let cur = "";
+    words.forEach(w=>{
+      const candidate = (cur + " " + w).trim();
+      if(candidate.length > maxChars && cur){ lines.push(cur); cur = w; }
+      else { cur = candidate; }
+    });
+    if(cur) lines.push(cur);
+    const x = sel.attr("x"), y0 = +sel.attr("y");
+    sel.attr("y", null);
+    lines.forEach((ln,i)=>{
+      sel.append("tspan").attr("x", x).attr("y", y0 + i*13).text(ln);
+    });
+  }
+  function drawCallout(mushafPos, dx, dy, anchor, label){
+    const px = LANE_X[0], py = yScale(mushafPos);
+    const tx = px+dx, ty = py+dy;
+    const g = svg.append("g").attr("class","callout");
+    g.append("line").attr("x1",px).attr("y1",py).attr("x2",tx).attr("y2",ty);
+    g.append("circle").attr("class","callout-dot").attr("cx",px).attr("cy",py).attr("r",2.5);
+    const text = g.append("text").attr("x",tx).attr("y",ty).attr("text-anchor",anchor);
+    wrapTspans(text, label, 28);
+  }
+  drawCallout(forward.mushaf, -40, -34, "end",
+    forward.name + " \u2014 " + ordinal(forward.mushaf) + " in the book, " + ordinal(forward.trad) + " revealed");
+  drawCallout(backward.mushaf, -40, -34, "end",
+    backward.name + " \u2014 " + ordinal(backward.mushaf) + " in the book, " + ordinal(backward.trad) + " revealed");
+
+  /* ---------------- interaction state ---------------- */
+  let activeFilter = null;
+  let focused = null;
+  let pinned = false;
+
+  // ---- Surah images ----
+  // Name files by mushaf number (1.jpg ... 114.jpg) and set IMG_BASE to the folder/CDN holding them,
+  // e.g. "img/" or "https://cdn.jsdelivr.net/gh/USERNAME/REPO@v1/". Leave "" to show placeholders only.
+  // A surah whose image is missing or fails to load keeps its generated placeholder.
+  const IMG_BASE = "https://cdn.jsdelivr.net/gh/amirsohil/surahimages@v3/resized/";
+  const IMG_EXT  = ".jpg";
+  // Optional per-surah overrides (any path/URL), e.g. SURAH_IMAGES[2] = "special/baqara.webp"
+  const SURAH_IMAGES = {};
+  function ttImage(d){
+    const n = d.mushaf;
+    const url = SURAH_IMAGES[n] || (IMG_BASE ? IMG_BASE + n + IMG_EXT : "");
+    const h = (d.place==="Meccan" ? 148 : 176) + ((n*47)%40) - 20;
+    const st = '--h:'+h+';--h2:'+(h+16)+';--mx:'+(12+((n*29)%70))+'%;--my:'+(20+((n*13)%26))+'%;--hx:'+(14+((n*23)%60))+'%';
+    const img = url ? '<img src="'+escapeHtml(url)+'" alt="" onload="this.parentNode.dataset.ok=1" onerror="this.remove()">' : '';
+    return '<div class="tt-image placeholder" style="'+st+'"><span>Surah '+n+' \u00b7 image</span>'+img+'</div>';
+  }
+  const tooltipEl = document.getElementById("tooltip");
+  const searchInput = document.getElementById("search");
+  const suggestionsEl = document.getElementById("suggestions");
+  const clearBtn = document.getElementById("clear-search");
+
+  function applyState(){
+    surahs.each(function(d){
+      const passesFilter = !activeFilter || d.place === activeFilter;
+      const isFocused = d === focused;
+      let opacity;
+      if(!passesFilter){ opacity = 0.035; }
+      else if(focused){ opacity = isFocused ? 1 : 0.07; }
+      else { opacity = 1; }
+      this.style.opacity = opacity;
+      this.style.pointerEvents = passesFilter ? "auto" : "none";
+      this.classList.toggle("active", isFocused);
+    });
+    if(focused){ surahs.filter(d=>d===focused).raise(); }
+  }
+
+  function scholarNote(d){
+    const diff = Math.abs(d.trad - d.noldeke);
+    if(diff >= 20){
+      return '<div class="tt-scholarly">Scholars seem to have a significant disagreement here \u2014 traditional chronology ranks it '+ordinal(d.trad)+
+        ' revealed; N\u00f6ldeke\u2019s reconstruction ranks it '+ordinal(d.noldeke)+' (a gap of '+diff+').</div>';
+    }
+    return "";
+  }
+
+  function renderTooltip(d){
+    const shiftText = d.shift === 0
+      ? "Sits in the same relative position under both orderings."
+      : d.shift > 0
+        ? "Revealed "+Math.abs(d.shift)+" positions earlier than its place in the book suggests."
+        : "Revealed "+Math.abs(d.shift)+" positions later than its place in the book suggests.";
+    const arrow = d.shift > 0 ? "\u25b2" : d.shift < 0 ? "\u25bc" : "\u2014";
+    tooltipEl.innerHTML =
+      ttImage(d)+
+      '<div class="tt-top">'+
+        '<span class="tt-badge '+d.place.toLowerCase()+'">'+d.place+'</span>'+
+        '<span class="tt-verses">'+d.verses+' verse'+(d.verses===1?"":"s")+'</span>'+
+      '</div>'+
+      '<div class="tt-name">'+escapeHtml(d.name)+'</div>'+
+      '<div class="tt-meaning">\u201c'+escapeHtml(d.meaning)+'\u201d</div>'+
+      '<div class="tt-grid">'+
+        '<div><label>Mushaf</label><strong>#'+d.mushaf+'</strong></div>'+
+        '<div><label>Traditional</label><strong>#'+d.trad+'</strong></div>'+
+        '<div><label>N\u00f6ldeke</label><strong>#'+d.noldeke+'</strong></div>'+
+        '<div><label>Net shift</label><strong>'+arrow+' '+Math.abs(d.shift)+'</strong></div>'+
+      '</div>'+
+      '<div class="tt-shift">'+shiftText+'</div>'+
+      scholarNote(d)+
+      '<div class="tt-fact">'+escapeHtml(d.fact)+'</div>';
+  }
+
+  function svgPointToClient(xSvg, ySvg){
+    const rect = document.getElementById("chart").getBoundingClientRect();
+    const scaleX = rect.width / WIDTH, scaleY = rect.height / HEIGHT;
+    return { x: rect.left + xSvg*scaleX, y: rect.top + ySvg*scaleY };
+  }
+
+  function positionTooltipAt(clientX, clientY){
+    const pad = 16;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const ttW = tooltipEl.offsetWidth || 308, ttH = tooltipEl.offsetHeight || 220;
+    let x = clientX + pad, y = clientY + pad;
+    if(x + ttW + pad > vw) x = clientX - ttW - pad;
+    if(y + ttH + pad > vh) y = clientY - ttH - pad;
+    if(x < pad) x = pad;
+    if(y < pad) y = pad;
+    tooltipEl.style.left = x+"px";
+    tooltipEl.style.top = y+"px";
+    // scale in from the point that triggered it, not the card's own center (spatial consistency, §7)
+    tooltipEl.style.setProperty("--tt-origin-x", (clientX - x) + "px");
+    tooltipEl.style.setProperty("--tt-origin-y", (clientY - y) + "px");
+  }
+
+  function hideTooltip(){ tooltipEl.classList.remove("visible"); }
+
+  function scrollToDatum(d){
+    const rect = document.getElementById("chart").getBoundingClientRect();
+    const scaleY = rect.height / HEIGHT;
+    const targetY = rect.top + window.scrollY + yScale(d.mushaf)*scaleY;
+    window.scrollTo({ top: Math.max(targetY - window.innerHeight/2, 0), behavior: REDUCE_MOTION ? "auto" : "smooth" });
+  }
+
+  function selectSurah(d){
+    pinned = true; focused = d;
+    applyState();
+    renderTooltip(d);
+    const pt = svgPointToClient(LANE_X[0], yScale(d.mushaf));
+    positionTooltipAt(pt.x, pt.y);
+    tooltipEl.classList.add("visible");
+    suggestionsEl.classList.remove("open");
+    searchInput.value = d.name;
+    clearBtn.classList.add("show");
+    scrollToDatum(d);
+  }
+
+  /* ---------------- hover / click ---------------- */
+  surahs
+    .on("mouseenter", function(event,d){
+      if(pinned) return;
+      focused = d; applyState();
+      renderTooltip(d);
+      positionTooltipAt(event.clientX, event.clientY);
+      tooltipEl.classList.add("visible");
+    })
+    .on("mousemove", function(event){
+      if(pinned) return;
+      positionTooltipAt(event.clientX, event.clientY);
+    })
+    .on("mouseleave", function(){
+      if(pinned) return;
+      focused = null; applyState(); hideTooltip();
+    })
+    .on("click", function(event,d){
+      event.stopPropagation();
+      if(pinned && focused===d){
+        pinned = false; focused = null; applyState(); hideTooltip();
+        return;
+      }
+      pinned = true; focused = d; applyState();
+      renderTooltip(d);
+      positionTooltipAt(event.clientX, event.clientY);
+      tooltipEl.classList.add("visible");
+      searchInput.value = d.name;
+      clearBtn.classList.add("show");
+    });
+
+  document.body.addEventListener("click", function(){
+    pinned = false; focused = null; applyState(); hideTooltip();
+  });
+
+  /* ---------------- search ---------------- */
+  function renderSuggestions(matches){
+    suggestionsEl.innerHTML = matches.map(d=>
+      '<div class="suggestion-item" data-mushaf="'+d.mushaf+'">'+
+        '<span class="s-name">'+escapeHtml(d.name)+'<span class="s-meaning">\u201c'+escapeHtml(d.meaning)+'\u201d</span></span>'+
+        '<span class="s-num">#'+d.mushaf+'</span>'+
+      '</div>'
+    ).join("");
+    suggestionsEl.classList.toggle("open", matches.length>0);
+  }
+
+  searchInput.addEventListener("input", function(){
+    const q = searchInput.value.trim().toLowerCase();
+    clearBtn.classList.toggle("show", q.length>0);
+    if(!q){ suggestionsEl.classList.remove("open"); suggestionsEl.innerHTML=""; return; }
+    const matches = DATA.filter(d=> d.name.toLowerCase().includes(q) || d.meaning.toLowerCase().includes(q)).slice(0,8);
+    renderSuggestions(matches);
+  });
+
+  searchInput.addEventListener("keydown", function(event){
+    if(event.key === "Escape"){ clearSearch(); }
+    if(event.key === "Enter"){
+      const first = suggestionsEl.querySelector(".suggestion-item");
+      if(first){ selectSurah(DATA.find(x=>x.mushaf===+first.dataset.mushaf)); }
+    }
+  });
+
+  suggestionsEl.addEventListener("click", function(event){
+    const item = event.target.closest(".suggestion-item");
+    if(!item) return;
+    event.stopPropagation();
+    selectSurah(DATA.find(x=>x.mushaf===+item.dataset.mushaf));
+  });
+
+  function clearSearch(){
+    searchInput.value = "";
+    suggestionsEl.classList.remove("open");
+    suggestionsEl.innerHTML = "";
+    clearBtn.classList.remove("show");
+    pinned = false; focused = null; applyState(); hideTooltip();
+  }
+  clearBtn.addEventListener("click", function(event){
+    event.stopPropagation();
+    clearSearch();
+  });
+
+  /* ---------------- legend filter (fluid segmented control) ---------------- */
+  const legendEl = document.getElementById("legend");
+  const legendPill = document.getElementById("legend-pill");
+  const pillX = makeSpring({ dampingRatio: 1, response: 0.32, onUpdate: v => legendPill.style.transform = "translateX(" + v + "px)" });
+  const pillW = makeSpring({ dampingRatio: 1, response: 0.32, onUpdate: v => legendPill.style.width = v + "px" });
+  let pillReady = false;
+
+  function movePillTo(chip, animate){
+    const lr = legendEl.getBoundingClientRect(), cr = chip.getBoundingClientRect();
+    const x = cr.left - lr.left - 3, w = cr.width;
+    if(animate && pillReady){ pillX.to(x); pillW.to(w); }
+    else { pillX.set(x); pillW.set(w); pillReady = true; }
+  }
+
+  function setFilter(place, animatePill){
+    activeFilter = place;
+    document.querySelectorAll(".chip[data-place]").forEach(c=>{
+      const cp = c.dataset.place || null;
+      const isActive = cp === activeFilter;
+      c.classList.toggle("active", isActive);
+      if(isActive) movePillTo(c, animatePill);
+    });
+    applyState();
+  }
+  document.querySelectorAll(".chip[data-place]").forEach(chip=>{
+    chip.addEventListener("click", function(event){
+      event.stopPropagation();
+      const place = chip.dataset.place || null;
+      setFilter(activeFilter === place ? null : place, true);
+    });
+  });
+  window.addEventListener("resize", function(){
+    const activeChip = document.querySelector(".chip.active");
+    if(activeChip) movePillTo(activeChip, false);
+  });
+
+  /* ---------------- stat card jump ---------------- */
+  const statBiggest = document.getElementById("stat-biggest");
+  statBiggest.addEventListener("click", function(event){
+    event.stopPropagation();
+    selectSurah(biggest);
+  });
+  statBiggest.addEventListener("keydown", function(event){
+    if(event.key === "Enter" || event.key === " "){
+      event.preventDefault();
+      event.stopPropagation();
+      selectSurah(biggest);
+    }
+  });
+
+  /* ---------------- scroll reveal ---------------- */
+  const revealEls = document.querySelectorAll(".reveal");
+  if("IntersectionObserver" in window){
+    const revealObs = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add("in");
+          revealObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" });
+    revealEls.forEach(el=> revealObs.observe(el));
+  } else {
+    revealEls.forEach(el=> el.classList.add("in"));
+  }
+
+  /* ---------------- sticky controls edge ---------------- */
+  const stickySentinel = document.getElementById("sticky-sentinel");
+  const stickyControls = document.getElementById("controls-sticky");
+  if("IntersectionObserver" in window && stickySentinel){
+    new IntersectionObserver(function(entries){
+      stickyControls.classList.toggle("stuck", !entries[0].isIntersecting);
+    }, { threshold: 1 }).observe(stickySentinel);
+  }
+
+  /* ---------------- drag-to-pan the wide chart ---------------- */
+  (function(){
+    const area = document.querySelector(".scroll-area");
+    if(!area) return;
+    let dragging = false, startX = 0, startScroll = 0;
+    let lastX = 0, lastT = 0, velocity = 0;
+    let stopMomentum = null;
+
+    area.addEventListener("pointerdown", function(e){
+      if(e.pointerType !== "mouse") return; // touch already scrolls natively; don't fight it
+      if(e.target.closest(".surah") || e.button !== 0) return; // let surah clicks behave normally
+      if(stopMomentum){ stopMomentum(); stopMomentum = null; }
+      dragging = true;
+      area.setPointerCapture(e.pointerId);
+      area.classList.add("dragging");
+      startX = e.clientX; startScroll = area.scrollLeft;
+      lastX = e.clientX; lastT = performance.now(); velocity = 0;
+    });
+
+    area.addEventListener("pointermove", function(e){
+      if(!dragging) return;
+      const now = performance.now();
+      const dt = Math.max(now - lastT, 1);
+      velocity = ((e.clientX - lastX) / dt) * 1000; // px/s, respects gesture velocity (§5)
+      lastX = e.clientX; lastT = now;
+      area.scrollLeft = startScroll - (e.clientX - startX); // 1:1 tracking, glued to the pointer
+    });
+
+    function endDrag(e){
+      if(!dragging) return;
+      dragging = false;
+      area.classList.remove("dragging");
+      try{ area.releasePointerCapture(e.pointerId); }catch(err){}
+      // hand off release velocity as momentum, projecting where the flick is headed (§6)
+      stopMomentum = decayTo(
+        () => area.scrollLeft,
+        v => { area.scrollLeft = v; },
+        -velocity,
+        { min: 0, max: area.scrollWidth - area.clientWidth, onDone: () => { stopMomentum = null; } }
+      );
+    }
+    area.addEventListener("pointerup", endDrag);
+    area.addEventListener("pointercancel", endDrag);
+  })();
+
+  /* ---------------- init ---------------- */
+  setFilter(null);
+  if(document.fonts && document.fonts.ready){
+    document.fonts.ready.then(function(){
+      const ac = document.querySelector(".chip.active");
+      if(ac) movePillTo(ac, false);
+    });
+  }
+})();
+</script>
+</body>
+</html>
