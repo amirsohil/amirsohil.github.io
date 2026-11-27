@@ -149,7 +149,23 @@
     "skills": ["Data Visualisation", "Data Storytelling"],
     "featured": false
   },
-   {
+  {
+    "title": "The Great Reordering",
+    "subtitle": "114 surahs, from page to revelation",
+    "description": "An interactive bump chart following all 114 surahs of the Qur'an from their place in the mushaf to their place in two scholarly chronologies of revelation, with hover cards, search, and Meccan/Medinan filters.",
+    "image": "images/project-cards/thegreatreordering.png",
+    "href": "thegreatreordering.html",
+    "tools": [
+      "D3.js",
+      "HTML"
+    ],
+    "skills": [
+      "Data Visualisation",
+      "Data Storytelling"
+    ],
+    "featured": false
+  },
+  {
     "title": "The Tragic Times",
     "subtitle": "The Titanic, as a 1912 newspaper",
     "description": "A historically styled analytical report exploring how class, age, gender, and fare influenced survival among 418 Titanic passengers \u2014 visualised as a period newspaper front page.",
